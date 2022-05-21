@@ -29,6 +29,18 @@ const Canvas = ({
         const originData = JSON.parse(
           JSON.stringify(data.find((item) => item.index === drawIndex))
         );
+        if (originData.type === "flowline") {
+          const newStartX = Math.min(originData.startX, originData.endX);
+          const newStartY = Math.min(originData.startY, originData.endY);
+          const newEndX = Math.max(originData.startY, originData.endY);
+          const newEndY = Math.max(originData.startY, originData.endY);
+          originData.startX = newStartX;
+          originData.startY = newStartY;
+          originData.x = newStartX;
+          originData.y = newStartY;
+          originData.endX = newEndX;
+          originData.endY = newEndY;
+        }
         const initPoint = JSON.parse(JSON.stringify(originData));
 
         originData.type = "process";
@@ -178,9 +190,9 @@ const Canvas = ({
           newData[index].height = newData[index].startY - endY;
           newData[index].y = endY;
         }
-        console.log(
-          `X/Y: ${newData[index].x}, ${newData[index].y}; end X/Y: ${endX}, ${endY}; W/H: ${newData[index].width}, ${newData[index].height}`
-        );
+        // console.log(
+        //   `X/Y: ${newData[index].x}, ${newData[index].y}; end X/Y: ${endX}, ${endY}; W/H: ${newData[index].width}, ${newData[index].height}`
+        // );
         return newData;
       });
     }
