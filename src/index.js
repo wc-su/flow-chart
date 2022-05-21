@@ -14,9 +14,7 @@ root.render(
     <BrowserRouter>
       <Header />
       <Routes>
-        {/* <Route path="/" element={<Home />} />
-        <Route path="/Chart" element={<Chart />} /> */}
-        <Route path="/" element={<Chart />} />
+        <Route path="/" element={<Home />} />
         <Route path="/Chart" element={<Chart />} />
         <Route
           path="*"

@@ -137,7 +137,7 @@ const Canvas = ({
               strokeDasharray: "0",
             },
             cursor: "move",
-            pointerEvents: "all"
+            pointerEvents: "all",
           },
         ];
 
@@ -178,9 +178,9 @@ const Canvas = ({
           newData[index].height = newData[index].startY - endY;
           newData[index].y = endY;
         }
-        // console.log(
-        //   `X/Y: ${newData[index].x}, ${newData[index].y}; end X/Y: ${endX}, ${endY}; W/H: ${newData[index].width}, ${newData[index].height}`
-        // );
+        console.log(
+          `X/Y: ${newData[index].x}, ${newData[index].y}; end X/Y: ${endX}, ${endY}; W/H: ${newData[index].width}, ${newData[index].height}`
+        );
         return newData;
       });
     }
@@ -251,9 +251,9 @@ const Canvas = ({
     >
       <svg
         className="svg"
-        width="500"
-        height="500"
-        viewBox="0 0 500 500"
+        width="1024"
+        height="1024"
+        viewBox="0 0 1024 1024"
         xmlns="http://www.w3.org/2000/svg"
         data-icon="content"
       >
