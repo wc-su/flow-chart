@@ -27,15 +27,14 @@ const DrawItem = ({ item, drawItemClick, setDrawIndex }) => {
 
   function mouseDown(e) {
     console.log("DrawItem.js -> mouse down", item.index, item.type, e.target);
-    if(item.type === "ellipse") {
-
+    if (item.type === "ellipse") {
     }
   }
   function click(e) {
     console.log("DrawItem.js -> click", item.index, item.type, e.target);
     // console.log("DrawItem.js -> click", item.index);
     drawItemClick.current = true;
-    if(item.type !== "ellipse") {
+    if (item.type !== "ellipse") {
       setDrawIndex(item.index);
     }
   }

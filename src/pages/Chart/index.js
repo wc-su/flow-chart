@@ -33,7 +33,7 @@ const Chart = () => {
           drawType={drawType}
           setDrawType={setDrawType}
         />
-        <div className="side"></div>
+        {/* <div className="side"></div> */}
       </div>
     </div>
   );

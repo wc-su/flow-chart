@@ -49,7 +49,7 @@ const Toolbar = ({ drawType, setDrawType }) => {
 
   return (
     <div className="toolbar" onClick={toolHandle} onMouseOver={mouseOver}>
-      {drawType}
+      {/* {drawType} */}
       <div className="toolbar__group">
         <div>
           100%
