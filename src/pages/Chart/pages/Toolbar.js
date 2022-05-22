@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 // icon
 import { AiOutlineZoomIn, AiOutlineZoomOut } from "react-icons/ai";
@@ -9,72 +9,74 @@ import {
 } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
 
-const Toolbar = ({ drawType, setDrawType }) => {
-  function toolHandle(e) {
-    console.log(e.target.nodeName);
-    if (e.target.nodeName != "DIV") {
-      // console.log(e.target.nodeName, e.target);
-      let element = e.target;
-      if (e.target.nodeName != "svg") {
-        element = e.target.parentElement;
-      }
-      // console.log(element.getAttribute("data-icon"));
+import ToolbarButton from "../components/ToolbarButton";
 
-      const type = element.getAttribute("data-draw");
-      if (type) {
-        setDrawType(type);
-      } else {
-        setDrawType("");
-      }
-    }
+const Toolbar = ({ drawType, setDrawType }) => {
+  const [activeButton, setActiveButton] = useState({});
+
+  if (!drawType && activeButton.purpose === "draw") {
+    setActiveButton({});
+  }
+
+  function toolHandle(e) {
+    // console.log(e.target.nodeName);
+    setActiveButton({});
+    setDrawType("");
   }
 
   function mouseOver(e) {
     // console.log(e.target.nodeName, e.target);
-    if (e.target.nodeName != "DIV") {
-      let element = e.target;
-      if (e.target.nodeName != "svg") {
-        element = e.target.parentElement;
-      }
-      // console.log(element.getAttribute("data-icon"));
-
-      // const type = element.getAttribute("data-draw");
-      // if (type) {
-      //   setDrawType(type);
-      // } else {
-      //   setDrawType("");
-      // }
-    }
   }
 
   return (
     <div className="toolbar" onClick={toolHandle} onMouseOver={mouseOver}>
       {/* {drawType} */}
       <div className="toolbar__group">
-        <div>
-          100%
-          <IoChevronDownSharp data-icon="down" />
-        </div>
+        <ToolbarButton
+          purpose="canvasRate"
+          feature="percent"
+          setDrawType={setDrawType}
+          activeButton={activeButton}
+          setActiveButton={setActiveButton}
+        >
+          100 % <IoChevronDownSharp />
+        </ToolbarButton>
         <div className="separator"></div>
         <div className="toolbar__group">
-          <div>
-            <AiOutlineZoomIn className="react-icon" data-icon="zoomIn" />
-          </div>
-          <div>
-            <AiOutlineZoomOut className="react-icon" data-icon="zoomOut" />
-          </div>
+          <ToolbarButton
+            purpose="canvasRate"
+            feature="zoomIn"
+            setDrawType={setDrawType}
+            activeButton={activeButton}
+            setActiveButton={setActiveButton}
+          >
+            <AiOutlineZoomIn className="react-icon" />
+          </ToolbarButton>
+          <ToolbarButton
+            purpose="canvasRate"
+            feature="zoomOut"
+            setDrawType={setDrawType}
+            activeButton={activeButton}
+            setActiveButton={setActiveButton}
+          >
+            <AiOutlineZoomOut className="react-icon" />
+          </ToolbarButton>
         </div>
       </div>
-      <div className="drawFigure toolbar__group">
-        <div>
+      <div className="toolbar__group">
+        <ToolbarButton
+          purpose="draw"
+          feature="terminal"
+          setDrawType={setDrawType}
+          activeButton={activeButton}
+          setActiveButton={setActiveButton}
+        >
           <svg
             className="svg"
             width="32"
             height="30"
             viewBox="0 0 32 30"
             xmlns="http://www.w3.org/2000/svg"
-            data-icon="terminal"
-            data-draw="terminal"
           >
             <rect
               x="1.44"
@@ -89,16 +91,20 @@ const Toolbar = ({ drawType, setDrawType }) => {
               pointerEvents="all"
             ></rect>
           </svg>
-        </div>
-        <div>
+        </ToolbarButton>
+        <ToolbarButton
+          purpose="draw"
+          feature="process"
+          setDrawType={setDrawType}
+          activeButton={activeButton}
+          setActiveButton={setActiveButton}
+        >
           <svg
             className="svg"
             width="32"
             height="30"
             viewBox="0 0 32 30"
             xmlns="http://www.w3.org/2000/svg"
-            data-icon="process"
-            data-draw="process"
           >
             <rect
               x="1.44"
@@ -111,16 +117,20 @@ const Toolbar = ({ drawType, setDrawType }) => {
               pointerEvents="all"
             ></rect>
           </svg>
-        </div>
-        <div>
+        </ToolbarButton>
+        <ToolbarButton
+          purpose="draw"
+          feature="inputOutput"
+          setDrawType={setDrawType}
+          activeButton={activeButton}
+          setActiveButton={setActiveButton}
+        >
           <svg
             className="svg"
             width="32"
             height="30"
             viewBox="0 0 32 30"
             xmlns="http://www.w3.org/2000/svg"
-            data-icon="inputOutput"
-            data-draw="inputOutput"
           >
             <path
               d="M 1.44 22.08 L 6.24 7.68 L 30.24 7.68 L 25.44 22.08 Z"
@@ -131,16 +141,20 @@ const Toolbar = ({ drawType, setDrawType }) => {
               pointerEvents="all"
             ></path>
           </svg>
-        </div>
-        <div>
+        </ToolbarButton>
+        <ToolbarButton
+          purpose="draw"
+          feature="decision"
+          setDrawType={setDrawType}
+          activeButton={activeButton}
+          setActiveButton={setActiveButton}
+        >
           <svg
             className="svg"
             width="32"
             height="30"
             viewBox="0 0 32 30"
             xmlns="http://www.w3.org/2000/svg"
-            data-icon="decision"
-            data-draw="decision"
           >
             <path
               d="M 15.98 1.36 L 29.58 14.96 L 15.98 28.56 L 2.38 14.96 Z"
@@ -151,16 +165,20 @@ const Toolbar = ({ drawType, setDrawType }) => {
               pointerEvents="all"
             ></path>
           </svg>
-        </div>
-        <div>
+        </ToolbarButton>
+        <ToolbarButton
+          purpose="draw"
+          feature="flowline"
+          setDrawType={setDrawType}
+          activeButton={activeButton}
+          setActiveButton={setActiveButton}
+        >
           <svg
             className="svg"
             width="32"
             height="30"
             viewBox="0 0 32 30"
             xmlns="http://www.w3.org/2000/svg"
-            data-icon="flowline"
-            data-draw="flowline"
           >
             <path
               d="M 5.04 25.2 L 24.15 6.09"
@@ -188,19 +206,37 @@ const Toolbar = ({ drawType, setDrawType }) => {
               pointerEvents="all"
             ></path>
           </svg>
-        </div>
+        </ToolbarButton>
         <div className="separator"></div>
-        <div>
-          <RiDeleteBin6Line className="react-icon" data-icon="delete" />
-        </div>
+        <ToolbarButton
+          purpose="figure"
+          feature="delete"
+          setDrawType={setDrawType}
+          activeButton={activeButton}
+          setActiveButton={setActiveButton}
+        >
+          <RiDeleteBin6Line className="react-icon"/>
+        </ToolbarButton>
         <div className="separator"></div>
         <div className="toolbar__group">
-          <div>
-            <IoArrowUndoOutline className="react-icon" data-icon="undo" />
-          </div>
-          <div>
-            <IoArrowRedoOutline className="react-icon" data-icon="redo" />
-          </div>
+          <ToolbarButton
+            purpose="step"
+            feature="undo"
+            setDrawType={setDrawType}
+            activeButton={activeButton}
+            setActiveButton={setActiveButton}
+          >
+            <IoArrowUndoOutline className="react-icon" />
+          </ToolbarButton>
+          <ToolbarButton
+            purpose="step"
+            feature="redo"
+            setDrawType={setDrawType}
+            activeButton={activeButton}
+            setActiveButton={setActiveButton}
+          >
+            <IoArrowRedoOutline className="react-icon" />
+          </ToolbarButton>
         </div>
       </div>
     </div>

@@ -18,14 +18,20 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      // &:not(:first-child) {
-      //   margin-left: 60px;
-      // }
     }
-    // .drawFigure {
-    //   display: flex;
-    //   align-items: center;
-    // }
+    .toolbar__button {
+      display: flex;
+      align-items: center;
+      height: 30px;
+      border-radius: 5px;
+      padding: 0 2px;
+      cursor: pointer;
+      // background-color: #efeeee;
+      &:hover,
+      &.toolbar__button--active {
+        background-color: #efeeee;
+      }
+    }
     .separator {
       width: 1px;
       height: 20px;
