@@ -1,16 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import DrawItem from "../pages/DrawItem";
 
-const DrawList = ({ data, drawItemClick, setDrawIndex }) => {
-  // let newArray=[];
-
-  // if (selected) {
-  //   // console.log("DrawList.js", data.length, selected, data);
-  //   // newData = [...data];
-  //   let newData = JSON.parse(JSON.stringify(data));
-  //   newArray.push(newData);
-
+const DrawList = ({
+  data,
+  canvasPosition,
+  drawStatus,
+  chartIndex,
+  test,
+}) => {
+  // if (test) {
+  //   console.log("DrawList.js:", test, data);
   // }
   return (
     <g>
@@ -19,8 +19,9 @@ const DrawList = ({ data, drawItemClick, setDrawIndex }) => {
           <DrawItem
             key={item.index}
             item={item}
-            drawItemClick={drawItemClick}
-            setDrawIndex={setDrawIndex}
+            canvasPosition={canvasPosition}
+            drawStatus={drawStatus}
+            chartIndex={chartIndex}
           />
         );
       })}
