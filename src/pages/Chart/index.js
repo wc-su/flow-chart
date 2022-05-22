@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, createContext } from "react";
 
 import "./index.scss";
 import Toolbar from "./pages/Toolbar";
 import Canvas from "./pages/Canvas";
+
+const DataContext = createContext();
+const DataSelectedContext = createContext();
+const DrawTypeContext = createContext();
 
 const Chart = () => {
   const [drawType, setDrawType] = useState("");
@@ -11,32 +15,41 @@ const Chart = () => {
   // 點選
   const [dataSelected, setDataSelected] = useState([]);
 
-  // useEffect(() => {
-  //   // console.log("ussEffect data: drawIndex:", drawIndex.current);
-  // }, [data]);
-
-  // useEffect(() => {
-  //   // console.log("ussEffect drawType:", drawType, drawIndex.current);
-  //   // if (drawType) {
-  //   // }
-  // }, [drawType]);
-
   return (
     <div className="Chart">
-      <Toolbar drawType={drawType} setDrawType={setDrawType} />
-      <div className="main">
-        <Canvas
-          data={data}
-          setData={setData}
-          dataSelected={dataSelected}
-          setDataSelected={setDataSelected}
-          drawType={drawType}
-          setDrawType={setDrawType}
-        />
-        {/* <div className="side"></div> */}
-      </div>
+      <DataContext.Provider value={{ data: data, setData: setData }}>
+        <DataSelectedContext.Provider
+          value={{
+            dataSelected: dataSelected,
+            setDataSelected: setDataSelected,
+          }}
+        >
+          <DrawTypeContext.Provider
+            value={{ drawType: drawType, setDrawType: setDrawType }}
+          >
+            <Toolbar />
+            <div className="main">
+              <Canvas />
+              {/* <div className="side"></div> */}
+            </div>
+          </DrawTypeContext.Provider>
+        </DataSelectedContext.Provider>
+      </DataContext.Provider>
     </div>
   );
 };
 
 export default Chart;
+export { DataContext, DataSelectedContext, DrawTypeContext };
+
+// Chart ( index.js )
+//    |----------------
+//    |               |
+// Toolbar          main
+//    |               |----------
+// ToolbarButton      |         |
+//                 Canvas      side
+//                    |
+//                DrawList
+//                    |
+//                DrawItem
