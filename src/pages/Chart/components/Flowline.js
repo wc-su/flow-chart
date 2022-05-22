@@ -14,7 +14,9 @@ const Flowline = ({ item }) => {
   const arrowY1 = unit * Math.sin((degree2 - 15) * (Math.PI / 180)) + endY;
   const arrowX2 = unit * Math.cos((degree2 + 15) * (Math.PI / 180)) + endX;
   const arrowY2 = unit * Math.sin((degree2 + 15) * (Math.PI / 180)) + endY;
-  // console.log(`end X/Y: ${endX}, ${endY}; ${distance}, ${degree}; new3 X/Y: ${arrowX1}, ${arrowY1}, new4 X/Y: ${arrowX2}, ${arrowY2}`);
+  // console.log(
+  //   `end X/Y: ${endX}, ${endY}; ${distance}, ${degree}; new3 X/Y: ${arrowX1}, ${arrowY1}, new4 X/Y: ${arrowX2}, ${arrowY2}`
+  // );
 
   return (
     <g>
@@ -35,14 +37,16 @@ const Flowline = ({ item }) => {
         strokeMiterlimit={strokeMiterlimit}
         pointerEvents="stroke"
       ></path>
-      <path
-        d={`M ${endX} ${endY} L ${arrowX1} ${arrowY1} L ${arrowX2} ${arrowY2} Z`}
-        fill="rgb(0, 0, 0)"
-        stroke={stroke}
-        strokeWidth={strokeWidth}
-        strokeMiterlimit={strokeMiterlimit}
-        pointerEvents={pointerEvents}
-      ></path>
+      {distance > 0 && (
+        <path
+          d={`M ${endX} ${endY} L ${arrowX1} ${arrowY1} L ${arrowX2} ${arrowY2} Z`}
+          fill="rgb(0, 0, 0)"
+          stroke={stroke}
+          strokeWidth={strokeWidth}
+          strokeMiterlimit={strokeMiterlimit}
+          pointerEvents={pointerEvents}
+        ></path>
+      )}
     </g>
   );
 };
