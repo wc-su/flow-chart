@@ -20,12 +20,41 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
   const moveInitData = useRef();
 
   const { data, setData } = useContext(DataContext);
-  const { dataSelected, setDataSelected } = useContext(DataSelectedContext);
+  const { dataSelected } = useContext(DataSelectedContext);
   const { drawType, setDrawType } = useContext(DrawTypeContext);
+
+  const [screenSize, setScreenSize] = useState({
+    screenWidth: window.innerWidth,
+    screenHeight: window.innerHeight,
+  });
+  // console.log("sssss", screenSize);
 
   const canvasClass = classNames("canvas", {
     crosshair: drawType !== "",
   });
+
+  const canvasStyle = {
+    width: "100%",
+    height: "100%",
+    display: "block",
+    minWidth: `${screenSize.screenWidth}px`,
+    minHeight: `${screenSize.screenHeight - 113}px`,
+  };
+
+  const detectResize = () => {
+    setScreenSize({
+      screenWidth: window.innerWidth,
+      screenHeight: window.innerHeight,
+    });
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", detectResize);
+    // console.log("rrrrr", screenSize);
+    return () => {
+      window.removeEventListener("resize", detectResize);
+    };
+  }, [screenSize]);
 
   useEffect(() => {
     // console.log("Canvas.js -> useEffect canvasRef:", canvasRef);
@@ -68,7 +97,7 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
       // );
 
       drawStatus.current = 1;
-      console.log(" -> change", drawStatus.current, chartIndex.current);
+      // console.log(" -> change", drawStatus.current, chartIndex.current);
       setData((preData) => {
         const x = e.clientX - canvasPosition.current.x;
         const y = e.clientY - canvasPosition.current.y;
@@ -350,9 +379,9 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
       onClick={click}
     >
       <svg
-        className="svg"
-        width="1920"
-        height="1024"
+        style={canvasStyle}
+        // width="1920"
+        // height="1024"
         // viewBox="0 0 1920 1024"
         xmlns="http://www.w3.org/2000/svg"
         data-icon="content"
