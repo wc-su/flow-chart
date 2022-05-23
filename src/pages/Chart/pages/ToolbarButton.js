@@ -1,10 +1,10 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import classNames from "classnames";
 
 import { DrawTypeContext } from "../index";
 import { ActiveButtonContext } from "./Toolbar";
 
-const ToolbarButton = ({ children, purpose, feature }) => {
+const ToolbarButton = ({ children, purpose, feature, chartIndex }) => {
   // console.log(children, purpose, feature);
 
   const { setDrawType } = useContext(DrawTypeContext);

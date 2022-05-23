@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { DataContext, DataSelectedContext, DrawTypeContext } from "../index";
 import DrawList from "../pages/DrawList";
 
-const Canvas = () => {
+const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
   // 取得畫布的起始座標
   const canvasRef = useRef();
   const canvasPosition = useRef({});
@@ -16,9 +16,8 @@ const Canvas = () => {
   // 5: 移動、 7: 移動結束
   // 8: 調整開始、9: 調整、10: 調整結束
   const drawStatus = useRef(0);
-  const chartIndex = useRef(-1);
+
   const moveInitData = useRef();
-  const resizeDirection = useRef("");
 
   const { data, setData } = useContext(DataContext);
   const { dataSelected, setDataSelected } = useContext(DataSelectedContext);
@@ -339,102 +338,6 @@ const Canvas = () => {
     }
     drawStatus.current = 0;
     drawPoint();
-  }
-
-  function drawPoint() {
-    setDataSelected((preData) => {
-      // console.log("wwwww", chartIndex.current);
-      if (chartIndex.current !== -1) {
-        // console.log("xxxx", chartIndex.current, data);
-        const originData = JSON.parse(
-          JSON.stringify(data.find((item) => item.index === chartIndex.current))
-        );
-        // if (originData.type === "flowline") {
-        // console.log(
-        //   "111:",
-        //   data.find((item) => item.index === chartIndex.current)
-        // );
-        const newStartX = Math.min(originData.startX, originData.endX);
-        const newStartY = Math.min(originData.startY, originData.endY);
-        const newEndX = Math.max(originData.startY, originData.endY);
-        const newEndY = Math.max(originData.startY, originData.endY);
-        // console.log("222:", originData);
-        originData.startX = newStartX;
-        originData.startY = newStartY;
-        originData.x = newStartX;
-        originData.y = newStartY;
-        originData.endX = newEndX;
-        originData.endY = newEndY;
-        // console.log("333:", originData);
-        // console.log("");
-        // }
-        const initPoint = JSON.parse(JSON.stringify(originData));
-
-        originData.type = "process";
-        originData.decorate.stroke = "#00a8ff";
-        originData.decorate.strokeDasharray = "3";
-        originData.pointerEvents = "none";
-
-        const newData = [];
-        if(resizeDirection.current !== "") {
-          originData.display = "none";
-        }
-        newData.push(originData);
-
-        const pointWidth = initPoint.width;
-        const pointHeight = initPoint.height;
-        initPoint.decorate.fill = "#00a8ff";
-        initPoint.decorate.stroke = "none";
-        initPoint.type = "ellipse";
-
-        const pointConfig = [
-          { cursor: "nw-resize", x: 0, y: 0 },
-          { cursor: "n-resize", x: 0.5, y: 0 },
-          { cursor: "ne-resize", x: 1, y: 0 },
-          { cursor: "w-resize", x: 0, y: 0.5 },
-          { cursor: "e-resize", x: 1, y: 0.5 },
-          { cursor: "sw-resize", x: 0, y: 1 },
-          { cursor: "s-resize", x: 0.5, y: 1 },
-          { cursor: "se-resize", x: 1, y: 1 },
-        ];
-        // if (resizeDirection.current !== "") {
-        //   newData.push({ ...initPoint });
-        //   const index = newData.length - 1;
-        //   const config = pointConfig.find((element) => element.cursor === resizeDirection.current);
-        //   newData[index].index = uuidv4();
-        //   newData[index].cursor = config.cursor;
-        //   newData[index].startX += pointWidth * config.x;
-        //   newData[index].startY += pointHeight * config.y;
-        //   newData[index].x = newData[index].startX;
-        //   newData[index].y = newData[index].startY;
-        //   newData[index].endX = newData[index].startX;
-        //   newData[index].endY = newData[index].startY;
-        //   newData[index].width = 4;
-        //   newData[index].height = 4;
-        // } else {
-          for (let i = 1; i <= pointConfig.length; i++) {
-            newData.push({ ...initPoint });
-            newData[i].index = uuidv4();
-            newData[i].cursor = pointConfig[i - 1].cursor;
-            newData[i].startX += pointWidth * pointConfig[i - 1].x;
-            newData[i].startY += pointHeight * pointConfig[i - 1].y;
-            newData[i].x = newData[i].startX;
-            newData[i].y = newData[i].startY;
-            newData[i].endX = newData[i].startX;
-            newData[i].endY = newData[i].startY;
-            newData[i].width = 4;
-            newData[i].height = 4;
-            if(resizeDirection.current !== "") {
-              // console.log("aaaa", resizeDirection.current);
-              newData[i].display = pointConfig[i - 1].cursor === resizeDirection.current ? "block": "none";
-            }
-          }
-        // }
-        return newData;
-      } else {
-        return preData.length > 0 ? [] : preData;
-      }
-    });
   }
 
   return (
