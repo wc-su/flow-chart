@@ -20,6 +20,8 @@ const Chart = () => {
   const [data, setData] = useState([]);
   // 點選
   const [dataSelected, setDataSelected] = useState([]);
+  // 步驟
+  const [steps, setSteps] = useState([]);
 
   useEffect(() => {
     // console.log("qqq", activeButton, chartIndex.current);
@@ -33,6 +35,10 @@ const Chart = () => {
         setData((preData) => {
           return preData.filter((item) => item.index !== chartIndex.current);
         });
+      }
+      if (activeButton.purpose === "step" && activeButton.feature === "undo") {
+      }
+      if (activeButton.purpose === "step" && activeButton.feature === "redo") {
       }
     }
   }, [activeButton]);
@@ -59,26 +65,30 @@ const Chart = () => {
         //   "111:",
         //   data.find((item) => item.index === chartIndex.current)
         // );
-        const newStartX = Math.min(originData.startX, originData.endX);
-        const newStartY = Math.min(originData.startY, originData.endY);
-        const newEndX = Math.max(originData.startY, originData.endY);
-        const newEndY = Math.max(originData.startY, originData.endY);
-        // console.log("222:", originData);
-        originData.startX = newStartX;
-        originData.startY = newStartY;
-        originData.x = newStartX;
-        originData.y = newStartY;
-        originData.endX = newEndX;
-        originData.endY = newEndY;
+        if (originData.type !== "flowline") {
+          const newStartX = Math.min(originData.startX, originData.endX);
+          const newStartY = Math.min(originData.startY, originData.endY);
+          const newEndX = Math.max(originData.startY, originData.endY);
+          const newEndY = Math.max(originData.startY, originData.endY);
+          // console.log("222:", originData);
+          originData.startX = newStartX;
+          originData.startY = newStartY;
+          originData.x = newStartX;
+          originData.y = newStartY;
+          originData.endX = newEndX;
+          originData.endY = newEndY;
+        }
         // console.log("333:", originData);
         // console.log("");
         // }
         const initPoint = JSON.parse(JSON.stringify(originData));
 
-        originData.type = "process";
-        originData.decorate.stroke = "#00a8ff";
-        originData.decorate.strokeDasharray = "3";
-        originData.pointerEvents = "none";
+        if (originData.type !== "flowline") {
+          originData.type = "process";
+          originData.decorate.stroke = "#00a8ff";
+          originData.decorate.strokeDasharray = "3";
+          originData.pointerEvents = "none";
+        }
 
         const newData = [];
         if (resizeDirection.current !== "") {
@@ -91,6 +101,8 @@ const Chart = () => {
         initPoint.decorate.fill = "#00a8ff";
         initPoint.decorate.stroke = "none";
         initPoint.type = "ellipse";
+        initPoint.width = 4;
+        initPoint.height = 4;
 
         const pointConfig = [
           { cursor: "nw-resize", x: 0, y: 0 },
@@ -102,23 +114,54 @@ const Chart = () => {
           { cursor: "s-resize", x: 0.5, y: 1 },
           { cursor: "se-resize", x: 1, y: 1 },
         ];
-        for (let i = 1; i <= pointConfig.length; i++) {
+        const linePointConfig = [
+          { cursor: "start-resize", x: 0, y: 0 },
+          { cursor: "end-resize", x: 1, y: 1 },
+        ];
+        if (originData.type === "flowline") {
           newData.push({ ...initPoint });
-          newData[i].index = uuidv4();
-          newData[i].cursor = pointConfig[i - 1].cursor;
-          newData[i].startX += pointWidth * pointConfig[i - 1].x;
-          newData[i].startY += pointHeight * pointConfig[i - 1].y;
-          newData[i].x = newData[i].startX;
-          newData[i].y = newData[i].startY;
-          newData[i].endX = newData[i].startX;
-          newData[i].endY = newData[i].startY;
-          newData[i].width = 4;
-          newData[i].height = 4;
-          if (resizeDirection.current !== "") {
-            newData[i].display =
-              pointConfig[i - 1].cursor === resizeDirection.current
-                ? "block"
-                : "none";
+          newData[1].index = uuidv4();
+          newData[1].cursor = linePointConfig[0].cursor;
+          newData[1].x = newData[1].startX;
+          newData[1].y = newData[1].startY;
+          newData[1].endX = newData[1].startX;
+          newData[1].endY = newData[1].startY;
+          if (
+            resizeDirection.current &&
+            resizeDirection.current !== linePointConfig[0].cursor
+          ) {
+            newData[1].display = "none";
+          }
+          newData.push({ ...initPoint });
+          newData[2].index = uuidv4();
+          newData[2].cursor = linePointConfig[1].cursor;
+          newData[2].startX = newData[2].endX;
+          newData[2].startY = newData[2].endY;
+          newData[2].x = newData[2].endX;
+          newData[2].y = newData[2].endY;
+          if (
+            resizeDirection.current &&
+            resizeDirection.current !== linePointConfig[1].cursor
+          ) {
+            newData[2].display = "none";
+          }
+        } else {
+          for (let i = 1; i <= pointConfig.length; i++) {
+            newData.push({ ...initPoint });
+            newData[i].index = uuidv4();
+            newData[i].cursor = pointConfig[i - 1].cursor;
+            newData[i].startX += pointWidth * pointConfig[i - 1].x;
+            newData[i].startY += pointHeight * pointConfig[i - 1].y;
+            newData[i].x = newData[i].startX;
+            newData[i].y = newData[i].startY;
+            newData[i].endX = newData[i].startX;
+            newData[i].endY = newData[i].startY;
+            if (resizeDirection.current) {
+              newData[i].display =
+                pointConfig[i - 1].cursor === resizeDirection.current
+                  ? "block"
+                  : "none";
+            }
           }
         }
         return newData;
@@ -126,31 +169,6 @@ const Chart = () => {
         return preData.length > 0 ? [] : preData;
       }
     });
-  }
-
-  function getWindowDimensions() {
-    const { innerWidth: width, innerHeight: height } = window;
-    return {
-      width,
-      height,
-    };
-  }
-
-  function useWindowDimensions() {
-    const [windowDimensions, setWindowDimensions] = useState(
-      getWindowDimensions()
-    );
-
-    useEffect(() => {
-      function handleResize() {
-        setWindowDimensions(getWindowDimensions());
-      }
-
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
-    }, []);
-
-    return windowDimensions;
   }
 
   return (

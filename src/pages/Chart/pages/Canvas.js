@@ -38,7 +38,7 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
     height: "100%",
     display: "block",
     minWidth: `${screenSize.screenWidth}px`,
-    minHeight: `${screenSize.screenHeight - 113}px`,
+    minHeight: `${screenSize.screenHeight - canvasPosition.current.y}px`,
   };
 
   const detectResize = () => {
@@ -131,7 +131,7 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
 
         return newData;
       });
-    } else if (drawStatus.current === 5) {
+    } else if (drawStatus.current === 5 || drawStatus.current === 8) {
       drawPoint();
       moveInitData.current = {
         item: JSON.parse(
@@ -142,19 +142,6 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
         mouseStartX: e.clientX,
         mouseStartY: e.clientY,
       };
-      // console.log(moveInitData);
-    } else if (drawStatus.current === 8) {
-      moveInitData.current = {
-        item: JSON.parse(
-          JSON.stringify(
-            data.find((element) => element.index === chartIndex.current)
-          )
-        ),
-        mouseStartX: e.clientX,
-        mouseStartY: e.clientY,
-      };
-      drawPoint();
-      // console.log(moveInitData.current.item);
     }
   }
   function mouseMove(e) {
@@ -254,8 +241,16 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
         let endX = e.clientX - canvasPosition.current.x;
         let endY = e.clientY - canvasPosition.current.y;
 
-        newItem.endX = endX;
-        newItem.endY = endY;
+        if (resizeDirection.current === "start-resize") {
+          newItem.startX = endX;
+          newItem.startY = endY;
+        } else if (resizeDirection.current === "end-resize") {
+          newItem.endX = endX;
+          newItem.endY = endY;
+        } else {
+          newItem.endX = endX;
+          newItem.endY = endY;
+        }
         if (!["n-resize", "s-resize"].includes(resizeDirection.current)) {
           if (endX >= newItem.startX) {
             newItem.width = endX - newItem.startX;
@@ -271,6 +266,10 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
             newItem.height = newItem.startY - endY;
             newItem.y = endY;
           }
+        }
+        if (resizeDirection.current === "start-resize") {
+          newItem.width = Math.abs(newItem.startX - newItem.endX);
+          newItem.height = Math.abs(newItem.startY - newItem.endY);
         }
         return newData;
       });
