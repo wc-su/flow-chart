@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { DataContext, DataSelectedContext, DrawTypeContext } from "../index";
 import DrawList from "../pages/DrawList";
 
-const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
+const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
   // 取得畫布的起始座標
   const canvasRef = useRef();
   const canvasPosition = useRef({});
@@ -65,12 +65,12 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
   }, [canvasRef]);
 
   useEffect(() => {
-    console.log(
-      "Canvas.js -> ussEffect data:",
-      drawStatus.current,
-      data.length,
-      data.length > 0 ? data[data.length - 1].index : -1
-    );
+    // console.log(
+    //   "Canvas.js -> ussEffect data:",
+    //   drawStatus.current,
+    //   data.length,
+    //   data.length > 0 ? data[data.length - 1].index : -1
+    // );
     if (drawStatus.current === 2) {
       // drawPoint();
     } else if (drawStatus.current === 5) {
@@ -86,7 +86,7 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
     if (![5, 8].includes(drawStatus.current)) {
       drawStatus.current = 0;
     }
-    console.log("Canvas.js -> mouse down", drawStatus.current);
+    // console.log("Canvas.js -> mouse down", drawStatus.current);
     if (drawStatus.current === 0 && drawType) {
       // console.log(
       //   `Screen X/Y: ${e.screenX}, ${e.screenY}, Client X/Y: ${e.clientX}, ${
@@ -276,12 +276,12 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
     }
   }
   function mouseUp(e) {
-    console.log(
-      "Canvas.js -> mouse up",
-      drawStatus.current,
-      chartIndex.current,
-      drawType
-    );
+    // console.log(
+    //   "Canvas.js -> mouse up",
+    //   drawStatus.current,
+    //   chartIndex.current,
+    //   drawType
+    // );
     if (drawStatus.current === 1) {
       setData((preData) => {
         // console.log("33333", drawStatus.current);
@@ -341,16 +341,17 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
         return newData;
       });
     }
+    needSaveStep.current = true;
   }
   function click(e) {
     // console.log(`click: ${e.target}, ${e.target.nodeName}`);
-    console.log(
-      "Canvas.js -> click:",
-      drawStatus.current,
-      chartIndex.current
-      // e.target.nodeName
-      // e.target
-    );
+    // console.log(
+    //   "Canvas.js -> click:",
+    //   drawStatus.current,
+    //   chartIndex.current
+    //   // e.target.nodeName
+    //   // e.target
+    // );
     // setPointArea();
 
     if (drawStatus.current === 2) {

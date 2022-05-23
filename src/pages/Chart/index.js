@@ -21,10 +21,18 @@ const Chart = () => {
   // 點選
   const [dataSelected, setDataSelected] = useState([]);
   // 步驟
-  const [steps, setSteps] = useState([]);
+  const [steps, setSteps] = useState([[]]);
+  const nowStep = useRef(-1);
+  const needSaveStep = useRef(false);
+  const stepChangeData = useRef(false);
 
   useEffect(() => {
-    // console.log("qqq", activeButton, chartIndex.current);
+    // console.log(
+    //   "Chart.js -> ussEffect activeButton:",
+    //   activeButton,
+    //   chartIndex.current,
+    //   nowStep.current
+    // );
     if (activeButton && Object.keys(activeButton).length !== 0) {
       if (
         activeButton.purpose === "figure" &&
@@ -35,36 +43,116 @@ const Chart = () => {
         setData((preData) => {
           return preData.filter((item) => item.index !== chartIndex.current);
         });
-      }
-      if (activeButton.purpose === "step" && activeButton.feature === "undo") {
-      }
-      if (activeButton.purpose === "step" && activeButton.feature === "redo") {
+      } else if (
+        activeButton.purpose === "step" &&
+        activeButton.feature === "undo"
+      ) {
+        console.log(" -> undo", nowStep.current, steps);
+        tempFlag.current = true;
+        setData((preData) => {
+          if (nowStep.current > 0) {
+            stepChangeData.current = true;
+            // nowStep.current--;
+            return steps[nowStep.current - 1];
+          } else {
+            console.log("no step records - undo");
+            tempFlag.current = false;
+            setActiveButton({});
+            return preData;
+          }
+        });
+      } else if (
+        activeButton.purpose === "step" &&
+        activeButton.feature === "redo"
+      ) {
+        tempFlag.current = true;
+        console.log(" -> redo", nowStep.current, steps);
+        setData((preData) => {
+          if (nowStep.current + 1 >= steps.length) {
+            console.log("no step records - redo");
+            tempFlag.current = false;
+            setActiveButton({});
+            return preData;
+          } else {
+            stepChangeData.current = true;
+            // nowStep.current++;
+            return steps[nowStep.current + 1];
+          }
+        });
       }
     }
   }, [activeButton]);
 
   useEffect(() => {
+    // console.log(
+    //   "Chart.js -> ussEffect data:",
+    //   data.length,
+    //   needSaveStep.current,
+    //   nowStep.current
+    // );
     if (tempFlag.current) {
-      chartIndex.current = -1;
+      if (
+        activeButton.purpose === "figure" &&
+        activeButton.feature === "delete"
+      ) {
+        chartIndex.current = -1;
+      }
       drawPoint();
       tempFlag.current = false;
       setActiveButton({});
     }
+    // 儲存步驟
+    if (needSaveStep.current) {
+      console.log(
+        "Chart.js -> ussEffect data:",
+        data.length,
+        needSaveStep.current,
+        nowStep.current
+      );
+      setSteps((preData) => {
+        const newData = JSON.parse(JSON.stringify(preData));
+
+        // console.log("aaaaaaa:", nowStep.current, newData);
+        // for (let i = nowStep.current + 1; i < newData.length; i++) {
+        //   console.log(" -> remove");
+        //   newData.pop();
+        // }
+        // console.log("bbbbbbb:", nowStep.current, newData);
+        
+        newData.push(data);
+        nowStep.current = newData.length - 1;
+        return newData;
+      });
+      needSaveStep.current = false;
+    }
+    // 讀取步驟，重新畫 points
+    if (stepChangeData.current) {
+      if (activeButton.feature === "undo") {
+        nowStep.current--;
+      } else if (activeButton.feature === "redo") {
+        nowStep.current++;
+      }
+      drawPoint();
+      stepChangeData.current = false;
+    }
   }, [data]);
+
+  useEffect(() => {
+    console.log(" ****** Chart.js -> ussEffect steps:", nowStep.current, steps);
+  }, [steps]);
 
   function drawPoint() {
     setDataSelected((preData) => {
       // console.log("wwwww", chartIndex.current);
-      if (chartIndex.current !== -1) {
+      let originItem = data.find((item) => item.index === chartIndex.current);
+      if (chartIndex.current !== -1 && originItem) {
         // console.log("xxxx", chartIndex.current, data);
-        const originData = JSON.parse(
-          JSON.stringify(data.find((item) => item.index === chartIndex.current))
-        );
         // if (originData.type === "flowline") {
         // console.log(
         //   "111:",
         //   data.find((item) => item.index === chartIndex.current)
         // );
+        const originData = JSON.parse(JSON.stringify(originItem));
         if (originData.type !== "flowline") {
           const newStartX = Math.min(originData.startX, originData.endX);
           const newStartY = Math.min(originData.startY, originData.endY);
@@ -193,6 +281,7 @@ const Chart = () => {
                 chartIndex={chartIndex}
                 drawPoint={drawPoint}
                 resizeDirection={resizeDirection}
+                needSaveStep={needSaveStep}
               />
               {/* <div className="side"></div> */}
             </div>
