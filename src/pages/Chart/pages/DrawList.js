@@ -7,6 +7,7 @@ const DrawList = ({
   canvasPosition,
   drawStatus,
   chartIndex,
+  resizeDirection,
   test,
 }) => {
   // if (test) {
@@ -22,6 +23,7 @@ const DrawList = ({
             canvasPosition={canvasPosition}
             drawStatus={drawStatus}
             chartIndex={chartIndex}
+            resizeDirection={resizeDirection}
           />
         );
       })}

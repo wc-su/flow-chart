@@ -18,6 +18,7 @@ const Canvas = () => {
   const drawStatus = useRef(0);
   const chartIndex = useRef(-1);
   const moveInitData = useRef();
+  const resizeDirection = useRef("");
 
   const { data, setData } = useContext(DataContext);
   const { dataSelected, setDataSelected } = useContext(DataSelectedContext);
@@ -36,15 +37,17 @@ const Canvas = () => {
   }, [canvasRef]);
 
   useEffect(() => {
-    // console.log(
-    //   "Canvas.js -> ussEffect data:",
-    //   drawStatus.current,
-    //   data.length,
-    //   data.length > 0 ? data[data.length - 1].index : -1
-    // );
+    console.log(
+      "Canvas.js -> ussEffect data:",
+      drawStatus.current,
+      data.length,
+      data.length > 0 ? data[data.length - 1].index : -1
+    );
     if (drawStatus.current === 2) {
       // drawPoint();
     } else if (drawStatus.current === 5) {
+      drawPoint();
+    } else if (drawStatus.current === 8) {
       drawPoint();
     } else if (drawStatus.current === 9) {
       drawPoint();
@@ -52,6 +55,9 @@ const Canvas = () => {
   }, [data]);
 
   function mouseDown(e) {
+    if (![5, 8].includes(drawStatus.current)) {
+      drawStatus.current = 0;
+    }
     console.log("Canvas.js -> mouse down", drawStatus.current);
     if (drawStatus.current === 0 && drawType) {
       // console.log(
@@ -91,6 +97,7 @@ const Canvas = () => {
             },
             cursor: "move",
             pointerEvents: "all",
+            display: "block",
           },
         ];
 
@@ -100,12 +107,26 @@ const Canvas = () => {
       drawPoint();
       moveInitData.current = {
         item: JSON.parse(
-          JSON.stringify(data.find((element) => element.index === chartIndex.current))
+          JSON.stringify(
+            data.find((element) => element.index === chartIndex.current)
+          )
         ),
         mouseStartX: e.clientX,
         mouseStartY: e.clientY,
       };
       // console.log(moveInitData);
+    } else if (drawStatus.current === 8) {
+      moveInitData.current = {
+        item: JSON.parse(
+          JSON.stringify(
+            data.find((element) => element.index === chartIndex.current)
+          )
+        ),
+        mouseStartX: e.clientX,
+        mouseStartY: e.clientY,
+      };
+      drawPoint();
+      // console.log(moveInitData.current.item);
     }
   }
   function mouseMove(e) {
@@ -163,26 +184,65 @@ const Canvas = () => {
         newItem.endY = initItem.endY + distancsY;
         return newData;
       });
-    } else if (drawStatus.current === 9) {
+    } else if (drawStatus.current === 8) {
+      // console.log("zzzzz", resizeDirection.current);
       setData((preData) => {
         const newData = JSON.parse(JSON.stringify(preData));
-        const newItem = newData.find((element) => element.index == chartIndex.current);
+        const newItem = newData.find(
+          (element) => element.index == chartIndex.current
+        );
+        const initItem = moveInitData.current.item;
+        switch (resizeDirection.current) {
+          case "nw-resize":
+            newItem.x = initItem.endX;
+            newItem.y = initItem.endY;
+            newItem.startX = initItem.endX;
+            newItem.startY = initItem.endY;
+            break;
+          case "n-resize":
+            newItem.y = initItem.endY;
+            newItem.startY = initItem.endY;
+            break;
+          case "ne-resize":
+            newItem.y = initItem.endY;
+            newItem.startY = initItem.endY;
+            break;
+          case "w-resize":
+            newItem.x = initItem.endX;
+            newItem.startX = initItem.endX;
+            break;
+          case "e-resize":
+            break;
+          case "sw-resize":
+            newItem.x = initItem.endX;
+            newItem.startX = initItem.endX;
+            break;
+          case "s-resize":
+            break;
+          case "se-resize":
+            break;
+        }
+
         let endX = e.clientX - canvasPosition.current.x;
         let endY = e.clientY - canvasPosition.current.y;
 
         newItem.endX = endX;
         newItem.endY = endY;
-        if (endX >= newItem.startX) {
-          newItem.width = endX - newItem.x;
-        } else {
-          newItem.width = newItem.startX - endX;
-          newItem.x = endX;
+        if (!["n-resize", "s-resize"].includes(resizeDirection.current)) {
+          if (endX >= newItem.startX) {
+            newItem.width = endX - newItem.startX;
+          } else {
+            newItem.width = newItem.startX - endX;
+            newItem.x = endX;
+          }
         }
-        if (endY >= newItem.startY) {
-          newItem.height = endY - newItem.y;
-        } else {
-          newItem.height = newItem.startY - endY;
-          newItem.y = endY;
+        if (!["w-resize", "e-resize"].includes(resizeDirection.current)) {
+          if (endY >= newItem.startY) {
+            newItem.height = endY - newItem.startY;
+          } else {
+            newItem.height = newItem.startY - endY;
+            newItem.y = endY;
+          }
         }
         return newData;
       });
@@ -197,12 +257,13 @@ const Canvas = () => {
     );
     if (drawStatus.current === 1) {
       setData((preData) => {
+        // console.log("33333", drawStatus.current);
         // const newData = [...preData];
         const newData = JSON.parse(JSON.stringify(preData));
         const index = newData.length - 1;
         // console.log("uuu", index, newData);
         // console.log("uuu2", newData[index].x);
-        if (!(drawType === "flowline")) {
+        if (drawType !== "flowline") {
           // console.log("change");
           newData[index].startX = newData[index].x;
           newData[index].startY = newData[index].y;
@@ -220,8 +281,38 @@ const Canvas = () => {
         // console.log(newData);
         return newData;
       });
-
       setDrawType("");
+    } else if (drawStatus.current === 8) {
+      setData((preData) => {
+        // const newData = [...preData];
+        const newData = JSON.parse(JSON.stringify(preData));
+        // const index = newData.length - 1;
+        const newItem = newData.find(
+          (element) => element.index == chartIndex.current
+        );
+        // console.log("uuu", index, newData);
+        // console.log("uuu2", newData[index].x);
+        if (newItem.type !== "flowline") {
+          console.log("change");
+          newItem.startX = newItem.x;
+          newItem.startY = newItem.y;
+          newItem.endX = newItem.x + newItem.width;
+          newItem.endY = newItem.y + newItem.height;
+        }
+
+        resizeDirection.current = "";
+        if (newItem.width === 0 || newItem.height === 0) {
+          // newData.pop();
+          // console.log("yyyyy");
+          drawStatus.current = 10;
+        } else {
+          // console.log("rrrrrr");
+          drawStatus.current = 9;
+        }
+        // console.log(`uuu: ${newData}`);
+        // console.log(newData);
+        return newData;
+      });
     }
   }
   function click(e) {
@@ -237,37 +328,46 @@ const Canvas = () => {
 
     if (drawStatus.current === 2) {
       chartIndex.current = data[data.length - 1].index;
-      drawPoint();
-      drawStatus.current = 0;
     } else if (drawStatus.current === 3) {
       chartIndex.current = -1;
-      drawPoint();
-      drawStatus.current = 0;
+    } else if (drawStatus.current === 5) {
+    } else if (drawStatus.current === 9) {
+    } else if (drawStatus.current === 10) {
+      chartIndex.current = -1;
     } else if (drawStatus.current === 0) {
       chartIndex.current = -1;
-      drawPoint();
     }
+    drawStatus.current = 0;
+    drawPoint();
   }
 
   function drawPoint() {
     setDataSelected((preData) => {
+      // console.log("wwwww", chartIndex.current);
       if (chartIndex.current !== -1) {
-        console.log("xxxx", chartIndex.current, data);
+        // console.log("xxxx", chartIndex.current, data);
         const originData = JSON.parse(
           JSON.stringify(data.find((item) => item.index === chartIndex.current))
         );
-        if (originData.type === "flowline") {
-          const newStartX = Math.min(originData.startX, originData.endX);
-          const newStartY = Math.min(originData.startY, originData.endY);
-          const newEndX = Math.max(originData.startY, originData.endY);
-          const newEndY = Math.max(originData.startY, originData.endY);
-          originData.startX = newStartX;
-          originData.startY = newStartY;
-          originData.x = newStartX;
-          originData.y = newStartY;
-          originData.endX = newEndX;
-          originData.endY = newEndY;
-        }
+        // if (originData.type === "flowline") {
+        // console.log(
+        //   "111:",
+        //   data.find((item) => item.index === chartIndex.current)
+        // );
+        const newStartX = Math.min(originData.startX, originData.endX);
+        const newStartY = Math.min(originData.startY, originData.endY);
+        const newEndX = Math.max(originData.startY, originData.endY);
+        const newEndY = Math.max(originData.startY, originData.endY);
+        // console.log("222:", originData);
+        originData.startX = newStartX;
+        originData.startY = newStartY;
+        originData.x = newStartX;
+        originData.y = newStartY;
+        originData.endX = newEndX;
+        originData.endY = newEndY;
+        // console.log("333:", originData);
+        // console.log("");
+        // }
         const initPoint = JSON.parse(JSON.stringify(originData));
 
         originData.type = "process";
@@ -276,6 +376,9 @@ const Canvas = () => {
         originData.pointerEvents = "none";
 
         const newData = [];
+        if(resizeDirection.current !== "") {
+          originData.display = "none";
+        }
         newData.push(originData);
 
         const pointWidth = initPoint.width;
@@ -294,21 +397,39 @@ const Canvas = () => {
           { cursor: "s-resize", x: 0.5, y: 1 },
           { cursor: "se-resize", x: 1, y: 1 },
         ];
-        // if (drawStatus.current !== 6) {
-        for (let i = 1; i <= pointConfig.length; i++) {
-          newData.push({ ...initPoint });
-          newData[i].index = uuidv4();
-          newData[i].cursor = pointConfig[i - 1].cursor;
-          newData[i].startX += pointWidth * pointConfig[i - 1].x;
-          newData[i].startY += pointHeight * pointConfig[i - 1].y;
-          newData[i].x = newData[i].startX;
-          newData[i].y = newData[i].startY;
-          newData[i].endX = newData[i].startX;
-          newData[i].endY = newData[i].startY;
-          newData[i].width = 4;
-          newData[i].height = 4;
-          // }
-        }
+        // if (resizeDirection.current !== "") {
+        //   newData.push({ ...initPoint });
+        //   const index = newData.length - 1;
+        //   const config = pointConfig.find((element) => element.cursor === resizeDirection.current);
+        //   newData[index].index = uuidv4();
+        //   newData[index].cursor = config.cursor;
+        //   newData[index].startX += pointWidth * config.x;
+        //   newData[index].startY += pointHeight * config.y;
+        //   newData[index].x = newData[index].startX;
+        //   newData[index].y = newData[index].startY;
+        //   newData[index].endX = newData[index].startX;
+        //   newData[index].endY = newData[index].startY;
+        //   newData[index].width = 4;
+        //   newData[index].height = 4;
+        // } else {
+          for (let i = 1; i <= pointConfig.length; i++) {
+            newData.push({ ...initPoint });
+            newData[i].index = uuidv4();
+            newData[i].cursor = pointConfig[i - 1].cursor;
+            newData[i].startX += pointWidth * pointConfig[i - 1].x;
+            newData[i].startY += pointHeight * pointConfig[i - 1].y;
+            newData[i].x = newData[i].startX;
+            newData[i].y = newData[i].startY;
+            newData[i].endX = newData[i].startX;
+            newData[i].endY = newData[i].startY;
+            newData[i].width = 4;
+            newData[i].height = 4;
+            if(resizeDirection.current !== "") {
+              // console.log("aaaa", resizeDirection.current);
+              newData[i].display = pointConfig[i - 1].cursor === resizeDirection.current ? "block": "none";
+            }
+          }
+        // }
         return newData;
       } else {
         return preData.length > 0 ? [] : preData;
@@ -339,6 +460,7 @@ const Canvas = () => {
           canvasPosition={canvasPosition}
           drawStatus={drawStatus}
           chartIndex={chartIndex}
+          resizeDirection={resizeDirection}
           test={true}
         />
         {/* 點選 */}
@@ -347,6 +469,7 @@ const Canvas = () => {
           canvasPosition={canvasPosition}
           drawStatus={drawStatus}
           chartIndex={chartIndex}
+          resizeDirection={resizeDirection}
           test={false}
         />
       </svg>
