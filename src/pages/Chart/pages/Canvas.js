@@ -101,9 +101,10 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
       setData((preData) => {
         const x = e.clientX - canvasPosition.current.x;
         const y = e.clientY - canvasPosition.current.y;
-        const newData = [
-          ...preData,
-          // JSON.parse(JSON.stringify(preData)),
+        const newData = JSON.parse(JSON.stringify(preData));
+        newData.push(
+          // const newData = [
+          //   ...preData,
           {
             index: uuidv4(),
             startX: x,
@@ -126,9 +127,9 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
             cursor: "move",
             pointerEvents: "all",
             display: "block",
-          },
-        ];
-
+          }
+          // ];
+        );
         return newData;
       });
     } else if (drawStatus.current === 5 || drawStatus.current === 8) {

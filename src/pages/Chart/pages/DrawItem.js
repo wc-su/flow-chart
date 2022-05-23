@@ -1,4 +1,4 @@
-import React, { useRef, useContext } from "react";
+import React, { useRef } from "react";
 
 import {
   Terminal,
@@ -8,8 +8,6 @@ import {
   Flowline,
   Ellipse,
 } from "../components/*";
-
-import { DataContext, DataSelectedContext, DrawTypeContext } from "../index";
 
 const DrawItem = ({
   item,
@@ -22,9 +20,6 @@ const DrawItem = ({
   const isItemClicked = useRef(false);
   // const initItem = useRef({});
   // const initStartPosition = useRef({});
-
-  const { data, setData } = useContext(DataContext);
-  const { dataSelected, setDataSelected } = useContext(DataSelectedContext);
 
   const gStyle = { cursor: item.cursor, display: item.display };
   if (["start-resize", "end-resize"].includes(item.cursor)) {

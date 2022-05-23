@@ -14,17 +14,21 @@ const Chart = () => {
   const resizeDirection = useRef("");
   const tempFlag = useRef(false);
 
+  // 步驟記錄
+  const stepRecord = useRef([]);
+  // 目前紀錄
+  const nowStep = useRef(-1);
+  // 需要存取紀錄註記
+  const needSaveStep = useRef(true);
+  //
+  const stepChangeData = useRef(false);
+
   const [drawType, setDrawType] = useState("");
   const [activeButton, setActiveButton] = useState({});
   // 畫圖
   const [data, setData] = useState([]);
   // 點選
   const [dataSelected, setDataSelected] = useState([]);
-  // 步驟
-  const [steps, setSteps] = useState([[]]);
-  const nowStep = useRef(-1);
-  const needSaveStep = useRef(false);
-  const stepChangeData = useRef(false);
 
   useEffect(() => {
     // console.log(
@@ -47,13 +51,12 @@ const Chart = () => {
         activeButton.purpose === "step" &&
         activeButton.feature === "undo"
       ) {
-        console.log(" -> undo", nowStep.current, steps);
+        console.log(" -> undo", nowStep.current, stepRecord.current);
         tempFlag.current = true;
         setData((preData) => {
           if (nowStep.current > 0) {
             stepChangeData.current = true;
-            // nowStep.current--;
-            return steps[nowStep.current - 1];
+            return stepRecord.current[nowStep.current - 1];
           } else {
             console.log("no step records - undo");
             tempFlag.current = false;
@@ -65,18 +68,17 @@ const Chart = () => {
         activeButton.purpose === "step" &&
         activeButton.feature === "redo"
       ) {
+        console.log(" -> redo", nowStep.current, stepRecord.current);
         tempFlag.current = true;
-        console.log(" -> redo", nowStep.current, steps);
         setData((preData) => {
-          if (nowStep.current + 1 >= steps.length) {
+          if (nowStep.current + 1 >= stepRecord.current.length) {
             console.log("no step records - redo");
             tempFlag.current = false;
             setActiveButton({});
             return preData;
           } else {
             stepChangeData.current = true;
-            // nowStep.current++;
-            return steps[nowStep.current + 1];
+            return stepRecord.current[nowStep.current + 1];
           }
         });
       }
@@ -84,12 +86,14 @@ const Chart = () => {
   }, [activeButton]);
 
   useEffect(() => {
+    // console.log("Chart.js -> ussEffect data:", data);
     // console.log(
     //   "Chart.js -> ussEffect data:",
     //   data.length,
     //   needSaveStep.current,
     //   nowStep.current
     // );
+
     if (tempFlag.current) {
       if (
         activeButton.purpose === "figure" &&
@@ -105,24 +109,23 @@ const Chart = () => {
     if (needSaveStep.current) {
       console.log(
         "Chart.js -> ussEffect data:",
-        data.length,
         needSaveStep.current,
-        nowStep.current
+        nowStep.current,
+        stepRecord.current,
+        data.length
       );
-      setSteps((preData) => {
-        const newData = JSON.parse(JSON.stringify(preData));
 
-        // console.log("aaaaaaa:", nowStep.current, newData);
-        // for (let i = nowStep.current + 1; i < newData.length; i++) {
-        //   console.log(" -> remove");
-        //   newData.pop();
-        // }
-        // console.log("bbbbbbb:", nowStep.current, newData);
-        
-        newData.push(data);
-        nowStep.current = newData.length - 1;
-        return newData;
-      });
+      // console.log("aaaaaaa:", nowStep.current, stepRecord.current);
+      for (let i = nowStep.current + 1; i < stepRecord.current.length; i++) {
+        // console.log(" -> remove");
+        stepRecord.current.pop();
+      }
+      // console.log("bbbbbbb:", nowStep.current, stepRecord.current);
+
+      stepRecord.current.push(data);
+      nowStep.current = nowStep.current + 1;
+      // console.log("ccccccc:", nowStep.current, stepRecord.current);
+
       needSaveStep.current = false;
     }
     // 讀取步驟，重新畫 points
@@ -132,14 +135,11 @@ const Chart = () => {
       } else if (activeButton.feature === "redo") {
         nowStep.current++;
       }
+      console.log(" -> step:", nowStep.current);
       drawPoint();
       stepChangeData.current = false;
     }
   }, [data]);
-
-  useEffect(() => {
-    console.log(" ****** Chart.js -> ussEffect steps:", nowStep.current, steps);
-  }, [steps]);
 
   function drawPoint() {
     setDataSelected((preData) => {
