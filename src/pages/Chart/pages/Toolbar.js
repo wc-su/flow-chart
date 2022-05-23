@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, createContext } from "react";
+import React, { useContext, useEffect, createContext } from "react";
 
 // icon
 import { AiOutlineZoomIn, AiOutlineZoomOut } from "react-icons/ai";
