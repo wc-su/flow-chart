@@ -27,6 +27,9 @@ const DrawItem = ({
   const { dataSelected, setDataSelected } = useContext(DataSelectedContext);
 
   const gStyle = { cursor: item.cursor, display: item.display };
+  if (["start-resize", "end-resize"].includes(item.cursor)) {
+    gStyle.cursor = "pointer";
+  }
 
   // const { x, y, width, height, type, startX, startY, endX, endY } = item;
   // console.log("array:", item);
