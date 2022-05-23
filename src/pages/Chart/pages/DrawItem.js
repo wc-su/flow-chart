@@ -16,16 +16,17 @@ const DrawItem = ({
   canvasPosition,
   drawStatus,
   chartIndex,
+  resizeDirection,
 }) => {
   // console.log("DrawItem.js", item);
   const isItemClicked = useRef(false);
-  const initItem = useRef({});
-  const initStartPosition = useRef({});
+  // const initItem = useRef({});
+  // const initStartPosition = useRef({});
 
   const { data, setData } = useContext(DataContext);
   const { dataSelected, setDataSelected } = useContext(DataSelectedContext);
 
-  const gStyle = { cursor: item.cursor };
+  const gStyle = { cursor: item.cursor, display: item.display };
 
   // const { x, y, width, height, type, startX, startY, endX, endY } = item;
   // console.log("array:", item);
@@ -39,6 +40,7 @@ const DrawItem = ({
       item.index,
       chartIndex.current
     );
+    drawStatus.current = 11;
     isItemClicked.current = true;
     // console.log(
     //   ` -> canvas X/Y: ${canvasPosition.current.x}, ${canvasPosition.current.y}; mouse X/Y: ${e.clientX}, ${e.clientY}; X/Y: ${item.x}, ${item.y}; W/H: ${item.width}, ${item.height}`
@@ -50,10 +52,11 @@ const DrawItem = ({
       // initStartPosition.current = { x: e.clientX, y: e.clientY };
     } else {
       drawStatus.current = 8;
+      resizeDirection.current = item.cursor;
       // initItem.current = JSON.parse(
       //   JSON.stringify(data.find((item) => item.index === chartIndex.current))
       // );
-      console.log("qqqq", initItem.current);
+      // console.log("qqqq", initItem.current);
     }
     // console.log(" -> ", initItem.current);
   }
@@ -135,11 +138,11 @@ const DrawItem = ({
       item.type,
       item.index
     );
-    initItem.current = {};
-    initStartPosition.current = {};
+    // initItem.current = {};
+    // initStartPosition.current = {};
     if (item.type !== "ellipse") {
       if (drawStatus.current === 5) {
-      drawStatus.current = 0;
+        drawStatus.current = 0;
       }
     } else {
       // setData((preData) => {
@@ -151,7 +154,6 @@ const DrawItem = ({
       //     newItem.endX = newItem.x + newItem.width;
       //     newItem.endY = newItem.y + newItem.height;
       //   }
-
       //   if (newItem.width === 0 || newItem.height === 0) {
       //     newData.pop();
       //   } else {
@@ -164,8 +166,8 @@ const DrawItem = ({
     // console.log(" -> ", isItemClicked.current);
   }
   function click(e) {
-    e.stopPropagation();
-    console.log("DrawItem.js -> click", item.type, item.index);
+    // e.stopPropagation();
+    // console.log("DrawItem.js -> click", item.type, item.index);
     // console.log("DrawItem.js -> click", item.index);
     if (item.type !== "ellipse") {
     } else {
@@ -196,10 +198,10 @@ const DrawItem = ({
   return (
     <g
       style={gStyle}
-      onClick={click}
+      // onClick={click}
       onMouseDown={mouseDown}
-      onMouseMove={mouseMove}
-      onMouseUp={mouseUp}
+      // onMouseMove={mouseMove}
+      // onMouseUp={mouseUp}
     >
       {drawItem}
     </g>
