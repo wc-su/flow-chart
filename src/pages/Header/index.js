@@ -21,7 +21,9 @@ const Header = () => {
             <a href="#">Log In</a>
           </li>
           <li>
-            <a href="#" className="signup">Sign Up</a>
+            <a href="#" className="signup">
+              Sign Up
+            </a>
           </li>
         </ul>
       </div>
