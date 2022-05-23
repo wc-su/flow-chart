@@ -353,7 +353,7 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection }) => {
         className="svg"
         width="1920"
         height="1024"
-        viewBox="0 0 1920 1024"
+        // viewBox="0 0 1920 1024"
         xmlns="http://www.w3.org/2000/svg"
         data-icon="content"
       >

@@ -11,22 +11,20 @@ import icon5 from "./images/scheme-32.png";
 const Header = () => {
   return (
     <div className="Header">
-      {/* <a href="/" className="logo"> */}
-      <Link to="/" className="logo">
-        {/* <a href="/"> */}
-        <img src={icon5} alt="logo" />
-        <h1>Flow Chart</h1>
-        {/* </a> */}
-        {/* </a> */}
-      </Link>
-      <ul className="menu">
-        <li>
-          <a href="#">Log In</a>
-        </li>
-        <li>
-          <a href="#">Sign Up</a>
-        </li>
-      </ul>
+      <div className="container">
+        <Link to="/" className="logo">
+          <img src={icon5} alt="logo" />
+          <h1>Flow Chart</h1>
+        </Link>
+        <ul className="menu">
+          <li>
+            <a href="#">Log In</a>
+          </li>
+          <li>
+            <a href="#" className="signup">Sign Up</a>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 };
