@@ -14,8 +14,7 @@ import ToolbarButton from "./ToolbarButton";
 
 const ActiveButtonContext = createContext();
 
-const Toolbar = () => {
-  const [activeButton, setActiveButton] = useState({});
+const Toolbar = ({ chartIndex, activeButton, setActiveButton }) => {
   const { drawType, setDrawType } = useContext(DrawTypeContext);
 
   useEffect(() => {
@@ -27,7 +26,9 @@ const Toolbar = () => {
 
   function click(e) {
     // console.log(e.target.nodeName);
-    setActiveButton({});
+    setActiveButton((preData) =>
+      preData.purpose || preData.feature ? {} : preData
+    );
     setDrawType("");
   }
 
@@ -166,7 +167,11 @@ const Toolbar = () => {
             </svg>
           </ToolbarButton>
           <div className="separator"></div>
-          <ToolbarButton purpose="figure" feature="delete">
+          <ToolbarButton
+            purpose="figure"
+            feature="delete"
+            chartIndex={chartIndex}
+          >
             <RiDeleteBin6Line className="react-icon" />
           </ToolbarButton>
           <div className="separator"></div>
