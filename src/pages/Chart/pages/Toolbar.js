@@ -8,13 +8,15 @@ import {
   IoChevronDownSharp,
 } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { FaRegHandPaper } from "react-icons/fa";
 
 import { DrawTypeContext } from "../index";
+import saveAsPng from "../images/png-file-format-symbol.png";
 import ToolbarButton from "./ToolbarButton";
 
 const ActiveButtonContext = createContext();
 
-const Toolbar = ({ chartIndex, activeButton, setActiveButton }) => {
+const Toolbar = ({ canvasRate, chartIndex, activeButton, setActiveButton }) => {
   const { drawType, setDrawType } = useContext(DrawTypeContext);
 
   useEffect(() => {
@@ -40,17 +42,33 @@ const Toolbar = ({ chartIndex, activeButton, setActiveButton }) => {
         {/* {drawType} */}
         <div className="toolbar__group">
           <ToolbarButton purpose="canvasRate" feature="percent">
-            100 % <IoChevronDownSharp />
+            {canvasRate.current} % <IoChevronDownSharp />
           </ToolbarButton>
           <div className="separator"></div>
           <div className="toolbar__group">
-            <ToolbarButton purpose="canvasRate" feature="zoomIn">
+            <ToolbarButton
+              purpose="canvasRate"
+              feature="zoomIn"
+              canvasRate={canvasRate}
+            >
               <AiOutlineZoomIn className="react-icon" />
             </ToolbarButton>
-            <ToolbarButton purpose="canvasRate" feature="zoomOut">
+            <ToolbarButton
+              purpose="canvasRate"
+              feature="zoomOut"
+              canvasRate={canvasRate}
+            >
               <AiOutlineZoomOut className="react-icon" />
             </ToolbarButton>
           </div>
+          <div className="separator"></div>
+          <ToolbarButton purpose="saveFile" feature="png">
+            <img src={saveAsPng} alt="saveAsPng"></img>
+          </ToolbarButton>
+          <div className="separator"></div>
+          <ToolbarButton purpose="move" feature="move">
+            <FaRegHandPaper className="react-icon" />
+          </ToolbarButton>
         </div>
         <div className="toolbar__group">
           <ToolbarButton purpose="draw" feature="terminal">

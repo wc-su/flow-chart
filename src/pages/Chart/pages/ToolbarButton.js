@@ -4,7 +4,13 @@ import classNames from "classnames";
 import { DrawTypeContext } from "../index";
 import { ActiveButtonContext } from "./Toolbar";
 
-const ToolbarButton = ({ children, purpose, feature, chartIndex }) => {
+const ToolbarButton = ({
+  children,
+  purpose,
+  feature,
+  chartIndex,
+  canvasRate,
+}) => {
   // console.log(children, purpose, feature);
 
   const { setDrawType } = useContext(DrawTypeContext);

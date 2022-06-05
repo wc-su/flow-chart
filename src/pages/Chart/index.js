@@ -1,18 +1,27 @@
 import React, { useState, useRef, useEffect, createContext } from "react";
 import { v4 as uuidv4 } from "uuid";
+import toImg from "react-svg-to-image";
+import saveSvgAsPng from "save-svg-as-png";
+console.log(saveSvgAsPng);
 
 import "./index.scss";
 import Toolbar from "./pages/Toolbar";
 import Canvas from "./pages/Canvas";
+import CanvasStyle from "./pages/CanvasStyle";
 
 const DataContext = createContext();
-const DataSelectedContext = createContext();
+// const DataSelectedContext = createContext();
 const DrawTypeContext = createContext();
 
 const Chart = () => {
   const chartIndex = useRef(-1);
   const resizeDirection = useRef("");
   const tempFlag = useRef(false);
+  const canvasBlockRange = useRef({ minX: 0, minY: 0, maxX: 0, maxY: 0 });
+
+  const canvasRate = useRef(100);
+
+  const svgRef = useRef();
 
   // 步驟記錄
   const stepRecord = useRef([]);
@@ -28,7 +37,10 @@ const Chart = () => {
   // 畫圖
   const [data, setData] = useState([]);
   // 點選
-  const [dataSelected, setDataSelected] = useState([]);
+  // const [dataSelected, setDataSelected] = useState([]);
+  const dataSelected = useRef([]);
+
+  const [rerender, setRerender] = useState(false);
 
   useEffect(() => {
     // console.log(
@@ -45,7 +57,11 @@ const Chart = () => {
       ) {
         tempFlag.current = true;
         setData((preData) => {
-          return preData.filter((item) => item.index !== chartIndex.current);
+          const newData = preData.filter(
+            (item) => item.index !== chartIndex.current
+          );
+          drawPoint2(newData);
+          return newData;
         });
       } else if (
         activeButton.purpose === "step" &&
@@ -56,6 +72,7 @@ const Chart = () => {
         setData((preData) => {
           if (nowStep.current > 0) {
             stepChangeData.current = true;
+            drawPoint2(stepRecord.current[nowStep.current - 1]);
             return stepRecord.current[nowStep.current - 1];
           } else {
             console.log("no step records - undo");
@@ -78,9 +95,48 @@ const Chart = () => {
             return preData;
           } else {
             stepChangeData.current = true;
+            drawPoint2(stepRecord.current[nowStep.current + 1]);
             return stepRecord.current[nowStep.current + 1];
           }
         });
+      } else if (
+        activeButton.purpose === "saveFile" &&
+        activeButton.feature === "png"
+      ) {
+        console.log("1111", svgRef.current);
+        saveSvgAsPng.saveSvgAsPng(svgRef.current, "name");
+        // saveSvgAsPng.saveSvgAsPng(svgRef.current, "name", {encoderType: "image/jpeg", encoderOptions: 0.8});
+        setActiveButton({});
+
+        // // 會修改我的 html
+        // // console.log(document.querySelector('#svgXXX'));
+        // toImg("#svgXXX", "name", {
+        //   // scale: 3,
+        //   // format: 'svg',
+        //   // quality: 0.01,
+        //   // download: true,
+        //   // ignore: '.ignored'
+        // }).then((fileData) => {
+        //   console.log("2222", fileData);
+        //   //do something with the data
+        //   setActiveButton({});
+        // });
+      } else if (
+        activeButton.purpose === "canvasRate" &&
+        activeButton.feature === "zoomIn"
+      ) {
+        canvasRate.current += 10;
+        setActiveButton({});
+      } else if (
+        activeButton.purpose === "canvasRate" &&
+        activeButton.feature === "zoomOut"
+      ) {
+        canvasRate.current -= 10;
+        setActiveButton({});
+      } else if (
+        activeButton.purpose === "move" &&
+        activeButton.feature === "move"
+      ) {
       }
     }
   }, [activeButton]);
@@ -101,30 +157,26 @@ const Chart = () => {
       ) {
         chartIndex.current = -1;
       }
-      drawPoint();
+      // drawPoint();
       tempFlag.current = false;
       setActiveButton({});
     }
     // 儲存步驟
     if (needSaveStep.current) {
-      console.log(
-        "Chart.js -> ussEffect data:",
-        needSaveStep.current,
-        nowStep.current,
-        stepRecord.current,
-        data.length
-      );
+      // console.log(
+      //   "Chart.js -> ussEffect data:",
+      //   needSaveStep.current,
+      //   nowStep.current,
+      //   stepRecord.current,
+      //   data.length
+      // );
 
-      // console.log("aaaaaaa:", nowStep.current, stepRecord.current);
       for (let i = nowStep.current + 1; i < stepRecord.current.length; i++) {
-        // console.log(" -> remove");
         stepRecord.current.pop();
       }
-      // console.log("bbbbbbb:", nowStep.current, stepRecord.current);
 
       stepRecord.current.push(data);
       nowStep.current = nowStep.current + 1;
-      // console.log("ccccccc:", nowStep.current, stepRecord.current);
 
       needSaveStep.current = false;
     }
@@ -136,29 +188,21 @@ const Chart = () => {
         nowStep.current++;
       }
       console.log(" -> step:", nowStep.current);
-      drawPoint();
+      // drawPoint();
       stepChangeData.current = false;
     }
   }, [data]);
 
   function drawPoint() {
     setDataSelected((preData) => {
-      // console.log("wwwww", chartIndex.current);
       let originItem = data.find((item) => item.index === chartIndex.current);
       if (chartIndex.current !== -1 && originItem) {
-        // console.log("xxxx", chartIndex.current, data);
-        // if (originData.type === "flowline") {
-        // console.log(
-        //   "111:",
-        //   data.find((item) => item.index === chartIndex.current)
-        // );
         const originData = JSON.parse(JSON.stringify(originItem));
         if (originData.type !== "flowline") {
           const newStartX = Math.min(originData.startX, originData.endX);
           const newStartY = Math.min(originData.startY, originData.endY);
           const newEndX = Math.max(originData.startY, originData.endY);
           const newEndY = Math.max(originData.startY, originData.endY);
-          // console.log("222:", originData);
           originData.startX = newStartX;
           originData.startY = newStartY;
           originData.x = newStartX;
@@ -166,9 +210,7 @@ const Chart = () => {
           originData.endX = newEndX;
           originData.endY = newEndY;
         }
-        // console.log("333:", originData);
-        // console.log("");
-        // }
+
         const initPoint = JSON.parse(JSON.stringify(originData));
 
         if (originData.type !== "flowline") {
@@ -259,50 +301,158 @@ const Chart = () => {
     });
   }
 
+  function drawPoint2(data) {
+    let originItem = data.find((item) => item.index === chartIndex.current);
+    if (chartIndex.current !== -1 && originItem) {
+      const originData = JSON.parse(JSON.stringify(originItem));
+      if (originData.type !== "flowline") {
+        const newStartX = Math.min(originData.startX, originData.endX);
+        const newStartY = Math.min(originData.startY, originData.endY);
+        const newEndX = Math.max(originData.startY, originData.endY);
+        const newEndY = Math.max(originData.startY, originData.endY);
+        originData.startX = newStartX;
+        originData.startY = newStartY;
+        originData.x = newStartX;
+        originData.y = newStartY;
+        originData.endX = newEndX;
+        originData.endY = newEndY;
+      }
+
+      const initPoint = JSON.parse(JSON.stringify(originData));
+
+      if (originData.type !== "flowline") {
+        originData.type = "process";
+        originData.decorate.stroke = "#00a8ff";
+        originData.decorate.strokeDasharray = "3";
+        originData.pointerEvents = "none";
+      }
+
+      const newData = [];
+      if (resizeDirection.current !== "") {
+        originData.display = "none";
+      }
+      newData.push(originData);
+
+      const pointWidth = initPoint.width;
+      const pointHeight = initPoint.height;
+      initPoint.decorate.fill = "#00a8ff";
+      initPoint.decorate.stroke = "none";
+      initPoint.type = "ellipse";
+      initPoint.width = 4;
+      initPoint.height = 4;
+
+      const pointConfig = [
+        { cursor: "nw-resize", x: 0, y: 0 },
+        { cursor: "n-resize", x: 0.5, y: 0 },
+        { cursor: "ne-resize", x: 1, y: 0 },
+        { cursor: "w-resize", x: 0, y: 0.5 },
+        { cursor: "e-resize", x: 1, y: 0.5 },
+        { cursor: "sw-resize", x: 0, y: 1 },
+        { cursor: "s-resize", x: 0.5, y: 1 },
+        { cursor: "se-resize", x: 1, y: 1 },
+      ];
+      const linePointConfig = [
+        { cursor: "start-resize", x: 0, y: 0 },
+        { cursor: "end-resize", x: 1, y: 1 },
+      ];
+      if (originData.type === "flowline") {
+        newData.push({ ...initPoint });
+        newData[1].index = uuidv4();
+        newData[1].cursor = linePointConfig[0].cursor;
+        newData[1].x = newData[1].startX;
+        newData[1].y = newData[1].startY;
+        newData[1].endX = newData[1].startX;
+        newData[1].endY = newData[1].startY;
+        if (
+          resizeDirection.current &&
+          resizeDirection.current !== linePointConfig[0].cursor
+        ) {
+          newData[1].display = "none";
+        }
+        newData.push({ ...initPoint });
+        newData[2].index = uuidv4();
+        newData[2].cursor = linePointConfig[1].cursor;
+        newData[2].startX = newData[2].endX;
+        newData[2].startY = newData[2].endY;
+        newData[2].x = newData[2].endX;
+        newData[2].y = newData[2].endY;
+        if (
+          resizeDirection.current &&
+          resizeDirection.current !== linePointConfig[1].cursor
+        ) {
+          newData[2].display = "none";
+        }
+      } else {
+        for (let i = 1; i <= pointConfig.length; i++) {
+          newData.push({ ...initPoint });
+          newData[i].index = uuidv4();
+          newData[i].cursor = pointConfig[i - 1].cursor;
+          newData[i].startX += pointWidth * pointConfig[i - 1].x;
+          newData[i].startY += pointHeight * pointConfig[i - 1].y;
+          newData[i].x = newData[i].startX;
+          newData[i].y = newData[i].startY;
+          newData[i].endX = newData[i].startX;
+          newData[i].endY = newData[i].startY;
+          if (resizeDirection.current) {
+            newData[i].display =
+              pointConfig[i - 1].cursor === resizeDirection.current
+                ? "block"
+                : "none";
+          }
+        }
+      }
+      dataSelected.current = newData;
+    } else {
+      if (dataSelected.current.length > 0) {
+        dataSelected.current = [];
+      }
+    }
+  }
+
+  function handleRerender() {
+    setRerender((preData) => !preData);
+  }
+
   return (
     <div className="Chart">
       <DataContext.Provider value={{ data: data, setData: setData }}>
-        <DataSelectedContext.Provider
+        {/* <DataSelectedContext.Provider
           value={{
             dataSelected: dataSelected,
             setDataSelected: setDataSelected,
           }}
+        > */}
+        <DrawTypeContext.Provider
+          value={{ drawType: drawType, setDrawType: setDrawType }}
         >
-          <DrawTypeContext.Provider
-            value={{ drawType: drawType, setDrawType: setDrawType }}
-          >
-            <Toolbar
+          <Toolbar
+            canvasRate={canvasRate}
+            chartIndex={chartIndex}
+            activeButton={activeButton}
+            setActiveButton={setActiveButton}
+          />
+          <div className="main">
+            <Canvas
+              canvasRate={canvasRate}
               chartIndex={chartIndex}
-              activeButton={activeButton}
-              setActiveButton={setActiveButton}
+              // drawPoint={drawPoint}
+              resizeDirection={resizeDirection}
+              needSaveStep={needSaveStep}
+              svgRef={svgRef}
+              canvasBlockRange={canvasBlockRange}
+              dataSelected={dataSelected}
+              drawPoint2={drawPoint2}
+              handleRerender={handleRerender}
             />
-            <div className="main">
-              <Canvas
-                chartIndex={chartIndex}
-                drawPoint={drawPoint}
-                resizeDirection={resizeDirection}
-                needSaveStep={needSaveStep}
-              />
-              {/* <div className="side"></div> */}
-            </div>
-          </DrawTypeContext.Provider>
-        </DataSelectedContext.Provider>
+            {/* <CanvasStyle /> */}
+          </div>
+        </DrawTypeContext.Provider>
+        {/* </DataSelectedContext.Provider> */}
       </DataContext.Provider>
     </div>
   );
 };
 
 export default Chart;
-export { DataContext, DataSelectedContext, DrawTypeContext };
-
-// Chart ( index.js )
-//    |----------------
-//    |               |
-// Toolbar          main
-//    |               |----------
-// ToolbarButton      |         |
-//                 Canvas      side
-//                    |
-//                DrawList
-//                    |
-//                DrawItem
+export { DataContext, DrawTypeContext };
+// export { DataContext, DataSelectedContext, DrawTypeContext };
