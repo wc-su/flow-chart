@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 
 import "./index.scss";
@@ -9,11 +9,17 @@ import icon4 from "./images/scheme-64.png";
 import icon5 from "./images/scheme-32.png";
 import User from "../User";
 import { auth, logout as fLogout, onAuthStateChanged } from "../User/firebase";
+// import UserProvider from "../Context/UserProvider.js";
+import { UserContext, UserUpdate } from "../Context/UserProvider.js";
 
 const Header = () => {
   const startFlag = useRef(true);
   const [userLogin, setUserLogin] = useState(false);
-  const [userAction, setUserAction] = useState("");
+  // const [userAction, setUserAction] = useState("");
+
+  const userAction = useContext(UserContext);
+  const setUserAction = useContext(UserUpdate);
+  // console.log("Header:", userAction, ",", setUserAction);
 
   useEffect(() => {
     if (startFlag.current) {
