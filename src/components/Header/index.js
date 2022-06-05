@@ -26,7 +26,7 @@ const Header = () => {
   // 使用者是否登陸
   // const [userLogin, setUserLogin] = useState(false);
 
-  const { userAction } = useContext(userActionContext);
+  const { userAction, setUserAction } = useContext(userActionContext);
   const { userLogin, setUserLogin } = useContext(UserLoginContext);
 
   const location = useLocation();
