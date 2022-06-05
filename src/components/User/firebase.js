@@ -31,7 +31,7 @@ const auth = getAuth(app);
 
 async function loginUseGoogle() {
   const returnResult = { result: false, data: {}, message: "系統錯誤" };
-  console.log("this~~~");
+  // console.log("this~~~");
   try {
     const result = await signInWithPopup(auth, provider);
     // This gives you a Google Access Token. You can use it to access the Google API.
@@ -39,11 +39,11 @@ async function loginUseGoogle() {
     const token = credential.accessToken;
     // The signed-in user info.
     const user = result.user;
-    console.log("token:", token);
-    console.log("user:", user);
-    console.log(" --> ", user.email, user.uid);
-    const ttt = await user.getIdToken();
-    console.log("ttt:", ttt);
+    // console.log("token:", token);
+    // console.log("user:", user);
+    // console.log(" --> ", user.email, user.uid);
+    // const ttt = await user.getIdToken();
+    // console.log("ttt:", ttt);
     returnResult.result = true;
     // returnResult.data = {
     //   uid: user.uid,
@@ -58,11 +58,11 @@ async function loginUseGoogle() {
     const email = error.customData.email;
     // The AuthCredential type that was used.
     const credential = GoogleAuthProvider.credentialFromError(error);
-    console.log("yyy", errorCode, errorMessage, email, credential);
+    // console.log("yyy", errorCode, errorMessage, email, credential);
     returnResult.message = errorMessage;
   }
 
-  console.log("end~~~");
+  // console.log("end~~~");
   return returnResult;
 }
 
@@ -76,7 +76,7 @@ async function SignupUseEmail(email, password) {
       password
     );
     const user = userCredential.user;
-    console.log("xxx2", user);
+    // console.log("xxx2", user);
     returnResult.result = true;
     // returnResult.data = {
     //   uid: user.uid,
@@ -88,7 +88,7 @@ async function SignupUseEmail(email, password) {
   } catch (error) {
     const errorCode = error.code;
     const errorMessage = error.message;
-    console.log("yyy2", errorCode, errorMessage);
+    // console.log("yyy2", errorCode, errorMessage);
     returnResult.message = errorMessage;
   }
   return returnResult;
@@ -110,11 +110,11 @@ async function loginUseEmail(email, password) {
     //   email: user.email,
     // };
     returnResult.message = "登入成功";
-    console.log("xxx3", user);
+    // console.log("xxx3", user);
   } catch (error) {
     const errorCode = error.code;
     const errorMessage = error.message;
-    console.log("yyy3", errorCode, errorMessage);
+    // console.log("yyy3", errorCode, errorMessage);
     returnResult.message = errorMessage;
   }
   return returnResult;
@@ -125,16 +125,16 @@ async function logout() {
   try {
     if (auth.currentUser) {
       await signOut(auth);
-      console.log("Sign-out successful", auth);
+      // console.log("Sign-out successful", auth);
       returnResult.result = true;
       returnResult.message = "登出成功";
     } else {
-      console.log("have been Sign-out", auth);
+      // console.log("have been Sign-out", auth);
     }
   } catch (error) {
     const errorCode = error.code;
     const errorMessage = error.message;
-    console.log("yyy3", errorCode, errorMessage);
+    // console.log("yyy3", errorCode, errorMessage);
     returnResult.message = errorMessage;
   }
   //   await signOut(auth)
@@ -156,7 +156,7 @@ async function verifyEmail() {
   sendEmailVerification(auth.currentUser).then(() => {
     // Email verification sent!
     // ...
-    console.log("what happaned");
+    // console.log("what happaned");
   });
 }
 

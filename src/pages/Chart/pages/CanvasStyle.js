@@ -31,8 +31,7 @@ const CanvasStyle = () => {
           <select name="stroke-style">
             {/* <option value="">--Please choose an option--</option> */}
             <option className="stroke-style--solid" value="solid"></option>
-            <option className="stroke-style--dashed" value="dashed">
-            </option>
+            <option className="stroke-style--dashed" value="dashed"></option>
           </select>
         </div>
         <div className="canvasStyle__container">

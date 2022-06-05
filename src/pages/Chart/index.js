@@ -8,6 +8,7 @@ import "./index.scss";
 import Toolbar from "./pages/Toolbar";
 import Canvas from "./pages/Canvas";
 import CanvasStyle from "./pages/CanvasStyle";
+// import Header from "../../components/Header";
 
 const DataContext = createContext();
 // const DataSelectedContext = createContext();
