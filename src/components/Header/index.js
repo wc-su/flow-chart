@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import "./index.scss";
 import icon from "./images/organization-chart-64.png";
@@ -8,44 +8,59 @@ import icon3 from "./images/flow-chart-32.png";
 import icon4 from "./images/scheme-64.png";
 import icon5 from "./images/scheme-32.png";
 import User from "../User";
-import { auth, logout as fLogout, onAuthStateChanged } from "../User/firebase";
+import {
+  // auth,
+  logout as fLogout,
+  // onAuthStateChanged,
+} from "../../firebase/auth";
 // import UserProvider from "../Context/UserProvider.js";
-import { UserContext, UserUpdate } from "../Context/UserProvider.js";
+import {
+  userActionContext,
+  UserLoginContext,
+} from "../Context/UserProvider.js";
 
 const Header = () => {
-  const startFlag = useRef(true);
-  const [userLogin, setUserLogin] = useState(false);
-  // const [userAction, setUserAction] = useState("");
+  // console.log("header```````");
+  // // 第一次執行
+  // const startFlag = useRef(true);
+  // 使用者是否登陸
+  // const [userLogin, setUserLogin] = useState(false);
 
-  const userAction = useContext(UserContext);
-  const setUserAction = useContext(UserUpdate);
-  // console.log("Header:", userAction, ",", setUserAction);
+  const { userAction } = useContext(userActionContext);
+  const { userLogin, setUserLogin } = useContext(UserLoginContext);
 
-  useEffect(() => {
-    if (startFlag.current) {
-      startFlag.current = false;
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          setUserLogin(true);
-        } else {
-          setUserLogin(false);
-        }
-      });
-    }
-  }, []);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    // console.log("effect: auth: ", userAction, auth.currentUser);
-  }, [userAction]);
+  // useEffect(() => {
+  //   console.log("<<< Header >>>", auth.currentUser);
+  //   if (startFlag.current) {
+  //     startFlag.current = false;
+  //     console.log("lllll");
+  //     onAuthStateChanged(auth, (user) => {
+  //       console.log("ppppp");
+  //       if (user) {
+  //         setUserLogin(true);
+  //         console.log("sssss");
+  //       } else {
+  //         setUserLogin(false);
+  //       }
+  //     });
+  //   }
+  // }, []);
 
   function clickMenu(e) {
     if (e.target.nodeName === "A") {
-      console.log("xxxx", auth);
+      // console.log("xxxx", auth);
       e.preventDefault();
       const action = e.target.getAttribute("data-action");
-      setUserAction(e.target.getAttribute("data-action"));
+      setUserAction(action);
       if (action === "logout") {
         logout();
+        console.log(location.pathname);
+        if (location.pathname === "/Chart") {
+          navigate("/");
+        }
       }
     }
   }
@@ -54,7 +69,7 @@ const Header = () => {
     // await fLogout();
     const result = await fLogout();
     console.log(result);
-    console.log("yyyy", auth.currentUser, auth);
+    // console.log("yyyy", auth.currentUser, auth);
     if (result.result) {
       setUserAction("");
     }
@@ -107,7 +122,7 @@ const Header = () => {
           {menuItems}
         </ul>
       </div>
-      {!auth.currentUser && userAction && (
+      {!userLogin && userAction && (
         <User userAction={userAction} setUserAction={setUserAction} />
       )}
     </div>

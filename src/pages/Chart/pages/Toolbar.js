@@ -10,8 +10,10 @@ import {
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { FaRegHandPaper } from "react-icons/fa";
 
-import { DrawTypeContext } from "../index";
 import saveAsPng from "../images/png-file-format-symbol.png";
+import saveToDB from "../images/save.png";
+
+import { DrawTypeContext } from "../index";
 import ToolbarButton from "./ToolbarButton";
 
 const ActiveButtonContext = createContext();
@@ -70,6 +72,7 @@ const Toolbar = ({ canvasRate, chartIndex, activeButton, setActiveButton }) => {
             <FaRegHandPaper className="react-icon" />
           </ToolbarButton>
         </div>
+        <div className="separator"></div>
         <div className="toolbar__group">
           <ToolbarButton purpose="draw" feature="terminal">
             <svg
@@ -199,6 +202,12 @@ const Toolbar = ({ canvasRate, chartIndex, activeButton, setActiveButton }) => {
             </ToolbarButton>
             <ToolbarButton purpose="step" feature="redo">
               <IoArrowRedoOutline className="react-icon" />
+            </ToolbarButton>
+          </div>
+          <div className="separator"></div>
+          <div className="toolbar__group">
+            <ToolbarButton purpose="save" feature="database">
+              <img src={saveToDB} alt="saveToDB"></img>
             </ToolbarButton>
           </div>
         </div>
