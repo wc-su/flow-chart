@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { app } from "./app";
 import {
   getAuth,
   signInWithPopup,
@@ -11,23 +11,9 @@ import {
   signOut,
 } from "firebase/auth";
 
-// TODO: Replace the following with your app's Firebase project configuration
-// See: https://firebase.google.com/docs/web/learn-more#config-object
-const firebaseConfig = {
-  apiKey: process.env.APIKEY,
-  authDomain: process.env.AUTHDOMAIN,
-  projectId: process.env.PROJECTID,
-  storageBucket: process.env.STORAGEBUCKET,
-  messagingSenderId: process.env.MESSAGINGSENDERID,
-  appId: process.env.APPID,
-  measurementId: process.env.MEASUREMENTID,
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
 const provider = new GoogleAuthProvider();
 const auth = getAuth(app);
+// console.log("uuuuu", auth.currentUser, auth);
 
 async function loginUseGoogle() {
   const returnResult = { result: false, data: {}, message: "系統錯誤" };

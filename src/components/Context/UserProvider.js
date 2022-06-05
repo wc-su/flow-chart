@@ -1,26 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
-const UserContext = React.createContext();
-const UserUpdate = React.createContext();
+import { auth, onAuthStateChanged } from "../../firebase/auth";
+
+const userActionContext = React.createContext();
+const UserLoginContext = React.createContext();
 
 const UserProvider = ({ children }) => {
-  const [userAction, setUserAction] = useState("");
+  // 第一次執行
+  const startFlag = useRef(true);
 
-  // function changeUserAction(action) {
-  //   setUserAction(action);
-  // }
+  const [userAction, setUserAction] = useState("");
+  const [userLogin, setUserLogin] = useState(false);
+
   useEffect(() => {
-    console.log("userAction:", userAction);
-  }, [userAction]);
+    // console.log("<<< Header >>>", auth.currentUser);
+    if (startFlag.current) {
+      startFlag.current = false;
+      // console.log("lllll");
+      onAuthStateChanged(auth, (user) => {
+        // console.log("ppppp");
+        if (user) {
+          setUserLogin(true);
+          // console.log("sssss");
+        } else {
+          setUserLogin(false);
+        }
+      });
+    }
+  }, []);
 
   return (
-    <UserContext.Provider value={userAction}>
-      <UserUpdate.Provider value={setUserAction}>
+    <userActionContext.Provider
+      value={{ userAction: userAction, setUserAction: setUserAction }}
+    >
+      <UserLoginContext.Provider
+        value={{ userLogin: userLogin, setUserLogin: setUserLogin }}
+      >
         {children}
-      </UserUpdate.Provider>
-    </UserContext.Provider>
+      </UserLoginContext.Provider>
+    </userActionContext.Provider>
   );
 };
 
 export default UserProvider;
-export { UserContext, UserUpdate };
+export { userActionContext, UserLoginContext };

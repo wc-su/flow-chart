@@ -1,20 +1,40 @@
-import React, { useState, useRef, useEffect, createContext } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  createContext,
+  useContext,
+} from "react";
 import { v4 as uuidv4 } from "uuid";
-import toImg from "react-svg-to-image";
+import { useNavigate } from "react-router-dom";
+
+// import toImg from "react-svg-to-image";
 import saveSvgAsPng from "save-svg-as-png";
-console.log(saveSvgAsPng);
+// console.log(saveSvgAsPng);
 
 import "./index.scss";
 import Toolbar from "./pages/Toolbar";
 import Canvas from "./pages/Canvas";
 import CanvasStyle from "./pages/CanvasStyle";
-// import Header from "../../components/Header";
+
+import { auth } from "../../firebase/auth";
+import {
+  addChartRecord,
+  addChartRecordByID,
+  getUserRecord,
+} from "../../firebase/database";
+import { UserLoginContext } from "../../components/Context/UserProvider";
 
 const DataContext = createContext();
-// const DataSelectedContext = createContext();
 const DrawTypeContext = createContext();
 
 const Chart = () => {
+  // console.log("chart```````");
+  const navigate = useNavigate();
+
+  const firstLogin = useRef(0);
+  const docID = useRef("");
+
   const chartIndex = useRef(-1);
   const resizeDirection = useRef("");
   const tempFlag = useRef(false);
@@ -42,6 +62,28 @@ const Chart = () => {
   const dataSelected = useRef([]);
 
   const [rerender, setRerender] = useState(false);
+
+  const { userLogin, setUserLogin } = useContext(UserLoginContext);
+
+  useEffect(() => {
+    // console.log("<<< Chart >>>", auth.currentUser);
+    if (auth.currentUser) {
+      // console.log("start ------>");
+      // getUserRecord();
+      // console.log("end ------>");
+    } else {
+      // console.log("leave~~~");
+      navigate("/");
+    }
+    // console.log("wwwwww", userLogin);
+  }, []);
+
+  if (userLogin && firstLogin.current === 0) {
+    // console.log("ssssss");
+    firstLogin.current = 1;
+    // console.log("eeeee", auth.currentUser.uid);
+    getDataFromDB();
+  }
 
   useEffect(() => {
     // console.log(
@@ -123,6 +165,11 @@ const Chart = () => {
         //   setActiveButton({});
         // });
       } else if (
+        activeButton.purpose === "save" &&
+        activeButton.feature === "database"
+      ) {
+        saveToDB();
+      } else if (
         activeButton.purpose === "canvasRate" &&
         activeButton.feature === "zoomIn"
       ) {
@@ -193,6 +240,37 @@ const Chart = () => {
       stepChangeData.current = false;
     }
   }, [data]);
+
+  async function getDataFromDB() {
+    const result = await getUserRecord(auth.currentUser.uid);
+    // console.log(result);
+    if (result.result) {
+      if(result.dataID) {
+        docID.current = result.dataID;
+        setData(result.data);
+        // console.log(result.data);
+      }
+    }
+    // console.log(result.message, result);
+  }
+
+  async function saveToDB() {
+    // console.log("this~~~~", auth.currentUser.uid);
+    if(docID.current) {
+      const result = await addChartRecordByID(auth.currentUser.uid, docID.current, { data });
+      if (result.result) {
+      } else {
+      }
+      // console.log("byID", result.message, result);
+    }else{
+      const result = await addChartRecord(auth.currentUser.uid, { data });
+      if (result.result) {
+        docID.current = result.dataID;
+      } else {
+      }
+      // console.log("firstWrite", result.message, result);
+    }
+  }
 
   function drawPoint() {
     setDataSelected((preData) => {
@@ -417,12 +495,6 @@ const Chart = () => {
   return (
     <div className="Chart">
       <DataContext.Provider value={{ data: data, setData: setData }}>
-        {/* <DataSelectedContext.Provider
-          value={{
-            dataSelected: dataSelected,
-            setDataSelected: setDataSelected,
-          }}
-        > */}
         <DrawTypeContext.Provider
           value={{ drawType: drawType, setDrawType: setDrawType }}
         >
@@ -445,10 +517,9 @@ const Chart = () => {
               drawPoint2={drawPoint2}
               handleRerender={handleRerender}
             />
-            {/* <CanvasStyle /> */}
+            <CanvasStyle />
           </div>
         </DrawTypeContext.Provider>
-        {/* </DataSelectedContext.Provider> */}
       </DataContext.Provider>
     </div>
   );
@@ -456,4 +527,3 @@ const Chart = () => {
 
 export default Chart;
 export { DataContext, DrawTypeContext };
-// export { DataContext, DataSelectedContext, DrawTypeContext };

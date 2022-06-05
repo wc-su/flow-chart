@@ -2,17 +2,14 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 
 import "./index.scss";
-import { auth } from "../../components/User/firebase";
-import { UserUpdate } from "../../components/Context/UserProvider";
+import { auth } from "../../firebase/auth";
+import { userActionContext } from "../../components/Context/UserProvider";
 
 const Home = () => {
-  const setUserAction = useContext(UserUpdate);
-  // console.log("Home:", setUserAction);
+  const { setUserAction } = useContext(userActionContext);
 
   function linkToChart(e) {
-    // console.log("link to chart");
-    if (auth.currentUser) {
-    } else {
+    if (!auth.currentUser) {
       e.preventDefault();
       setUserAction("login");
     }

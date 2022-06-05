@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import "./index.scss";
 
-import { loginUseGoogle, loginUseEmail } from "../firebase";
+import { loginUseGoogle, loginUseEmail } from "../../../firebase/auth";
 
 const Login = ({ setUserAction }) => {
   const [email, setEmail] = useState("");
