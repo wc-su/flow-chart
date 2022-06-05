@@ -16,19 +16,12 @@ const DrawItem = ({
   chartIndex,
   resizeDirection,
 }) => {
-  // console.log("DrawItem.js", item);
   const isItemClicked = useRef(false);
-  // const initItem = useRef({});
-  // const initStartPosition = useRef({});
 
   const gStyle = { cursor: item.cursor, display: item.display };
   if (["start-resize", "end-resize"].includes(item.cursor)) {
     gStyle.cursor = "pointer";
   }
-
-  // const { x, y, width, height, type, startX, startY, endX, endY } = item;
-  // console.log("array:", item);
-  // console.log("array:", x, y, width, height, type, startX, startY, endX, endY);
 
   function mouseDown(e) {
     console.log(
@@ -46,17 +39,10 @@ const DrawItem = ({
     if (item.type !== "ellipse") {
       drawStatus.current = 5;
       chartIndex.current = item.index;
-      // initItem.current = JSON.parse(JSON.stringify(item));
-      // initStartPosition.current = { x: e.clientX, y: e.clientY };
     } else {
       drawStatus.current = 8;
       resizeDirection.current = item.cursor;
-      // initItem.current = JSON.parse(
-      //   JSON.stringify(data.find((item) => item.index === chartIndex.current))
-      // );
-      // console.log("qqqq", initItem.current);
     }
-    // console.log(" -> ", initItem.current);
   }
   function mouseMove(e) {
     // console.log(

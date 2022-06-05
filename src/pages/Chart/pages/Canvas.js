@@ -2,13 +2,29 @@ import React, { useRef, useState, useEffect, useContext } from "react";
 import { v4 as uuidv4 } from "uuid";
 import classNames from "classnames";
 
-import { DataContext, DataSelectedContext, DrawTypeContext } from "../index";
+// import { DataContext, DataSelectedContext, DrawTypeContext } from "../index";
+import { DataContext, DrawTypeContext } from "../index";
 import DrawList from "../pages/DrawList";
 
-const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
+const Canvas = ({
+  canvasRate,
+  chartIndex,
+  // drawPoint,
+  resizeDirection,
+  needSaveStep,
+  svgRef,
+  canvasBlockRange,
+  dataSelected,
+  drawPoint2,
+  handleRerender,
+}) => {
+  const newRate = 100 / canvasRate.current;
+  // console.log("wwwww", canvasRate.current, newRate);
+
   // 取得畫布的起始座標
   const canvasRef = useRef();
   const canvasPosition = useRef({});
+  const svgPos = useRef({});
 
   // 狀態：
   // 0: 初始
@@ -20,28 +36,44 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
   const moveInitData = useRef();
 
   const { data, setData } = useContext(DataContext);
-  const { dataSelected } = useContext(DataSelectedContext);
+  // const { dataSelected } = useContext(DataSelectedContext);
   const { drawType, setDrawType } = useContext(DrawTypeContext);
 
   const [screenSize, setScreenSize] = useState({
     screenWidth: window.innerWidth,
     screenHeight: window.innerHeight,
   });
-  // console.log("sssss", screenSize);
+  // const [screenSizeMinusScroll, setScreenSizeMinusScroll] = useState({
+  //   width: window.innerWidth,
+  //   height: window.innerHeight,
+  // });
+  // const screenSizeMinusScroll = useRef({
+  //   width: canvasRef.current ? canvasRef.current.clientWidth : null
+  // });
 
   const canvasClass = classNames("canvas", {
     crosshair: drawType !== "",
   });
+  // console.log("this", drawType, canvasClass);
+  // const canvasOuterClass = {
+
+  // }
 
   const canvasStyle = {
-    width: "100%",
-    height: "100%",
-    display: "block",
-    minWidth: `${screenSize.screenWidth}px`,
-    minHeight: `${screenSize.screenHeight - canvasPosition.current.y}px`,
+    // width: "100%",
+    // height: "100%",
+    // display: "block",
+    // minWidth: `${screenSize.screenWidth}px`,
+    // minHeight: `${screenSize.screenHeight - canvasPosition.current.y}px`,
+    position: "absolute",
+    top: "0",
+    // top: "10px",
+    left: "0",
+    // cursor: "crosshair"
   };
 
   const detectResize = () => {
+    // console.log("yyyy");
     setScreenSize({
       screenWidth: window.innerWidth,
       screenHeight: window.innerHeight,
@@ -49,18 +81,43 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
   };
 
   useEffect(() => {
+    // console.log("xxxx", screenSize, canvasRef.current);
     window.addEventListener("resize", detectResize);
-    // console.log("rrrrr", screenSize);
     return () => {
       window.removeEventListener("resize", detectResize);
     };
   }, [screenSize]);
 
+  // const detectonScrollResize = () => {
+  //   // console.log("yyyy");
+  //   setScreenSizeMinusScroll({
+  //     screenWidth: window.innerWidth,
+  //     screenHeight: window.innerHeight,
+  //   });
+  // };
+
+  // useEffect(() => {
+  //   console.log("xxxx", screenSize, canvasRef.current, screenSizeMinusScroll.current);
+  //   window.addEventListener("onScroll", detectonScrollResize);
+  //   return () => {
+  //     window.removeEventListener("onScroll", detectonScrollResize);
+  //   };
+  // }, [screenSizeMinusScroll]);
+
   useEffect(() => {
-    // console.log("Canvas.js -> useEffect canvasRef:", canvasRef);
+    // console.log("aaaas", canvasRef);
     if (canvasRef) {
       canvasPosition.current = canvasRef.current.getBoundingClientRect();
-      // console.log("->", canvasPosition.current);
+      svgPos.current = {
+        x: screenSize.screenWidth,
+        y: screenSize.screenHeight - canvasPosition.current.y,
+        width: screenSize.screenWidth * 3,
+        height: (screenSize.screenHeight - canvasPosition.current.y) * 2,
+      };
+
+      // screenSizeMinusScroll.current.width = canvasRef.current.clientWidth;
+      // screenSizeMinusScroll.current.height = canvasRef.current.clientHeight;
+      // console.log("zzzz", canvasPosition.current, screenSizeMinusScroll.current);
     }
   }, [canvasRef]);
 
@@ -71,22 +128,22 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
     //   data.length,
     //   data.length > 0 ? data[data.length - 1].index : -1
     // );
-    if (drawStatus.current === 2) {
-      // drawPoint();
-    } else if (drawStatus.current === 5) {
-      drawPoint();
-    } else if (drawStatus.current === 8) {
-      drawPoint();
-    } else if (drawStatus.current === 9) {
-      drawPoint();
-    }
+    // if (drawStatus.current === 2) {
+    //   // drawPoint();
+    // } else if (drawStatus.current === 5) {
+    //   drawPoint();
+    // } else if (drawStatus.current === 8) {
+    //   drawPoint();
+    // } else if (drawStatus.current === 9) {
+    //   drawPoint();
+    // }
   }, [data]);
 
   function mouseDown(e) {
+    console.log("Canvas.js -> mouse down", drawStatus.current);
     if (![5, 8].includes(drawStatus.current)) {
       drawStatus.current = 0;
     }
-    // console.log("Canvas.js -> mouse down", drawStatus.current);
     if (drawStatus.current === 0 && drawType) {
       // console.log(
       //   `Screen X/Y: ${e.screenX}, ${e.screenY}, Client X/Y: ${e.clientX}, ${
@@ -97,43 +154,40 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
       // );
 
       drawStatus.current = 1;
-      // console.log(" -> change", drawStatus.current, chartIndex.current);
       setData((preData) => {
-        const x = e.clientX - canvasPosition.current.x;
-        const y = e.clientY - canvasPosition.current.y;
+        const x = (e.clientX - canvasPosition.current.x) * newRate;
+        const y = (e.clientY - canvasPosition.current.y) * newRate;
         const newData = JSON.parse(JSON.stringify(preData));
-        newData.push(
-          // const newData = [
-          //   ...preData,
-          {
-            index: uuidv4(),
-            startX: x,
-            startY: y,
-            endX: x,
-            endY: y,
-            x: x,
-            y: y,
-            width: 0,
-            height: 0,
-            type: drawType,
-            decorate: {
-              fill: "rgb(255, 255, 255)",
-              fillOpacity: "0",
-              stroke: "rgb(0, 0, 0)",
-              strokeWidth: "1.3",
-              strokeMiterlimit: 10,
-              strokeDasharray: "0",
-            },
-            cursor: "move",
-            pointerEvents: "all",
-            display: "block",
-          }
-          // ];
-        );
+        newData.push({
+          index: uuidv4(),
+          startX: x,
+          startY: y,
+          endX: x,
+          endY: y,
+          x: x,
+          y: y,
+          width: 0,
+          height: 0,
+          type: drawType,
+          decorate: {
+            fill: "rgb(255, 255, 255)",
+            fillOpacity: "0",
+            stroke: "rgb(0, 0, 0)",
+            strokeWidth: "1.3",
+            strokeMiterlimit: 10,
+            strokeDasharray: "0",
+          },
+          cursor: "move",
+          pointerEvents: "all",
+          display: "block",
+        });
+        drawPoint2(newData);
         return newData;
       });
     } else if (drawStatus.current === 5 || drawStatus.current === 8) {
-      drawPoint();
+      // drawPoint();
+      drawPoint2(data);
+      handleRerender();
       moveInitData.current = {
         item: JSON.parse(
           JSON.stringify(
@@ -151,19 +205,14 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
     // );
     // console.log("mouse move:", drawStatus.current);
 
-    // if (drawStatus.current === 1) {
-    //   drawStatus.current = 2;
-    // }
     if (drawStatus.current === 1) {
       // console.log("mouse move", chartIndex.current);
       setData((preData) => {
-        // const newData = [...preData];
         const newData = JSON.parse(JSON.stringify(preData));
         const index = newData.length - 1;
-        // const index = chartIndex.current;
-        // console.log("mmm", index, newData);
-        let endX = e.clientX - canvasPosition.current.x;
-        let endY = e.clientY - canvasPosition.current.y;
+
+        let endX = (e.clientX - canvasPosition.current.x) * newRate;
+        let endY = (e.clientY - canvasPosition.current.y) * newRate;
         newData[index].endX = endX;
         newData[index].endY = endY;
         if (endX >= newData[index].startX) {
@@ -181,11 +230,12 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
         // console.log(
         //   `X/Y: ${newData[index].x}, ${newData[index].y}; end X/Y: ${endX}, ${endY}; W/H: ${newData[index].width}, ${newData[index].height}`
         // );
+        drawPoint2(newData);
         return newData;
       });
     } else if (drawStatus.current === 5) {
-      let distancsX = e.clientX - moveInitData.current.mouseStartX;
-      let distancsY = e.clientY - moveInitData.current.mouseStartY;
+      let distancsX = (e.clientX - moveInitData.current.mouseStartX) * newRate;
+      let distancsY = (e.clientY - moveInitData.current.mouseStartY) * newRate;
       const initItem = moveInitData.current.item;
       setData((preData) => {
         const newData = JSON.parse(JSON.stringify(preData));
@@ -198,10 +248,10 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
         newItem.startY = initItem.startY + distancsY;
         newItem.endX = initItem.endX + distancsX;
         newItem.endY = initItem.endY + distancsY;
+        drawPoint2(newData);
         return newData;
       });
     } else if (drawStatus.current === 8) {
-      // console.log("zzzzz", resizeDirection.current);
       setData((preData) => {
         const newData = JSON.parse(JSON.stringify(preData));
         const newItem = newData.find(
@@ -239,8 +289,8 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
             break;
         }
 
-        let endX = e.clientX - canvasPosition.current.x;
-        let endY = e.clientY - canvasPosition.current.y;
+        let endX = (e.clientX - canvasPosition.current.x) * newRate;
+        let endY = (e.clientY - canvasPosition.current.y) * newRate;
 
         if (resizeDirection.current === "start-resize") {
           newItem.startX = endX;
@@ -272,6 +322,7 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
           newItem.width = Math.abs(newItem.startX - newItem.endX);
           newItem.height = Math.abs(newItem.startY - newItem.endY);
         }
+        drawPoint2(newData);
         return newData;
       });
     }
@@ -285,19 +336,31 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
     // );
     if (drawStatus.current === 1) {
       setData((preData) => {
-        // console.log("33333", drawStatus.current);
-        // const newData = [...preData];
         const newData = JSON.parse(JSON.stringify(preData));
         const index = newData.length - 1;
-        // console.log("uuu", index, newData);
-        // console.log("uuu2", newData[index].x);
         if (drawType !== "flowline") {
-          // console.log("change");
           newData[index].startX = newData[index].x;
           newData[index].startY = newData[index].y;
           newData[index].endX = newData[index].x + newData[index].width;
           newData[index].endY = newData[index].y + newData[index].height;
         }
+
+        canvasBlockRange.current.minX = Math.min(
+          newData[index].startX,
+          newData[index].endX
+        );
+        canvasBlockRange.current.minY = Math.min(
+          newData[index].startY,
+          newData[index].endY
+        );
+        canvasBlockRange.current.maxX = Math.max(
+          newData[index].startX,
+          newData[index].endX
+        );
+        canvasBlockRange.current.maxY = Math.max(
+          newData[index].startY,
+          newData[index].endY
+        );
 
         if (newData[index].width === 0 || newData[index].height === 0) {
           newData.pop();
@@ -305,21 +368,16 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
         } else {
           drawStatus.current = 2;
         }
-        // console.log(`uuu: ${newData}`);
-        // console.log(newData);
+        drawPoint2(newData);
         return newData;
       });
       setDrawType("");
     } else if (drawStatus.current === 8) {
       setData((preData) => {
-        // const newData = [...preData];
         const newData = JSON.parse(JSON.stringify(preData));
-        // const index = newData.length - 1;
         const newItem = newData.find(
           (element) => element.index == chartIndex.current
         );
-        // console.log("uuu", index, newData);
-        // console.log("uuu2", newData[index].x);
         if (newItem.type !== "flowline") {
           console.log("change");
           newItem.startX = newItem.x;
@@ -330,15 +388,11 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
 
         resizeDirection.current = "";
         if (newItem.width === 0 || newItem.height === 0) {
-          // newData.pop();
-          // console.log("yyyyy");
           drawStatus.current = 10;
         } else {
-          // console.log("rrrrrr");
           drawStatus.current = 9;
         }
-        // console.log(`uuu: ${newData}`);
-        // console.log(newData);
+        drawPoint2(newData);
         return newData;
       });
     }
@@ -353,7 +407,6 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
     //   // e.target.nodeName
     //   // e.target
     // );
-    // setPointArea();
 
     if (drawStatus.current === 2) {
       chartIndex.current = data[data.length - 1].index;
@@ -367,11 +420,15 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
       chartIndex.current = -1;
     }
     drawStatus.current = 0;
-    drawPoint();
+    // drawPoint();
+    drawPoint2(data);
+    handleRerender();
   }
 
   return (
     <div
+      // width={screenSize.screenWidth}
+      // height={screenSize.screenHeight - canvasPosition.current.y}
       ref={canvasRef}
       className={canvasClass}
       onMouseDown={mouseDown}
@@ -379,8 +436,50 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
       onMouseUp={mouseUp}
       onClick={click}
     >
+      {/* <div className="canvasOuter"></div> */}
+      <div
+        style={{
+          position: "absolute",
+          top: screenSize.screenHeight - canvasPosition.current.y,
+          // top: "10px",
+          left: screenSize.screenWidth,
+          // ledt: "10px",
+          backgroundColor: "#000",
+          width: screenSize.screenWidth,
+          height: screenSize.screenHeight - canvasPosition.current.y,
+        }}
+      ></div>
       <svg
-        style={canvasStyle}
+        // width={screenSize.screenWidth * 3}
+        // height={(screenSize.screenHeight - canvasPosition.current.y) * 2}
+        // // viewBox={`${screenSize.screenWidth} ${
+        // //   screenSize.screenHeight - canvasPosition.current.y
+        // // } ${screenSize.screenWidth * newRate} ${
+        // //   (screenSize.screenHeight - canvasPosition.current.y) * newRate
+        // // }`}
+        // viewBox={`${screenSize.screenWidth} ${
+        //   screenSize.screenHeight - canvasPosition.current.y
+        // } ${screenSize.screenWidth * 3} ${
+        //   (screenSize.screenHeight - canvasPosition.current.y) * 2
+        // }`}
+
+        // width={svgPos.current.width}
+        // height={svgPos.current.height}
+        // viewBox={`${-svgPos.current.x} ${-svgPos.current.y} ${
+        //   svgPos.current.width * newRate
+        // } ${svgPos.current.height * newRate}`}
+
+        width={screenSize.screenWidth}
+        height={screenSize.screenHeight - 119}
+        viewBox={`0 0 ${screenSize.screenWidth} ${
+          screenSize.screenHeight - 119
+        }`}
+        // width="600"
+        // height="800"
+        // viewBox="0 0 600 800"
+        // style={canvasStyle}
+        id="svgXXX"
+        ref={svgRef}
         // width="1920"
         // height="1024"
         // viewBox="0 0 1920 1024"
@@ -398,7 +497,7 @@ const Canvas = ({ chartIndex, drawPoint, resizeDirection, needSaveStep }) => {
         />
         {/* 點選 */}
         <DrawList
-          data={dataSelected}
+          data={dataSelected.current}
           canvasPosition={canvasPosition}
           drawStatus={drawStatus}
           chartIndex={chartIndex}

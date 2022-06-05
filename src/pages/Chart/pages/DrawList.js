@@ -10,9 +10,6 @@ const DrawList = ({
   resizeDirection,
   test,
 }) => {
-  // if (test) {
-  //   console.log("DrawList.js:", test, data);
-  // }
   return (
     <g>
       {data.map((item) => {
