@@ -253,6 +253,7 @@ const Chart = () => {
   }
 
   async function saveToDB() {
+    setMessage("資料儲存中，請稍候...");
     // console.log("this~~~~", auth.currentUser.uid);
     if (docID.current) {
       const result = await addChartRecordByID(
@@ -272,6 +273,7 @@ const Chart = () => {
       }
       // console.log("firstWrite", result.message, result);
     }
+    setMessage("");
   }
 
   function drawPoint() {
