@@ -246,9 +246,9 @@ const Chart = () => {
         docID.current = result.dataID;
         setData(result.data);
         // console.log(result.data);
-        setMessage("");
       }
     }
+    setMessage("");
     // console.log(result.message, result);
   }
 
