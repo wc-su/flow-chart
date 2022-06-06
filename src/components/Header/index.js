@@ -13,11 +13,12 @@ import {
   logout as fLogout,
   // onAuthStateChanged,
 } from "../../firebase/auth";
-// import UserProvider from "../Context/UserProvider.js";
+
 import {
   userActionContext,
   UserLoginContext,
 } from "../Context/UserProvider.js";
+import { LoadingContext } from "../Context/LoadingProvider";
 
 const Header = () => {
   // console.log("header```````");
@@ -28,26 +29,10 @@ const Header = () => {
 
   const { userAction, setUserAction } = useContext(userActionContext);
   const { userLogin, setUserLogin } = useContext(UserLoginContext);
+  const { message, setMessage } = useContext(LoadingContext);
 
   const location = useLocation();
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   console.log("<<< Header >>>", auth.currentUser);
-  //   if (startFlag.current) {
-  //     startFlag.current = false;
-  //     console.log("lllll");
-  //     onAuthStateChanged(auth, (user) => {
-  //       console.log("ppppp");
-  //       if (user) {
-  //         setUserLogin(true);
-  //         console.log("sssss");
-  //       } else {
-  //         setUserLogin(false);
-  //       }
-  //     });
-  //   }
-  // }, []);
 
   function clickMenu(e) {
     if (e.target.nodeName === "A") {
@@ -56,17 +41,17 @@ const Header = () => {
       const action = e.target.getAttribute("data-action");
       setUserAction(action);
       if (action === "logout") {
+        setMessage("登出中，請稍候...");
         logout();
-        console.log(location.pathname);
         if (location.pathname === "/Chart") {
           navigate("/");
         }
+        setMessage("");
       }
     }
   }
 
   async function logout() {
-    // await fLogout();
     const result = await fLogout();
     console.log(result);
     // console.log("yyyy", auth.currentUser, auth);
@@ -76,9 +61,6 @@ const Header = () => {
   }
 
   let menuItems;
-  // console.log("auth is null:", auth.currentUser === null);
-  // console.log("userLogin flag = ", userLogin.current);
-  // console.log("userLogin =", userLogin);
   if (userLogin) {
     menuItems = (
       <>
