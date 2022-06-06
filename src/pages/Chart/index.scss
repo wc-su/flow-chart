@@ -26,10 +26,18 @@
     padding: 0 2px;
     cursor: pointer;
     // background-color: #efeeee;
-    &:hover,
+    &:not(&--unactive):hover,
     &--active {
       background-color: #efeeee;
     }
+    &--unactive {
+      cursor: default;
+      opacity: 0.2;
+    }
+  }
+  &__img {
+    width: 32px;
+    height: 32px;
   }
   .separator {
     width: 1px;

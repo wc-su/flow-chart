@@ -16,10 +16,14 @@ import saveToDB from "../images/save.png";
 import { DrawTypeContext } from "../index";
 import ToolbarButton from "./ToolbarButton";
 
+import { UserLoginContext } from "../../../components/Context/UserProvider";
+
 const ActiveButtonContext = createContext();
 
 const Toolbar = ({ canvasRate, chartIndex, activeButton, setActiveButton }) => {
   const { drawType, setDrawType } = useContext(DrawTypeContext);
+
+  const { userLogin, setUserLogin } = useContext(UserLoginContext);
 
   useEffect(() => {
     // console.log("Toolbar.js -> useEffect drawType", drawType, activeButton);
@@ -43,7 +47,7 @@ const Toolbar = ({ canvasRate, chartIndex, activeButton, setActiveButton }) => {
       >
         {/* {drawType} */}
         <div className="toolbar__group">
-          <ToolbarButton purpose="canvasRate" feature="percent">
+          {/* <ToolbarButton purpose="canvasRate" feature="percent">
             {canvasRate.current} % <IoChevronDownSharp />
           </ToolbarButton>
           <div className="separator"></div>
@@ -63,16 +67,16 @@ const Toolbar = ({ canvasRate, chartIndex, activeButton, setActiveButton }) => {
               <AiOutlineZoomOut className="react-icon" />
             </ToolbarButton>
           </div>
-          <div className="separator"></div>
+          <div className="separator"></div> */}
           <ToolbarButton purpose="saveFile" feature="png">
-            <img src={saveAsPng} alt="saveAsPng"></img>
+            <img className="toolbar__img" src={saveAsPng} alt="saveAsPng"></img>
           </ToolbarButton>
-          <div className="separator"></div>
+          {/* <div className="separator"></div>
           <ToolbarButton purpose="move" feature="move">
             <FaRegHandPaper className="react-icon" />
-          </ToolbarButton>
+          </ToolbarButton> */}
         </div>
-        <div className="separator"></div>
+        {/* <div className="separator"></div> */}
         <div className="toolbar__group">
           <ToolbarButton purpose="draw" feature="terminal">
             <svg
@@ -206,8 +210,12 @@ const Toolbar = ({ canvasRate, chartIndex, activeButton, setActiveButton }) => {
           </div>
           <div className="separator"></div>
           <div className="toolbar__group">
-            <ToolbarButton purpose="save" feature="database">
-              <img src={saveToDB} alt="saveToDB"></img>
+            <ToolbarButton
+              purpose="save"
+              feature="database"
+              disabled={userLogin ? false : true}
+            >
+              <img className="toolbar__img" src={saveToDB} alt="saveToDB"></img>
             </ToolbarButton>
           </div>
         </div>

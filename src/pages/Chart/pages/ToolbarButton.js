@@ -10,6 +10,7 @@ const ToolbarButton = ({
   feature,
   chartIndex,
   canvasRate,
+  disabled,
 }) => {
   // console.log(children, purpose, feature);
 
@@ -19,22 +20,29 @@ const ToolbarButton = ({
   const buttonClass = classNames("toolbar__button", {
     "toolbar__button--active":
       activeButton.purpose === purpose && activeButton.feature === feature,
+    "toolbar__button--unactive": disabled,
   });
 
   function click(e) {
     e.stopPropagation();
-    // setBtnClick((preSatae) => !preSatae);
-    // console.log(purpose, feature);
-    if (purpose === "draw") {
-      setDrawType(feature);
+    if (disabled) {
     } else {
-      setDrawType("");
-    }
-    if (activeButton.purpose === purpose && activeButton.feature === feature) {
-      setActiveButton({});
-      setDrawType("");
-    } else {
-      setActiveButton(() => ({ purpose: purpose, feature: feature }));
+      // setBtnClick((preSatae) => !preSatae);
+      // console.log(purpose, feature);
+      if (purpose === "draw") {
+        setDrawType(feature);
+      } else {
+        setDrawType("");
+      }
+      if (
+        activeButton.purpose === purpose &&
+        activeButton.feature === feature
+      ) {
+        setActiveButton({});
+        setDrawType("");
+      } else {
+        setActiveButton(() => ({ purpose: purpose, feature: feature }));
+      }
     }
   }
 
