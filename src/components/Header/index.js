@@ -115,7 +115,7 @@ const Header = () => {
     <div className="Header">
       <div className="Header__container">
         <Link to="/" className="Header__logo">
-          <img src={icon5} alt="logo" />
+          <img src={icon4} alt="logo" />
           <h1>Flow Chart</h1>
         </Link>
         <ul className="Header__menu" onClick={clickMenu}>

@@ -5,6 +5,7 @@ import classNames from "classnames";
 // import { DataContext, DataSelectedContext, DrawTypeContext } from "../index";
 import { DataContext, DrawTypeContext } from "../index";
 import DrawList from "../pages/DrawList";
+// import CanvasStyle from "./CanvasStyle";
 
 const Canvas = ({
   canvasRate,
@@ -170,9 +171,9 @@ const Canvas = ({
           height: 0,
           type: drawType,
           decorate: {
-            fill: "rgb(255, 255, 255)",
+            fill: "#FFFFFF",
             fillOpacity: "0",
-            stroke: "rgb(0, 0, 0)",
+            stroke: "#000000",
             strokeWidth: "1.3",
             strokeMiterlimit: 10,
             strokeDasharray: "0",
@@ -437,7 +438,7 @@ const Canvas = ({
       onClick={click}
     >
       {/* <div className="canvasOuter"></div> */}
-      <div
+      {/* <div
         style={{
           position: "absolute",
           top: screenSize.screenHeight - canvasPosition.current.y,
@@ -448,7 +449,7 @@ const Canvas = ({
           width: screenSize.screenWidth,
           height: screenSize.screenHeight - canvasPosition.current.y,
         }}
-      ></div>
+      ></div> */}
       <svg
         // width={screenSize.screenWidth * 3}
         // height={(screenSize.screenHeight - canvasPosition.current.y) * 2}
@@ -505,6 +506,7 @@ const Canvas = ({
           test={false}
         />
       </svg>
+      {/* <CanvasStyle chartIndex={chartIndex} /> */}
     </div>
   );
 };

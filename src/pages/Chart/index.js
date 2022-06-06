@@ -29,7 +29,6 @@ const DataContext = createContext();
 const DrawTypeContext = createContext();
 
 const Chart = () => {
-  // console.log("chart```````");
   const navigate = useNavigate();
 
   const firstLogin = useRef(0);
@@ -66,16 +65,10 @@ const Chart = () => {
   const { userLogin, setUserLogin } = useContext(UserLoginContext);
 
   useEffect(() => {
-    // console.log("<<< Chart >>>", auth.currentUser);
     if (auth.currentUser) {
-      // console.log("start ------>");
-      // getUserRecord();
-      // console.log("end ------>");
     } else {
-      // console.log("leave~~~");
-      navigate("/");
+      // navigate("/");
     }
-    // console.log("wwwwww", userLogin);
   }, []);
 
   if (userLogin && firstLogin.current === 0) {
@@ -147,7 +140,8 @@ const Chart = () => {
         activeButton.feature === "png"
       ) {
         console.log("1111", svgRef.current);
-        saveSvgAsPng.saveSvgAsPng(svgRef.current, "name");
+        saveSvgAsPng.saveSvgAsPng(svgRef.current, "chart");
+        // saveSvgAsPng.saveSvgAsPng(svgRef.current, "name", {width: "", height: ""});
         // saveSvgAsPng.saveSvgAsPng(svgRef.current, "name", {encoderType: "image/jpeg", encoderOptions: 0.8});
         setActiveButton({});
 
@@ -245,7 +239,7 @@ const Chart = () => {
     const result = await getUserRecord(auth.currentUser.uid);
     // console.log(result);
     if (result.result) {
-      if(result.dataID) {
+      if (result.dataID) {
         docID.current = result.dataID;
         setData(result.data);
         // console.log(result.data);
@@ -256,13 +250,17 @@ const Chart = () => {
 
   async function saveToDB() {
     // console.log("this~~~~", auth.currentUser.uid);
-    if(docID.current) {
-      const result = await addChartRecordByID(auth.currentUser.uid, docID.current, { data });
+    if (docID.current) {
+      const result = await addChartRecordByID(
+        auth.currentUser.uid,
+        docID.current,
+        { data }
+      );
       if (result.result) {
       } else {
       }
       // console.log("byID", result.message, result);
-    }else{
+    } else {
       const result = await addChartRecord(auth.currentUser.uid, { data });
       if (result.result) {
         docID.current = result.dataID;
@@ -517,7 +515,7 @@ const Chart = () => {
               drawPoint2={drawPoint2}
               handleRerender={handleRerender}
             />
-            <CanvasStyle />
+            {/* <CanvasStyle chartIndex={chartIndex} /> */}
           </div>
         </DrawTypeContext.Provider>
       </DataContext.Provider>

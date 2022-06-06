@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Chart from "./pages/Chart";
 import Header from "./components/Header";
 import UserProvider from "./components/Context/UserProvider.js";
+import Loading from "./components/Loading";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
