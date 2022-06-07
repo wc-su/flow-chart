@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import classNames from "classnames";
 
 import "./index.scss";
 import icon from "./images/organization-chart-64.png";
@@ -33,6 +34,10 @@ const Header = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  const logoClass = classNames("Header__logo", {
+    "Header--isIndex": location.pathname === "/",
+  });
 
   function clickMenu(e) {
     if (e.target.nodeName === "A") {
@@ -96,9 +101,19 @@ const Header = () => {
   return (
     <div className="Header">
       <div className="Header__container">
-        <Link to="/" className="Header__logo">
-          <img src={icon4} alt="logo" />
-          <h1>Flow Chart</h1>
+        <Link to="/" className={logoClass}>
+          {/* <img src={icon4} alt="logo" /> */}
+          <h1>
+            <span className="logo-pre">F</span>
+            <span className="logo-pre">l</span>
+            <span className="logo-pre">o</span>
+            <span className="logo-pre">w</span>
+            <span>C</span>
+            <span>h</span>
+            <span>a</span>
+            <span>r</span>
+            <span>t</span>
+          </h1>
         </Link>
         <ul className="Header__menu" onClick={clickMenu}>
           {menuItems}

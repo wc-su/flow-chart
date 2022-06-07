@@ -24,7 +24,7 @@ import {
   getUserRecord,
 } from "../../firebase/database";
 import { UserLoginContext } from "../../components/Context/UserProvider";
-import {LoadingContext} from "../../components/Context/LoadingProvider";
+import { LoadingContext } from "../../components/Context/LoadingProvider";
 
 const DataContext = createContext();
 const DrawTypeContext = createContext();
