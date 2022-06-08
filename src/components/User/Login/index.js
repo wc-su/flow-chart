@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 
 import "./index.scss";
 
 import { loginUseGoogle, loginUseEmail } from "../../../firebase/auth";
+import { LoadingContext } from "../../Context/LoadingProvider";
 
 const Login = ({ setUserAction }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const { message, setMessage } = useContext(LoadingContext);
 
   function handleEmailChange(e) {
     setEmail(e.target.value);
@@ -16,17 +19,21 @@ const Login = ({ setUserAction }) => {
   }
 
   async function loginByGoogle() {
+    setMessage("請操作跳出視窗進行登入");
     const result = await loginUseGoogle();
     console.log("result:", result);
     if (result.result) {
       setUserAction("");
+      setMessage("");
     }
   }
   async function loginByEmail() {
+    setMessage("登入中，請稍候...");
     const result = await loginUseEmail(email, password);
     console.log("result:", result);
     if (result.result) {
       setUserAction("");
+      setMessage("");
     }
   }
 

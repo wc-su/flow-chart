@@ -24,6 +24,7 @@ import {
   getUserRecord,
 } from "../../firebase/database";
 import { UserLoginContext } from "../../components/Context/UserProvider";
+import { LoadingContext } from "../../components/Context/LoadingProvider";
 
 const DataContext = createContext();
 const DrawTypeContext = createContext();
@@ -63,6 +64,7 @@ const Chart = () => {
   const [rerender, setRerender] = useState(false);
 
   const { userLogin, setUserLogin } = useContext(UserLoginContext);
+  const { message, setMessage } = useContext(LoadingContext);
 
   useEffect(() => {
     if (auth.currentUser) {
@@ -236,6 +238,7 @@ const Chart = () => {
   }, [data]);
 
   async function getDataFromDB() {
+    setMessage("資料讀取中，請稍候...");
     const result = await getUserRecord(auth.currentUser.uid);
     // console.log(result);
     if (result.result) {
@@ -245,10 +248,12 @@ const Chart = () => {
         // console.log(result.data);
       }
     }
+    setMessage("");
     // console.log(result.message, result);
   }
 
   async function saveToDB() {
+    setMessage("資料儲存中，請稍候...");
     // console.log("this~~~~", auth.currentUser.uid);
     if (docID.current) {
       const result = await addChartRecordByID(
@@ -268,6 +273,7 @@ const Chart = () => {
       }
       // console.log("firstWrite", result.message, result);
     }
+    setMessage("");
   }
 
   function drawPoint() {
