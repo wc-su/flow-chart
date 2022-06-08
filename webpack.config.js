@@ -43,6 +43,8 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: "index.html",
       template: "./src/index.html",
+      title: "FlowChart",
+      favicon: "./src/favicon.ico",
     }),
     new Dotenv(),
   ],
