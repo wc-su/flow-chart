@@ -13,9 +13,9 @@ import saveSvgAsPng from "save-svg-as-png";
 // console.log(saveSvgAsPng);
 
 import "./index.scss";
-import Toolbar from "./pages/Toolbar";
-import Canvas from "./pages/Canvas";
-import CanvasStyle from "./pages/CanvasStyle";
+import Toolbar from "./components/ToolBar";
+import Canvas from "./components/Canvas/Canvas";
+import CanvasStyle from "./components/Canvas/CanvasStyle";
 
 import { auth } from "../../firebase/auth";
 import {
@@ -66,12 +66,12 @@ const Chart = () => {
   const { userLogin, setUserLogin } = useContext(UserLoginContext);
   const { message, setMessage } = useContext(LoadingContext);
 
-  useEffect(() => {
-    if (auth.currentUser) {
-    } else {
-      // navigate("/");
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (auth.currentUser) {
+  //   } else {
+  //     // navigate("/");
+  //   }
+  // }, []);
 
   if (userLogin && firstLogin.current === 0) {
     // console.log("ssssss");
@@ -84,10 +84,11 @@ const Chart = () => {
     // console.log(
     //   "Chart.js -> ussEffect activeButton:",
     //   activeButton,
+    //   Object.keys(activeButton).length,
     //   chartIndex.current,
     //   nowStep.current
     // );
-    if (activeButton && Object.keys(activeButton).length !== 0) {
+    if (Object.keys(activeButton).length !== 0) {
       if (
         activeButton.purpose === "figure" &&
         activeButton.feature === "delete" &&
@@ -142,7 +143,12 @@ const Chart = () => {
         activeButton.feature === "png"
       ) {
         console.log("1111", svgRef.current);
-        saveSvgAsPng.saveSvgAsPng(svgRef.current, "chart");
+        const selectArea = svgRef.current.removeChild(
+          svgRef.current.children[1]
+        );
+        saveSvgAsPng.saveSvgAsPng(svgRef.current, "chart").then(() => {
+          svgRef.current.appendChild(selectArea);
+        });
         // saveSvgAsPng.saveSvgAsPng(svgRef.current, "name", {width: "", height: ""});
         // saveSvgAsPng.saveSvgAsPng(svgRef.current, "name", {encoderType: "image/jpeg", encoderOptions: 0.8});
         setActiveButton({});
@@ -160,6 +166,29 @@ const Chart = () => {
         //   //do something with the data
         //   setActiveButton({});
         // });
+      } else if (
+        activeButton.purpose === "saveFile" &&
+        activeButton.feature === "jpg"
+      ) {
+        // console.log(svgRef.current, svgRef.current.children);
+        // 將點選區塊移除
+        const selectArea = svgRef.current.removeChild(
+          svgRef.current.children[1]
+        );
+        // console.log(tttt, svgRef.current);
+        saveSvgAsPng
+          .saveSvgAsPng(svgRef.current, "chart", {
+            encoderType: "image/jpeg",
+            encoderOptions: 0.8,
+            backgroundColor: "#fff",
+          })
+          .then(() => {
+            // console.log("ok");
+            // 將點選區塊加回
+            svgRef.current.appendChild(selectArea);
+          });
+        // console.log("xxx");
+        setActiveButton({});
       } else if (
         activeButton.purpose === "save" &&
         activeButton.feature === "database"
@@ -236,6 +265,10 @@ const Chart = () => {
       stepChangeData.current = false;
     }
   }, [data]);
+
+  useEffect(() => {
+    // console.log("Chart.js -> ussEffect drawType:", drawType);
+  }, [drawType]);
 
   async function getDataFromDB() {
     setMessage("資料讀取中，請稍候...");

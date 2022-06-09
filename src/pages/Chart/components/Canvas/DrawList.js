@@ -1,6 +1,6 @@
 import React from "react";
 
-import DrawItem from "../pages/DrawItem";
+import DrawItem from "./DrawItem";
 
 const DrawList = ({
   data,
@@ -8,7 +8,6 @@ const DrawList = ({
   drawStatus,
   chartIndex,
   resizeDirection,
-  test,
 }) => {
   return (
     <g>

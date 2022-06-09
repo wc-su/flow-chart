@@ -7,7 +7,7 @@ import {
   Decision,
   Flowline,
   Ellipse,
-} from "../components/*";
+} from "../*";
 
 const DrawItem = ({
   item,

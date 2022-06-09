@@ -3,8 +3,8 @@ import { v4 as uuidv4 } from "uuid";
 import classNames from "classnames";
 
 // import { DataContext, DataSelectedContext, DrawTypeContext } from "../index";
-import { DataContext, DrawTypeContext } from "../index";
-import DrawList from "../pages/DrawList";
+import { DataContext, DrawTypeContext } from "../../index";
+import DrawList from "./DrawList";
 // import CanvasStyle from "./CanvasStyle";
 
 const Canvas = ({
@@ -141,7 +141,7 @@ const Canvas = ({
   }, [data]);
 
   function mouseDown(e) {
-    console.log("Canvas.js -> mouse down", drawStatus.current);
+    console.log("Canvas.js -> mouse down", drawStatus.current, drawType);
     if (![5, 8].includes(drawStatus.current)) {
       drawStatus.current = 0;
     }
@@ -494,7 +494,6 @@ const Canvas = ({
           drawStatus={drawStatus}
           chartIndex={chartIndex}
           resizeDirection={resizeDirection}
-          test={true}
         />
         {/* 點選 */}
         <DrawList
@@ -503,7 +502,6 @@ const Canvas = ({
           drawStatus={drawStatus}
           chartIndex={chartIndex}
           resizeDirection={resizeDirection}
-          test={false}
         />
       </svg>
       {/* <CanvasStyle chartIndex={chartIndex} /> */}

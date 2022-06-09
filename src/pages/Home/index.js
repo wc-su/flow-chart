@@ -12,7 +12,6 @@ import linkedinIcon from "./images/linkedin.png";
 import feature1 from "./images/feature-1.png";
 import feature2 from "./images/feature-2.png";
 import feature3 from "./images/feature-3.png";
-import feature3T from "./images/feature-3T.png";
 
 const githubHref = "#";
 const linkedinHref = "#";

@@ -1,19 +1,10 @@
-import React, { useEffect, useRef, useState, useContext } from "react";
+import React, { useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import classNames from "classnames";
 
 import "./index.scss";
-import icon from "./images/organization-chart-64.png";
-import icon2 from "./images/flow-chart-64.png";
-import icon3 from "./images/flow-chart-32.png";
-import icon4 from "./images/scheme-64.png";
-import icon5 from "./images/scheme-32.png";
 import User from "../User";
-import {
-  // auth,
-  logout as fLogout,
-  // onAuthStateChanged,
-} from "../../firebase/auth";
+import { logout as fLogout } from "../../firebase/auth";
 
 import {
   userActionContext,
@@ -65,38 +56,33 @@ const Header = () => {
     }
   }
 
-  let menuItems;
-  if (userLogin) {
-    menuItems = (
-      <>
-        {/* <li>
+  let menuItems = userLogin ? (
+    <>
+      {/* <li>
           <a className="member" href="#" data-action="member">
             T
           </a>
         </li> */}
-        <li>
-          <a href="#" data-action="logout">
-            Log Out
-          </a>
-        </li>
-      </>
-    );
-  } else {
-    menuItems = (
-      <>
-        <li>
-          <a href="#" data-action="login">
-            Log In
-          </a>
-        </li>
-        <li>
-          <a className="signup" href="#" data-action="signup">
-            Sign Up
-          </a>
-        </li>
-      </>
-    );
-  }
+      <li>
+        <a href="#" data-action="logout">
+          Log Out
+        </a>
+      </li>
+    </>
+  ) : (
+    <>
+      <li>
+        <a href="#" data-action="login">
+          Log In
+        </a>
+      </li>
+      <li>
+        <a className="signup" href="#" data-action="signup">
+          Sign Up
+        </a>
+      </li>
+    </>
+  );
 
   return (
     <div className="Header">
