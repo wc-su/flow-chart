@@ -6,7 +6,7 @@
   & > input {
     width: 100%;
     font-size: 16px;
-    border: 1px solid #000;
+    border: 1px solid #3d405b;
     border-radius: 8px;
     padding: 19px 20px;
     &[type="button"],
@@ -15,8 +15,13 @@
     }
   }
   &__submit {
-    background-color: #000;
+    background-color: #3d405b;
     color: #fff;
+    &:hover {
+      color: #3d405b;
+      background-color: #fb8500;
+      border-color: #fb8500;
+    }
   }
   &__link {
     display: inline-block;

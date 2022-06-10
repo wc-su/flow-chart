@@ -34,11 +34,10 @@
 .Home {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 72px);
-}
-
-.main {
-  overflow: hidden;
+  .outer & {
+    height: calc(100vh - 60px);
+    overflow: hidden;
+  }
 }
 
 .header {
