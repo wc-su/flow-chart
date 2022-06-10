@@ -1,25 +1,11 @@
-.User {
-  // width: 100vw;
-  // height: 100vh;
-  // position: fixed;
-  // top: 50%;
-  // left: 50%;
-  // transform: translate(-50%, -50%);
-
+.user {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  inset: 0;
   box-shadow: 0 100vh 0 100vh rgba(#000000, 0.2);
-
   background-color: rgba(#000000, 0.2);
-  // display: flex;
-  // justify-content: center;
-  // align-items: center;
   z-index: 50;
 
-  .user__container {
+  &__container {
     width: 390px;
     margin: 100px auto;
     // margin: auto;
@@ -54,6 +40,16 @@
       &::after {
         transform: translate(-50%, -50%) rotate(-45deg);
       }
+    }
+  }
+}
+
+// mobile
+@media (max-width: 576px) {
+  .user {
+    &__container {
+      width: 330px;
+      padding: 50px 30px 40px 30px;
     }
   }
 }

@@ -58,8 +58,7 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
       // } else {
       //   setDrawType("");
       // }
-      // changeActiveButton();
-      isMounted.current = true;
+      changeActiveButton();
       setToolBarPop("");
     }
   }

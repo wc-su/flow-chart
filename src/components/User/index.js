@@ -20,7 +20,7 @@ const User = ({ userAction, setUserAction }) => {
   }
   return (
     <div
-      className="User"
+      className="user"
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
     >

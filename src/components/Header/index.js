@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import classNames from "classnames";
 
@@ -12,6 +12,9 @@ import {
 } from "../Context/UserProvider.js";
 import { LoadingContext } from "../Context/LoadingProvider";
 
+import menuIcon from "./images/menu.png";
+import closeIcon from "./images/close.png";
+
 const Header = () => {
   // console.log("header```````");
   // // 第一次執行
@@ -22,6 +25,8 @@ const Header = () => {
   const { userAction, setUserAction } = useContext(userActionContext);
   const { userLogin, setUserLogin } = useContext(UserLoginContext);
   const { message, setMessage } = useContext(LoadingContext);
+
+  const menuRef = useRef();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -56,31 +61,53 @@ const Header = () => {
     }
   }
 
-  let menuItems = userLogin ? (
+  function handleCloseIconClick() {
+    menuRef.current.classList.remove("Header__menu--display");
+  }
+
+  function handleOpenIconClick() {
+    menuRef.current.classList.add("Header__menu--display");
+  }
+
+  let menu = (
     <>
-      {/* <li>
+      <div className="Header__menuIcon" onClick={handleOpenIconClick}>
+        <img src={menuIcon} alt="menu icon"></img>
+      </div>
+      <div className="Header__menu" ref={menuRef}>
+        <div className="Header__menu-closeIcon" onClick={handleCloseIconClick}>
+          <img src={closeIcon} alt="close icon"></img>
+        </div>
+        <ul onClick={clickMenu}>
+          {userLogin ? (
+            <>
+              {/* <li>
           <a className="member" href="#" data-action="member">
             T
           </a>
         </li> */}
-      <li>
-        <a href="#" data-action="logout">
-          Log Out
-        </a>
-      </li>
-    </>
-  ) : (
-    <>
-      <li>
-        <a href="#" data-action="login">
-          Log In
-        </a>
-      </li>
-      <li>
-        <a className="signup" href="#" data-action="signup">
-          Sign Up
-        </a>
-      </li>
+              <li>
+                <a href="#" data-action="logout">
+                  Log Out
+                </a>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <a href="#" data-action="login">
+                  Log In
+                </a>
+              </li>
+              <li>
+                <a className="signup" href="#" data-action="signup">
+                  Sign Up
+                </a>
+              </li>
+            </>
+          )}
+        </ul>
+      </div>
     </>
   );
 
@@ -88,7 +115,6 @@ const Header = () => {
     <div className="Header">
       <div className="Header__container">
         <Link to="/" className={logoClass}>
-          {/* <img src={icon4} alt="logo" /> */}
           <h1>
             <span className="logo-pre">F</span>
             <span className="logo-pre">l</span>
@@ -101,9 +127,7 @@ const Header = () => {
             <span>t</span>
           </h1>
         </Link>
-        <ul className="Header__menu" onClick={clickMenu}>
-          {menuItems}
-        </ul>
+        {menu}
       </div>
       {!userLogin && userAction && (
         <User userAction={userAction} setUserAction={setUserAction} />

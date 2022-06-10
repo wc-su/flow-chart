@@ -50,7 +50,7 @@ const Home = () => {
           <ul className="feature__list">
             <li className="feature__item">
               <p>
-                選擇要繪製的圖形
+                選擇圖形
                 <br />
                 在畫布上畫出
               </p>
@@ -58,9 +58,7 @@ const Home = () => {
             </li>
             <li className="feature__item">
               <p>
-                選擇繪製好的圖形
-                <br />
-                拖移
+                將圖形拖移
                 <br />
                 或進行縮放
               </p>
@@ -78,7 +76,9 @@ const Home = () => {
               <p>
                 使用
                 <br />
-                上一步/下一步調整
+                上一步/下一步
+                <br />
+                調整
               </p>
               <div></div>
             </li>

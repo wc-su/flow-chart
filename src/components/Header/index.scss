@@ -42,48 +42,98 @@
     }
   }
   &__menu {
-    display: flex;
-    li {
-      padding: 10px 15px;
-      &:first-child {
-        padding: 10px 15px 10px 0;
-      }
-      &:last-child {
-        padding: 10px 0 10px 15px;
-      }
-      a {
-        text-decoration: none;
-        color: #3d405b;
-        font-size: 18px;
-        font-weight: bold;
-        padding: 2px 10px;
-        &:hover {
-          border-bottom: 3px solid #e07a5f;
-          transition: border-bottom 0.08s;
+    &-closeIcon {
+      display: none;
+    }
+    ul {
+      display: flex;
+      li {
+        padding: 10px 15px;
+        &:first-child {
+          padding: 10px 15px 10px 0;
         }
-        &.member {
-          color: #f1faee;
-          position: relative;
-          &::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 40px;
-            background-color: #14213d;
-            border-radius: 50%;
-            z-index: -1;
+        &:last-child {
+          padding: 10px 0 10px 15px;
+        }
+        a {
+          text-decoration: none;
+          color: #3d405b;
+          font-size: 18px;
+          font-weight: bold;
+          padding: 2px 10px;
+          &:hover {
+            border-bottom: 3px solid #e07a5f;
+            transition: border-bottom 0.08s;
+          }
+          &.member {
+            color: #f1faee;
+            position: relative;
+            &::before {
+              content: "";
+              position: absolute;
+              top: 0;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 40px;
+              height: 40px;
+              background-color: #14213d;
+              border-radius: 50%;
+              z-index: -1;
+            }
           }
         }
       }
     }
+  }
+  &__menuIcon {
+    display: none;
   }
 }
 
 @keyframes wordAnimate {
   5% {
     opacity: 0.3;
+  }
+}
+
+// laptop
+@media (max-width: 768px) {
+  .Header {
+    &__menu {
+      position: fixed;
+      inset: 0 0 0 150%;
+      background-color: #f4f1de;
+      z-index: 10;
+      transition: inset 0.3s;
+      &--display {
+        inset: 0;
+      }
+      &-closeIcon {
+        display: block;
+        cursor: pointer;
+        padding: 14px 20px 11px 0;
+        img {
+          width: 20px;
+          margin-left: auto;
+        }
+      }
+      ul {
+        flex-direction: column;
+        align-items: center;
+        margin-top: 100px;
+        li {
+          &:nth-child(n) {
+            padding: 15px 15px;
+          }
+        }
+      }
+    }
+    &__menuIcon {
+      display: block;
+      cursor: pointer;
+      img {
+        width: 20px;
+      }
+    }
   }
 }
