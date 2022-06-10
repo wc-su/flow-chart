@@ -1,28 +1,12 @@
-.User {
-  // width: 100vw;
-  // height: 100vh;
-  // position: fixed;
-  // top: 50%;
-  // left: 50%;
-  // transform: translate(-50%, -50%);
-
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  box-shadow: 0 100vh 0 100vh rgba(#000000, 0.2);
-
+.user {
+  position: fixed;
+  inset: 0;
   background-color: rgba(#000000, 0.2);
-  // display: flex;
-  // justify-content: center;
-  // align-items: center;
   z-index: 50;
-
-  .user__container {
+  overflow-y: auto;
+  &__container {
     width: 390px;
     margin: 100px auto;
-    // margin: auto;
     background-color: #fff;
     border-radius: 10px;
     padding: 50px 40px 40px 40px;
@@ -54,6 +38,16 @@
       &::after {
         transform: translate(-50%, -50%) rotate(-45deg);
       }
+    }
+  }
+}
+
+// mobile
+@media (max-width: 576px) {
+  .user {
+    &__container {
+      width: 330px;
+      padding: 50px 30px 40px 30px;
     }
   }
 }

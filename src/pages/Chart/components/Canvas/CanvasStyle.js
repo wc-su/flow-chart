@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 
-import { DataContext } from "../index";
+import { DataContext } from "../../index";
 
 const CanvasStyle = ({ chartIndex }) => {
   console.log("CanvasStyle");
