@@ -30,7 +30,14 @@ import iconMove from "../../images/canvas-move.png";
 
 const ActiveButtonContext = createContext();
 
-const Toolbar = ({ canvasRate, chartIndex, activeButton, setActiveButton }) => {
+const Toolbar = ({
+  canvasRate,
+  chartIndex,
+  activeButton,
+  setActiveButton,
+  toolBarPop,
+  setToolBarPop,
+}) => {
   const [drawSelected, setDrawSelected] = useState(0);
   const [saveSelected, setSaveSelected] = useState(0);
 
@@ -69,11 +76,12 @@ const Toolbar = ({ canvasRate, chartIndex, activeButton, setActiveButton }) => {
   }, [saveSelected]);
 
   function click(e) {
-    // console.log(e.target.nodeName);
+    // console.log("Toolbar click", e.target.nodeName);
     setActiveButton((preData) =>
       preData.purpose || preData.feature ? {} : preData
     );
     setDrawType("");
+    setToolBarPop("");
   }
 
   const itemImg = {
@@ -135,7 +143,12 @@ const Toolbar = ({ canvasRate, chartIndex, activeButton, setActiveButton }) => {
   return (
     <div className="toolList" onClick={click}>
       <ActiveButtonContext.Provider
-        value={{ activeButton: activeButton, setActiveButton: setActiveButton }}
+        value={{
+          activeButton: activeButton,
+          setActiveButton: setActiveButton,
+          toolBarPop: toolBarPop,
+          setToolBarPop: setToolBarPop,
+        }}
       >
         <ToolItem
           purpose="canvasRate"

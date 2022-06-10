@@ -10,10 +10,10 @@ import iconSelectDown from "../../../images/down.png";
 
 const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
   const isMounted = useRef(false);
-  const [pop, setPop] = useState(false);
 
   const { setDrawType } = useContext(DrawTypeContext);
-  const { activeButton, setActiveButton } = useContext(ActiveButtonContext);
+  const { activeButton, setActiveButton, toolBarPop, setToolBarPop } =
+    useContext(ActiveButtonContext);
 
   let feature = data.info[data.selected].feature;
   const imgUrl = data.info[data.selected].imgUrl;
@@ -38,16 +38,16 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
     // }
     if (isMounted.current) {
       // feature =  data.info[data.selected].feature;
-      console.log("xxxxx", feature);
+      // console.log("xxxxx", feature);
       // if(!false) {
       changeActiveButton();
       isMounted.current = false;
       // }
     }
-  }, [pop]);
+  }, [toolBarPop]);
 
   function handleItemclick(e) {
-    console.log("handleItem:", purpose, feature);
+    // console.log("handleItem:", purpose, feature);
     e.stopPropagation();
     if (disabled) {
     } else {
@@ -63,26 +63,33 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
   }
 
   function changeActiveButton() {
-    console.log("wwww", activeButton, purpose, feature);
+    // console.log("wwww", activeButton, purpose, feature);
     if (purpose === "draw") {
       setDrawType(feature);
     } else {
       setDrawType("");
     }
     if (activeButton.purpose === purpose && activeButton.feature === feature) {
-      console.log("zzzzz");
+      // console.log("zzzzz");
       setActiveButton({});
       setDrawType("");
     } else {
-      console.log("yyyyy", purpose, feature);
+      // console.log("yyyyy", purpose, feature);
       setActiveButton(() => ({ purpose: purpose, feature: feature }));
     }
   }
 
   function popDropdownList(e) {
-    console.log("popDropdown", e.target);
+    // console.log("popDropdown", e.target);
     e.stopPropagation();
-    setPop(true);
+    setToolBarPop((preData) => {
+      if (preData) {
+        return preData === purpose ? "" : purpose;
+      } else {
+        return purpose;
+      }
+    });
+    // setToolBarPop(purpose);
   }
 
   function handlelDropListClick(e) {
@@ -107,7 +114,7 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
           ></img>
         </div>
       )}
-      {data.info.length > 1 && pop && (
+      {data.info.length > 1 && toolBarPop === purpose && (
         <div className="toolItem__dropdown" onClick={handlelDropListClick}>
           {data.info.map((item, index) => {
             return (
@@ -115,7 +122,7 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
                 key={item.text}
                 index={index}
                 changeSelected={changeSelected}
-                setPop={setPop}
+                setToolBarPop={setToolBarPop}
                 isMounted={isMounted}
               >
                 <img

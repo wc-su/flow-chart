@@ -18,6 +18,7 @@ const Canvas = ({
   dataSelected,
   drawPoint2,
   handleRerender,
+  tempFlag,
 }) => {
   const newRate = 100 / canvasRate.current;
   // console.log("wwwww", canvasRate.current, newRate);
@@ -372,6 +373,7 @@ const Canvas = ({
         drawPoint2(newData);
         return newData;
       });
+      tempFlag.current = true;
       setDrawType("");
     } else if (drawStatus.current === 8) {
       setData((preData) => {

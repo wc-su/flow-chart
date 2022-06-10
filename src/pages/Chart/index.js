@@ -66,6 +66,8 @@ const Chart = () => {
   const { userLogin, setUserLogin } = useContext(UserLoginContext);
   const { message, setMessage } = useContext(LoadingContext);
 
+  const [toolBarPop, setToolBarPop] = useState("");
+
   // useEffect(() => {
   //   if (auth.currentUser) {
   //   } else {
@@ -142,7 +144,10 @@ const Chart = () => {
         activeButton.purpose === "saveFile" &&
         activeButton.feature === "png"
       ) {
-        console.log("1111", svgRef.current);
+        // console.log("1111", svgRef.current);
+        // const ttt = svgRef.current.getAttribute("width");
+        // console.log(ttt);
+        // svgRef.current.setAttribute("width", ttt);
         const selectArea = svgRef.current.removeChild(
           svgRef.current.children[1]
         );
@@ -529,6 +534,10 @@ const Chart = () => {
     setRerender((preData) => !preData);
   }
 
+  function handleMainClick() {
+    setToolBarPop("");
+  }
+
   return (
     <div className="Chart">
       <DataContext.Provider value={{ data: data, setData: setData }}>
@@ -540,8 +549,10 @@ const Chart = () => {
             chartIndex={chartIndex}
             activeButton={activeButton}
             setActiveButton={setActiveButton}
+            toolBarPop={toolBarPop}
+            setToolBarPop={setToolBarPop}
           />
-          <div className="main">
+          <div className="main" onClick={handleMainClick}>
             <Canvas
               canvasRate={canvasRate}
               chartIndex={chartIndex}
@@ -553,6 +564,7 @@ const Chart = () => {
               dataSelected={dataSelected}
               drawPoint2={drawPoint2}
               handleRerender={handleRerender}
+              tempFlag={tempFlag}
             />
             {/* <CanvasStyle chartIndex={chartIndex} /> */}
           </div>

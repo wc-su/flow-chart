@@ -4,7 +4,7 @@ const ToolDropdownItem = ({
   children,
   index,
   changeSelected,
-  setPop,
+  setToolBarPop,
   isMounted,
 }) => {
   // console.log("eeee");
@@ -14,7 +14,7 @@ const ToolDropdownItem = ({
     if (changeSelected) {
       isMounted.current = true;
       changeSelected(index);
-      setPop(false);
+      setToolBarPop("");
     }
   }
 
