@@ -1,17 +1,11 @@
-import React, {
-  useContext,
-  useEffect,
-  createContext,
-  useState,
-  useRef,
-} from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 
 import "./index.scss";
 
 import { DrawTypeContext } from "../../index";
 import ToolItem from "./components/ToolItem";
 
-import { UserLoginContext } from "../../../../components/Context/UserProvider";
+import { UserLoginContext } from "../../../../context/UserProvider";
 
 import saveAsJPG from "../../images/save-as-jpg.png";
 import saveAsPNG from "../../images/save-as-png.png";
@@ -28,7 +22,7 @@ import iconZoomin from "../../images/zoom-in.png";
 import iconZoomout from "../../images/zoom-out.png";
 import iconMove from "../../images/canvas-move.png";
 
-const ActiveButtonContext = createContext();
+const ActiveButtonContext = React.createContext();
 
 const Toolbar = ({
   canvasRate,

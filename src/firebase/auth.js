@@ -9,13 +9,14 @@ import {
   deleteUser,
   sendEmailVerification,
   signOut,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 
 const provider = new GoogleAuthProvider();
 const auth = getAuth(app);
 // console.log("uuuuu", auth.currentUser, auth);
 
-async function loginUseGoogle() {
+async function authUseGoogle() {
   const returnResult = { result: false, data: {}, message: "系統錯誤" };
   // console.log("this~~~");
   try {
@@ -45,7 +46,8 @@ async function loginUseGoogle() {
     // The AuthCredential type that was used.
     const credential = GoogleAuthProvider.credentialFromError(error);
     // console.log("yyy", errorCode, errorMessage, email, credential);
-    returnResult.message = errorMessage;
+    // console.log(errorCode, errorMessage, email, credential);
+    returnResult.message = errorCode.replace("auth/", "");
   }
 
   // console.log("end~~~");
@@ -74,8 +76,8 @@ async function SignupUseEmail(email, password) {
   } catch (error) {
     const errorCode = error.code;
     const errorMessage = error.message;
-    // console.log("yyy2", errorCode, errorMessage);
-    returnResult.message = errorMessage;
+    // console.log(errorCode, errorMessage);
+    returnResult.message = errorCode.replace("auth/", "");
   }
   return returnResult;
 }
@@ -100,8 +102,8 @@ async function loginUseEmail(email, password) {
   } catch (error) {
     const errorCode = error.code;
     const errorMessage = error.message;
-    // console.log("yyy3", errorCode, errorMessage);
-    returnResult.message = errorMessage;
+    // console.log(errorCode, errorMessage);
+    returnResult.message = errorCode.replace("auth/", "");
   }
   return returnResult;
 }
@@ -146,12 +148,29 @@ async function verifyEmail() {
   });
 }
 
+async function resetPassword(email) {
+  const returnResult = { result: false, data: {}, message: "系統錯誤" };
+  await sendPasswordResetEmail(auth, email)
+    .then(() => {
+      returnResult.result = "ok";
+      returnResult.message = "信件已寄出";
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // console.log(error.code, error.message);
+      returnResult.message = errorCode.replace("auth/", "");
+    });
+  return returnResult;
+}
+
 export {
   auth,
-  loginUseGoogle,
+  authUseGoogle,
   loginUseEmail,
   SignupUseEmail,
   logout,
   verifyEmail,
   onAuthStateChanged,
+  resetPassword,
 };

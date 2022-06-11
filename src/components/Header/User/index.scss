@@ -40,6 +40,11 @@
       }
     }
   }
+  &__errMsg {
+    color: #ff0000;
+    text-align: center;
+    margin-bottom: 20px;
+  }
 }
 
 // mobile

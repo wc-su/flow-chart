@@ -7,10 +7,9 @@ import "./index.scss";
 import Home from "./pages/Home";
 import Chart from "./pages/Chart";
 import Header from "./components/Header";
-import Loading from "./components/Loading";
 
-import UserProvider from "./components/Context/UserProvider.js";
-import LoadingProvider from "./components/Context/LoadingProvider.js";
+import UserProvider from "./context/UserProvider.js";
+import LoadingProvider from "./context/LoadingProvider.js";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -21,7 +20,6 @@ root.render(
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
-            {/* <Route path="/" element={<Chart />} /> */}
             <Route path="/Chart" element={<Chart />} />
             <Route
               path="*"
@@ -32,7 +30,6 @@ root.render(
               }
             />
           </Routes>
-          <Loading />
         </LoadingProvider>
       </UserProvider>
     </BrowserRouter>

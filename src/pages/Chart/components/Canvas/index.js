@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 // import { DataContext, DataSelectedContext, DrawTypeContext } from "../index";
 import { DataContext, DrawTypeContext } from "../../index";
-import DrawList from "./DrawList";
+import DrawList from "./components/DrawList";
 // import CanvasStyle from "./CanvasStyle";
 
 const Canvas = ({

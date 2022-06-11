@@ -1,15 +1,27 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 
 import "./index.scss";
 
-import { loginUseGoogle, loginUseEmail } from "../../../firebase/auth";
-import { LoadingContext } from "../../Context/LoadingProvider";
+import { authUseGoogle, loginUseEmail } from "../../../../../firebase/auth";
+import { LoadingContext } from "../../../../../context/LoadingProvider";
 
-const Login = ({ setUserAction }) => {
+const Login = ({ userAction, setUserAction, changeErrMsg }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const { message, setMessage } = useContext(LoadingContext);
+
+  useEffect(() => {
+    // 測試帳號
+    setEmail("demo@test.com");
+    setPassword("123456");
+  }, []);
+
+  useEffect(() => {
+    console.log("Login: useEffect userAction:", userAction);
+    if (!userAction) {
+    }
+  }, [userAction]);
 
   function handleEmailChange(e) {
     setEmail(e.target.value);
@@ -20,12 +32,13 @@ const Login = ({ setUserAction }) => {
 
   async function loginByGoogle() {
     setMessage("請操作跳出視窗進行登入");
-    const result = await loginUseGoogle();
+    const result = await authUseGoogle();
     console.log("result:", result);
     if (result.result) {
       setUserAction("");
-      setMessage("");
     }
+    changeErrMsg(result.message);
+    setMessage("");
   }
   async function loginByEmail() {
     setMessage("登入中，請稍候...");
@@ -33,8 +46,9 @@ const Login = ({ setUserAction }) => {
     console.log("result:", result);
     if (result.result) {
       setUserAction("");
-      setMessage("");
     }
+    changeErrMsg(result.message);
+    setMessage("");
   }
 
   return (

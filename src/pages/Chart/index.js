@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  createContext,
-  useContext,
-} from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 
@@ -14,8 +8,8 @@ import saveSvgAsPng from "save-svg-as-png";
 
 import "./index.scss";
 import Toolbar from "./components/ToolBar";
-import Canvas from "./components/Canvas/Canvas";
-import CanvasStyle from "./components/Canvas/CanvasStyle";
+import Canvas from "./components/Canvas";
+import CanvasStyle from "./components/Canvas/components/CanvasStyle";
 
 import { auth } from "../../firebase/auth";
 import {
@@ -23,11 +17,11 @@ import {
   addChartRecordByID,
   getUserRecord,
 } from "../../firebase/database";
-import { UserLoginContext } from "../../components/Context/UserProvider";
-import { LoadingContext } from "../../components/Context/LoadingProvider";
+import { UserLoginContext } from "../../context/UserProvider";
+import { LoadingContext } from "../../context/LoadingProvider";
 
-const DataContext = createContext();
-const DrawTypeContext = createContext();
+const DataContext = React.createContext();
+const DrawTypeContext = React.createContext();
 
 const Chart = () => {
   const navigate = useNavigate();
@@ -75,12 +69,20 @@ const Chart = () => {
   //   }
   // }, []);
 
-  if (userLogin && firstLogin.current === 0) {
-    // console.log("ssssss");
-    firstLogin.current = 1;
-    // console.log("eeeee", auth.currentUser.uid);
-    getDataFromDB();
-  }
+  useEffect(() => {
+    if (userLogin && firstLogin.current === 0) {
+      // console.log("ssssss");
+      firstLogin.current = 1;
+      // console.log("eeeee", auth.currentUser.uid);
+      getDataFromDB();
+    }
+    if (!userLogin && firstLogin.current === 1) {
+      // console.log("ssssss");
+      firstLogin.current = 2;
+      // console.log("eeeee", auth.currentUser.uid);
+      setData([]);
+    }
+  });
 
   useEffect(() => {
     // console.log(
@@ -199,6 +201,7 @@ const Chart = () => {
         activeButton.feature === "database"
       ) {
         saveToDB();
+        setActiveButton({});
       } else if (
         activeButton.purpose === "canvasRate" &&
         activeButton.feature === "zoomIn"
@@ -312,114 +315,6 @@ const Chart = () => {
       // console.log("firstWrite", result.message, result);
     }
     setMessage("");
-  }
-
-  function drawPoint() {
-    setDataSelected((preData) => {
-      let originItem = data.find((item) => item.index === chartIndex.current);
-      if (chartIndex.current !== -1 && originItem) {
-        const originData = JSON.parse(JSON.stringify(originItem));
-        if (originData.type !== "flowline") {
-          const newStartX = Math.min(originData.startX, originData.endX);
-          const newStartY = Math.min(originData.startY, originData.endY);
-          const newEndX = Math.max(originData.startY, originData.endY);
-          const newEndY = Math.max(originData.startY, originData.endY);
-          originData.startX = newStartX;
-          originData.startY = newStartY;
-          originData.x = newStartX;
-          originData.y = newStartY;
-          originData.endX = newEndX;
-          originData.endY = newEndY;
-        }
-
-        const initPoint = JSON.parse(JSON.stringify(originData));
-
-        if (originData.type !== "flowline") {
-          originData.type = "process";
-          originData.decorate.stroke = "#00a8ff";
-          originData.decorate.strokeDasharray = "3";
-          originData.pointerEvents = "none";
-        }
-
-        const newData = [];
-        if (resizeDirection.current !== "") {
-          originData.display = "none";
-        }
-        newData.push(originData);
-
-        const pointWidth = initPoint.width;
-        const pointHeight = initPoint.height;
-        initPoint.decorate.fill = "#00a8ff";
-        initPoint.decorate.stroke = "none";
-        initPoint.type = "ellipse";
-        initPoint.width = 4;
-        initPoint.height = 4;
-
-        const pointConfig = [
-          { cursor: "nw-resize", x: 0, y: 0 },
-          { cursor: "n-resize", x: 0.5, y: 0 },
-          { cursor: "ne-resize", x: 1, y: 0 },
-          { cursor: "w-resize", x: 0, y: 0.5 },
-          { cursor: "e-resize", x: 1, y: 0.5 },
-          { cursor: "sw-resize", x: 0, y: 1 },
-          { cursor: "s-resize", x: 0.5, y: 1 },
-          { cursor: "se-resize", x: 1, y: 1 },
-        ];
-        const linePointConfig = [
-          { cursor: "start-resize", x: 0, y: 0 },
-          { cursor: "end-resize", x: 1, y: 1 },
-        ];
-        if (originData.type === "flowline") {
-          newData.push({ ...initPoint });
-          newData[1].index = uuidv4();
-          newData[1].cursor = linePointConfig[0].cursor;
-          newData[1].x = newData[1].startX;
-          newData[1].y = newData[1].startY;
-          newData[1].endX = newData[1].startX;
-          newData[1].endY = newData[1].startY;
-          if (
-            resizeDirection.current &&
-            resizeDirection.current !== linePointConfig[0].cursor
-          ) {
-            newData[1].display = "none";
-          }
-          newData.push({ ...initPoint });
-          newData[2].index = uuidv4();
-          newData[2].cursor = linePointConfig[1].cursor;
-          newData[2].startX = newData[2].endX;
-          newData[2].startY = newData[2].endY;
-          newData[2].x = newData[2].endX;
-          newData[2].y = newData[2].endY;
-          if (
-            resizeDirection.current &&
-            resizeDirection.current !== linePointConfig[1].cursor
-          ) {
-            newData[2].display = "none";
-          }
-        } else {
-          for (let i = 1; i <= pointConfig.length; i++) {
-            newData.push({ ...initPoint });
-            newData[i].index = uuidv4();
-            newData[i].cursor = pointConfig[i - 1].cursor;
-            newData[i].startX += pointWidth * pointConfig[i - 1].x;
-            newData[i].startY += pointHeight * pointConfig[i - 1].y;
-            newData[i].x = newData[i].startX;
-            newData[i].y = newData[i].startY;
-            newData[i].endX = newData[i].startX;
-            newData[i].endY = newData[i].startY;
-            if (resizeDirection.current) {
-              newData[i].display =
-                pointConfig[i - 1].cursor === resizeDirection.current
-                  ? "block"
-                  : "none";
-            }
-          }
-        }
-        return newData;
-      } else {
-        return preData.length > 0 ? [] : preData;
-      }
-    });
   }
 
   function drawPoint2(data) {

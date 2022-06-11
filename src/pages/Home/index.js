@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 
 import "./index.scss";
-import { userActionContext } from "../../components/Context/UserProvider";
+import { userActionContext } from "../../context/UserProvider";
 import header1 from "./images/header-1.png";
 
 import icon4 from "./images/logo-icon.png";

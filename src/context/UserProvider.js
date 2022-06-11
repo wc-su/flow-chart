@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import { auth, onAuthStateChanged } from "../../firebase/auth";
+import { auth, onAuthStateChanged } from "../firebase/auth";
 
 const userActionContext = React.createContext();
 const UserLoginContext = React.createContext();
@@ -31,6 +31,7 @@ const UserProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    console.log("UserProvider: useEffect userAction:", userAction);
     if (userAction) {
       stopScroll(true);
     } else {
