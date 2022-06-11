@@ -48,6 +48,7 @@ const Chart = () => {
   const stepChangeData = useRef(false);
 
   const [drawType, setDrawType] = useState("");
+  const [moveCanvas, setMoveCanvas] = useState(false);
   const [activeButton, setActiveButton] = useState({});
   // 畫圖
   const [data, setData] = useState([]);
@@ -92,6 +93,7 @@ const Chart = () => {
     //   chartIndex.current,
     //   nowStep.current
     // );
+    setMoveCanvas(false);
     if (Object.keys(activeButton).length !== 0) {
       if (
         activeButton.purpose === "figure" &&
@@ -206,18 +208,57 @@ const Chart = () => {
         activeButton.purpose === "canvasRate" &&
         activeButton.feature === "zoomIn"
       ) {
+        const oldRate = canvasRate.current / 100;
         canvasRate.current += 10;
+        const newRate = canvasRate.current / 100 / oldRate;
+        setData((preData) => {
+          let newData = JSON.parse(JSON.stringify(preData));
+          newData = newData.map((item) => {
+            item.startX *= newRate;
+            item.startY *= newRate;
+            item.endX *= newRate;
+            item.endY *= newRate;
+            item.y *= newRate;
+            item.x *= newRate;
+            item.height *= newRate;
+            item.width *= newRate;
+            item.decorate.strokeWidth *= newRate;
+            return item;
+          });
+          drawPoint2(newData);
+          return newData;
+        });
         setActiveButton({});
       } else if (
         activeButton.purpose === "canvasRate" &&
         activeButton.feature === "zoomOut"
       ) {
+        const oldRate = canvasRate.current / 100;
         canvasRate.current -= 10;
+        const newRate = canvasRate.current / 100 / oldRate;
+        setData((preData) => {
+          let newData = JSON.parse(JSON.stringify(preData));
+          newData = newData.map((item) => {
+            item.startX *= newRate;
+            item.startY *= newRate;
+            item.endX *= newRate;
+            item.endY *= newRate;
+            item.y *= newRate;
+            item.x *= newRate;
+            item.height *= newRate;
+            item.width *= newRate;
+            item.decorate.strokeWidth *= newRate;
+            return item;
+          });
+          drawPoint2(newData);
+          return newData;
+        });
         setActiveButton({});
       } else if (
         activeButton.purpose === "move" &&
         activeButton.feature === "move"
       ) {
+        setMoveCanvas(true);
       }
     }
   }, [activeButton]);
@@ -318,6 +359,7 @@ const Chart = () => {
   }
 
   function drawPoint2(data) {
+    // console.log(chartIndex.current, data);
     let originItem = data.find((item) => item.index === chartIndex.current);
     if (chartIndex.current !== -1 && originItem) {
       const originData = JSON.parse(JSON.stringify(originItem));
@@ -447,7 +489,7 @@ const Chart = () => {
             toolBarPop={toolBarPop}
             setToolBarPop={setToolBarPop}
           />
-          <div className="main" onClick={handleMainClick}>
+          <div className="Chart__main" onClick={handleMainClick}>
             <Canvas
               canvasRate={canvasRate}
               chartIndex={chartIndex}
@@ -460,6 +502,7 @@ const Chart = () => {
               drawPoint2={drawPoint2}
               handleRerender={handleRerender}
               tempFlag={tempFlag}
+              moveCanvas={moveCanvas}
             />
             {/* <CanvasStyle chartIndex={chartIndex} /> */}
           </div>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { resetPassword } from "../../../../../firebase/auth";
+import { resetPassword } from "../../../../../../firebase/auth";
 
 import "./index.scss";
 

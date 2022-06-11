@@ -31,7 +31,6 @@ const UserProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    console.log("UserProvider: useEffect userAction:", userAction);
     if (userAction) {
       stopScroll(true);
     } else {

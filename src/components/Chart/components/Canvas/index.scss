@@ -1,22 +1,42 @@
-.main {
-  display: grid;
-  // grid-template-columns: 1fr 150px;
-  grid-template-columns: 1fr;
-  position: relative;
-}
 .canvas {
   // width: 731px;
-  overflow: hidden;
+  // overflow: hidden;
+  // overflow: hidden;
   // height: 408px;
-  position: relative;
+  // position: relative;
+  // position: absolute;
+  // // inset: 0px 0px 0px 0px;
+  // top: 0;
+  // left: 0;
+  // height: 100%;
+  // background-color: rgb(230, 229, 229);
+  // background-color: #fff;
+  // width: 600px;
+  // height: 800px;
+  // box-shadow: 0 0 5px #b4b4b4;
   &.crosshair {
     cursor: crosshair;
   }
-  .canvasOuter {
+  // .canvasOuter {
+  //   position: absolute;
+  //   width: 1024px;
+  //   height: 800px;
+  // }
+  &__svg {
     position: absolute;
-    width: 1024px;
-    height: 800px;
+    top: 0;
+    left: 0;
   }
+  // &__svgBg {
+  //   position: absolute;
+  //   top: 0;
+  //   left: 0;
+  //   // width: 100%;
+  //   background-color: #fff;
+  //   width: 600px;
+  //   height: 800px;
+  //   box-shadow: 0 0 5px gray;
+  // }
 }
 .canvasStyle {
   position: absolute;

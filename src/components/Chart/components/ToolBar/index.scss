@@ -1,5 +1,8 @@
 .toolList {
   display: flex;
+  align-items: center;
+  // justify-content: space-evenly;
+  // justify-content: space-between;
   height: 50px;
   background-color: #3d405b;
   //   align-items: center;
@@ -21,6 +24,20 @@
   //     background: #898989;
   //     margin: 0 6px;
   //   }
+  // &__container {
+  //   display: flex;
+  // }
+  &__separator {
+    width: 2px;
+    height: 30px;
+    background-color: lighten(#3d405b, 20%);
+    line-height: 50px;
+    margin: 0 10px;
+  }
+  .percent {
+    width: 60px;
+    text-align: right;
+  }
 }
 
 .toolItem {

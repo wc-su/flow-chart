@@ -2,8 +2,8 @@ import React, { useState, useContext, useEffect } from "react";
 
 import "./index.scss";
 
-import { authUseGoogle, loginUseEmail } from "../../../../../firebase/auth";
-import { LoadingContext } from "../../../../../context/LoadingProvider";
+import { authUseGoogle, loginUseEmail } from "../../../../../../firebase/auth";
+import { LoadingContext } from "../../../../../../context/LoadingProvider";
 
 const Login = ({ userAction, setUserAction, changeErrMsg }) => {
   const [email, setEmail] = useState("");

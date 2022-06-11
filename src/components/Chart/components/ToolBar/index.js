@@ -7,20 +7,20 @@ import ToolItem from "./components/ToolItem";
 
 import { UserLoginContext } from "../../../../context/UserProvider";
 
-import saveAsJPG from "../../images/save-as-jpg.png";
-import saveAsPNG from "../../images/save-as-png.png";
-import upload from "../../images/upload.png";
-import deleteDiagram from "../../images/delete.png";
-import nextStep from "../../images/next-step.png";
-import backStep from "../../images/back-step.png";
-import iconFlowline from "../../images/flowline.png";
-import iconInputOutput from "../../images/inputOutput.png";
-import iconProcess from "../../images/process.png";
-import iconTerminal from "../../images/terminal.png";
-import iconDecision from "../../images/decision.png";
-import iconZoomin from "../../images/zoom-in.png";
-import iconZoomout from "../../images/zoom-out.png";
-import iconMove from "../../images/canvas-move.png";
+import saveAsJPG from "./images/save-as-jpg.png";
+import saveAsPNG from "./images/save-as-png.png";
+import upload from "./images/upload.png";
+import deleteDiagram from "./images/delete.png";
+import nextStep from "./images/next-step.png";
+import backStep from "./images/back-step.png";
+import iconFlowline from "./images/flowline.png";
+import iconInputOutput from "./images/inputOutput.png";
+import iconProcess from "./images/process.png";
+import iconTerminal from "./images/terminal.png";
+import iconDecision from "./images/decision.png";
+import iconZoomin from "./images/zoom-in.png";
+import iconZoomout from "./images/zoom-out.png";
+import iconMove from "./images/canvas-move.png";
 
 const ActiveButtonContext = React.createContext();
 
@@ -38,39 +38,7 @@ const Toolbar = ({
   const { drawType, setDrawType } = useContext(DrawTypeContext);
   const { userLogin, setUserLogin } = useContext(UserLoginContext);
 
-  useEffect(() => {
-    // console.log("Toolbar.js -> useEffect drawType", drawType, activeButton);
-    // if (!drawType && Object.keys(activeButton).length > 0) {
-    //   setActiveButton({});
-    // }
-  }, [drawType]);
-
-  useEffect(() => {
-    // console.log(
-    //   "Toolbar.js -> useEffect drawSelected:",
-    //   drawSelected
-    //   // itemImg.draw.info[drawSelected]
-    // );
-    // setActiveButton(() => ({
-    //   purpose: "draw",
-    //   feature: itemImg.draw.info[drawSelected].feature,
-    // }));
-  }, [drawSelected]);
-
-  useEffect(() => {
-    // console.log(
-    //   "Toolbar.js -> useEffect saveSelected:",
-    //   saveSelected,
-    //   // itemImg.saveFile.info[saveSelected]
-    // );
-    // setActiveButton(() => ({
-    //   purpose: "saveFile",
-    //   feature: itemImg.saveFile.info[saveSelected].feature,
-    // }));
-  }, [saveSelected]);
-
   function click(e) {
-    // console.log("Toolbar click", e.target.nodeName);
     setActiveButton((preData) =>
       preData.purpose || preData.feature ? {} : preData
     );
@@ -149,40 +117,46 @@ const Toolbar = ({
           data={itemImg["percent"]}
           disabled={true}
         >
-          <p>{canvasRate.current} %</p>
+          <p className="percent">{canvasRate.current} %</p>
         </ToolItem>
         <ToolItem
           purpose="canvasRate"
           data={itemImg["zoomIn"]}
-          disabled={true}
+          disabled={canvasRate.current >= 2000}
         ></ToolItem>
         <ToolItem
           purpose="canvasRate"
           data={itemImg["zoomOut"]}
-          disabled={true}
+          disabled={canvasRate.current <= 50}
         ></ToolItem>
+        <div className="toolList__separator"></div>
         <ToolItem
           purpose="move"
           data={itemImg["move"]}
-          disabled={true}
+          // disabled={true}
         ></ToolItem>
+        <div className="toolList__separator"></div>
         <ToolItem
           purpose="draw"
           data={itemImg["draw"]}
           changeSelected={setDrawSelected}
         ></ToolItem>
+        <div className="toolList__separator"></div>
         <ToolItem purpose="figure" data={itemImg["figure"]}></ToolItem>
+        <div className="toolList__separator"></div>
         <ToolItem purpose="step" data={itemImg["undo"]}></ToolItem>
         <ToolItem purpose="step" data={itemImg["redo"]}></ToolItem>
-        <ToolItem
-          purpose="saveFile"
-          data={itemImg["saveFile"]}
-          changeSelected={setSaveSelected}
-        ></ToolItem>
+        <div className="toolList__separator"></div>
         <ToolItem
           purpose="save"
           data={itemImg["save"]}
           disabled={userLogin ? false : true}
+        ></ToolItem>
+        <div className="toolList__separator"></div>
+        <ToolItem
+          purpose="saveFile"
+          data={itemImg["saveFile"]}
+          changeSelected={setSaveSelected}
         ></ToolItem>
       </ActiveButtonContext.Provider>
     </div>

@@ -5,8 +5,7 @@ import Signup from "./components/Signup";
 import Login from "./components/Login";
 import ForgotPwd from "./components/ForgotPwd";
 
-// import { userActionContext } from "../../context/UserProvider";
-import { userActionContext } from "../../../context/UserProvider";
+import { userActionContext } from "../../../../context/UserProvider";
 
 const User = ({}) => {
   const clickAction = useRef(false);

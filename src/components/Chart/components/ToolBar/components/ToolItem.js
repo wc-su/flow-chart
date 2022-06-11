@@ -6,7 +6,7 @@ import { ActiveButtonContext } from "../index";
 // components
 import ToolDropdownItem from "./ToolDropdownItem";
 //images
-import iconSelectDown from "../../../images/down.png";
+import iconSelectDown from "../images/down.png";
 
 const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
   const isMounted = useRef(false);
@@ -57,6 +57,9 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
       //   setDrawType(feature);
       // } else {
       //   setDrawType("");
+      // }
+      // if(feature === "move") {
+      //   setMoveCanvas((preData) => !preData);
       // }
       changeActiveButton();
       setToolBarPop("");

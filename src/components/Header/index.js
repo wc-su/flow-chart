@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import classNames from "classnames";
 
 import "./index.scss";
-import User from "./User";
+import User from "./components/User";
 import { logout as fLogout } from "../../firebase/auth";
 
 import {

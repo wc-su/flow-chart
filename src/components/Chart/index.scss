@@ -1,0 +1,11 @@
+.Chart {
+  &__main {
+    // display: grid;
+    // // grid-template-columns: 1fr 150px;
+    // grid-template-columns: 1fr;
+    position: absolute;
+    inset: 110px 0 0 0;
+    overflow: hidden;
+    background-color: rgb(230, 229, 229);
+  }
+}

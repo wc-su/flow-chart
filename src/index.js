@@ -4,8 +4,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import "./index.scss";
 
-import Home from "./pages/Home";
-import Chart from "./pages/Chart";
+import Home from "./components/Home";
+import Chart from "./components/Chart";
 import Header from "./components/Header";
 
 import UserProvider from "./context/UserProvider.js";
