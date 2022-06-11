@@ -155,9 +155,13 @@ const Chart = () => {
         const selectArea = svgRef.current.removeChild(
           svgRef.current.children[1]
         );
-        saveSvgAsPng.saveSvgAsPng(svgRef.current, "chart").then(() => {
-          svgRef.current.appendChild(selectArea);
-        });
+        saveSvgAsPng
+          .saveSvgAsPng(svgRef.current, "chart", {
+            scale: 100 / canvasRate.current,
+          })
+          .then(() => {
+            svgRef.current.appendChild(selectArea);
+          });
         // saveSvgAsPng.saveSvgAsPng(svgRef.current, "name", {width: "", height: ""});
         // saveSvgAsPng.saveSvgAsPng(svgRef.current, "name", {encoderType: "image/jpeg", encoderOptions: 0.8});
         setActiveButton({});
@@ -190,6 +194,7 @@ const Chart = () => {
             encoderType: "image/jpeg",
             encoderOptions: 0.8,
             backgroundColor: "#fff",
+            scale: 100 / canvasRate.current,
           })
           .then(() => {
             // console.log("ok");
