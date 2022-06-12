@@ -1,16 +1,16 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import classNames from "classnames";
 
 import "./index.scss";
-import User from "../User";
+import User from "./components/User";
 import { logout as fLogout } from "../../firebase/auth";
 
 import {
   userActionContext,
   UserLoginContext,
-} from "../Context/UserProvider.js";
-import { LoadingContext } from "../Context/LoadingProvider";
+} from "../../context/UserProvider";
+import { LoadingContext } from "../../context/LoadingProvider";
 
 import menuIcon from "./images/menu.png";
 import closeIcon from "./images/close.png";
@@ -35,6 +35,13 @@ const Header = () => {
     "Header--isIndex": location.pathname === "/",
   });
 
+  useEffect(() => {
+    // console.log("Header: useEffect userAction:", userAction);
+    if (!userAction) {
+      menuRef.current.classList.remove("Header__menu--display");
+    }
+  }, [userAction]);
+
   function clickMenu(e) {
     if (e.target.nodeName === "A") {
       // console.log("xxxx", auth);
@@ -44,9 +51,9 @@ const Header = () => {
       if (action === "logout") {
         setMessage("登出中，請稍候...");
         logout();
-        if (location.pathname === "/Chart") {
-          navigate("/");
-        }
+        // if (location.pathname === "/Chart") {
+        //   navigate("/");
+        // }
         setMessage("");
       }
     }
@@ -54,7 +61,7 @@ const Header = () => {
 
   async function logout() {
     const result = await fLogout();
-    console.log(result);
+    // console.log(result);
     // console.log("yyyy", auth.currentUser, auth);
     if (result.result) {
       setUserAction("");
@@ -79,7 +86,7 @@ const Header = () => {
           <img src={closeIcon} alt="close icon"></img>
         </div>
         <ul onClick={clickMenu}>
-          {userLogin ? (
+          {userLogin === 1 ? (
             <>
               {/* <li>
           <a className="member" href="#" data-action="member">
@@ -129,7 +136,7 @@ const Header = () => {
         </Link>
         {menu}
       </div>
-      {!userLogin && userAction && (
+      {!(userLogin === 1) && userAction && (
         <User userAction={userAction} setUserAction={setUserAction} />
       )}
     </div>

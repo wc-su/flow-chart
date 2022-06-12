@@ -3,3 +3,4 @@ dist
 functions
 .env
 .firebase/
+.DS_Store

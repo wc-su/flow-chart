@@ -1,0 +1,75 @@
+.canvas {
+  // width: 731px;
+  // overflow: hidden;
+  // overflow: hidden;
+  // height: 408px;
+  // position: relative;
+  // position: absolute;
+  // // inset: 0px 0px 0px 0px;
+  // top: 0;
+  // left: 0;
+  // height: 100%;
+  // background-color: rgb(230, 229, 229);
+  // background-color: #fff;
+  // width: 600px;
+  // height: 800px;
+  // box-shadow: 0 0 5px #b4b4b4;
+  &.crosshair {
+    cursor: crosshair;
+  }
+  // .canvasOuter {
+  //   position: absolute;
+  //   width: 1024px;
+  //   height: 800px;
+  // }
+  &__svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  // &__svgBg {
+  //   position: absolute;
+  //   top: 0;
+  //   left: 0;
+  //   // width: 100%;
+  //   background-color: #fff;
+  //   width: 600px;
+  //   height: 800px;
+  //   box-shadow: 0 0 5px gray;
+  // }
+}
+.canvasStyle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 200px;
+  border-left: 2px solid gray;
+  &__container {
+    display: flex;
+  }
+  &__color {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #000;
+    border-radius: 3px;
+    &-code {
+      &-prefix {
+        // min-width: min-content;
+        width: 20px;
+      }
+    }
+  }
+  // .stroke-style--solid::before {
+  //   content: "     ";
+  //   width: 20px;
+  //   border: 1px solid #000;
+  //   display: inline-block;
+  // }
+  // .stroke-style--dashed::before {
+  //   content: "";
+  //   width: 20px;
+  //   border: 1px dashed #000;
+  //   display: inline-block;
+  // }
+}

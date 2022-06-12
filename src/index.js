@@ -1,28 +1,30 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom";
 
 import "./index.scss";
 
-import Home from "./pages/Home";
-import Chart from "./pages/Chart";
 import Header from "./components/Header";
-import Loading from "./components/Loading";
+import Home from "./components/Home";
+import Files from "./components/Files";
+import Chart from "./components/Chart";
 
-import UserProvider from "./components/Context/UserProvider.js";
-import LoadingProvider from "./components/Context/LoadingProvider.js";
+import UserProvider from "./context/UserProvider.js";
+import LoadingProvider from "./context/LoadingProvider.js";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <UserProvider>
         <LoadingProvider>
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
-            {/* <Route path="/" element={<Chart />} /> */}
-            <Route path="/Chart" element={<Chart />} />
+            <Route path="Files" element={<Files />} />
+            <Route path="/Chart" element={<Chart />}>
+              <Route path=":chartId" element={<Chart />} />
+            </Route>
             <Route
               path="*"
               element={
@@ -32,9 +34,8 @@ root.render(
               }
             />
           </Routes>
-          <Loading />
         </LoadingProvider>
       </UserProvider>
-    </BrowserRouter>
+    </HashRouter>
   </React.StrictMode>
 );

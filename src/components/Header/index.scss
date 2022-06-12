@@ -111,10 +111,15 @@
       &-closeIcon {
         display: block;
         cursor: pointer;
-        padding: 14px 20px 11px 0;
+        padding: 15px;
         img {
-          width: 20px;
+          width: 30px;
           margin-left: auto;
+          padding: 5px;
+          &:hover {
+            background: #e7e6e6;
+            border-radius: 5px;
+          }
         }
       }
       ul {
@@ -131,8 +136,14 @@
     &__menuIcon {
       display: block;
       cursor: pointer;
+      margin: 5px 0 10px 0;
       img {
-        width: 20px;
+        width: 30px;
+        padding: 5px;
+        &:hover {
+          background: #e7e6e6;
+          border-radius: 5px;
+        }
       }
     }
   }
