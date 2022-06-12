@@ -61,7 +61,7 @@ const Header = () => {
 
   async function logout() {
     const result = await fLogout();
-    console.log(result);
+    // console.log(result);
     // console.log("yyyy", auth.currentUser, auth);
     if (result.result) {
       setUserAction("");
@@ -86,7 +86,7 @@ const Header = () => {
           <img src={closeIcon} alt="close icon"></img>
         </div>
         <ul onClick={clickMenu}>
-          {userLogin ? (
+          {userLogin === 1 ? (
             <>
               {/* <li>
           <a className="member" href="#" data-action="member">
@@ -136,7 +136,7 @@ const Header = () => {
         </Link>
         {menu}
       </div>
-      {!userLogin && userAction && (
+      {!(userLogin === 1) && userAction && (
         <User userAction={userAction} setUserAction={setUserAction} />
       )}
     </div>

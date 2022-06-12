@@ -116,12 +116,12 @@ const DrawItem = ({
     }
   }
   function mouseUp(e) {
-    console.log(
-      "DrawItem.js -> mouse up:",
-      drawStatus.current,
-      item.type,
-      item.index
-    );
+    // console.log(
+    //   "DrawItem.js -> mouse up:",
+    //   drawStatus.current,
+    //   item.type,
+    //   item.index
+    // );
     // initItem.current = {};
     // initStartPosition.current = {};
     if (item.type !== "ellipse") {

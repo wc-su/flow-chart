@@ -21,6 +21,7 @@ import iconDecision from "./images/decision.png";
 import iconZoomin from "./images/zoom-in.png";
 import iconZoomout from "./images/zoom-out.png";
 import iconMove from "./images/canvas-move.png";
+import iconBackFiles from "./images/back-files.png";
 
 const ActiveButtonContext = React.createContext();
 
@@ -31,12 +32,66 @@ const Toolbar = ({
   setActiveButton,
   toolBarPop,
   setToolBarPop,
+  docTitle,
 }) => {
   const [drawSelected, setDrawSelected] = useState(0);
   const [saveSelected, setSaveSelected] = useState(0);
+  const [title, setTitle] = useState("undefined");
+  // console.log("zxxxxxxx", title, docTitle.current);
+
+  const firstInitTitle = useRef(0);
 
   const { drawType, setDrawType } = useContext(DrawTypeContext);
   const { userLogin, setUserLogin } = useContext(UserLoginContext);
+
+  // if(firstInitTitle.current == 0) {
+  //   if(docTitle.current) {
+  //     console.log("11111");
+  //     setTitle(docTitle.current);
+  //     firstInitTitle.current == 1;
+  //   } else {
+  //     console.log("22222");
+  //     setTitle("undefined");
+  //     firstInitTitle.current == 1;
+  //   }
+  // }
+
+  useEffect(() => {
+    // console.log("tttttt", title, docTitle.current);
+    // if (title === "") {
+    //   setTitle(docTitle.current);
+    // }
+    // if(firstInitTitle.current == 0) {
+    //   setTitle("undefined");
+    //     firstInitTitle.current = 1;
+    //   // if(docTitle.current) {
+    //   //   // console.log("11111");
+    //   //   setTitle(docTitle.current);
+    //   //   firstInitTitle.current = 1;
+    //   // } else {
+    //   //   // console.log("22222");
+    //   //   setTitle("undefined");
+    //   //   firstInitTitle.current = 1;
+    //   // }
+    // } else if(firstInitTitle.current === 1) {
+    //   if(docTitle.current) {
+    //     // console.log("11111");
+    //     setTitle(docTitle.current);
+    //     firstInitTitle.current = 2;
+    //   }
+    // }
+    if (firstInitTitle.current == 0 && docTitle.current) {
+      setTitle(docTitle.current);
+      firstInitTitle.current = 1;
+    }
+  });
+
+  useEffect(() => {
+    // console.log("tttttt", title, docTitle.current);
+    // if (title === "") {
+    //   setTitle(docTitle.current);
+    // }
+  }, [title]);
 
   function click(e) {
     setActiveButton((preData) =>
@@ -47,6 +102,10 @@ const Toolbar = ({
   }
 
   const itemImg = {
+    back: {
+      selected: 0,
+      info: [{ feature: "back", imgUrl: iconBackFiles, text: "back Files" }],
+    },
     move: {
       selected: 0,
       info: [{ feature: "move", imgUrl: iconMove, text: "move" }],
@@ -100,7 +159,16 @@ const Toolbar = ({
       selected: 0,
       info: [{ feature: "database", imgUrl: upload, text: "database" }],
     },
+    title: {
+      selected: 0,
+      info: [{ feature: "database", imgUrl: upload, text: "database" }],
+    },
   };
+
+  function handleTitleChange(e) {
+    setTitle(e.target.value);
+    docTitle.current = e.target.value;
+  }
 
   return (
     <div className="toolList" onClick={click}>
@@ -112,52 +180,61 @@ const Toolbar = ({
           setToolBarPop: setToolBarPop,
         }}
       >
+        <div className="toolList__container">
         <ToolItem
-          purpose="canvasRate"
-          data={itemImg["percent"]}
-          disabled={true}
-        >
-          <p className="percent">{canvasRate.current} %</p>
-        </ToolItem>
-        <ToolItem
-          purpose="canvasRate"
-          data={itemImg["zoomIn"]}
-          disabled={canvasRate.current >= 2000}
-        ></ToolItem>
-        <ToolItem
-          purpose="canvasRate"
-          data={itemImg["zoomOut"]}
-          disabled={canvasRate.current <= 50}
-        ></ToolItem>
-        <div className="toolList__separator"></div>
-        <ToolItem
-          purpose="move"
-          data={itemImg["move"]}
-          // disabled={true}
-        ></ToolItem>
-        <div className="toolList__separator"></div>
-        <ToolItem
-          purpose="draw"
-          data={itemImg["draw"]}
-          changeSelected={setDrawSelected}
-        ></ToolItem>
-        <div className="toolList__separator"></div>
-        <ToolItem purpose="figure" data={itemImg["figure"]}></ToolItem>
-        <div className="toolList__separator"></div>
-        <ToolItem purpose="step" data={itemImg["undo"]}></ToolItem>
-        <ToolItem purpose="step" data={itemImg["redo"]}></ToolItem>
-        <div className="toolList__separator"></div>
-        <ToolItem
-          purpose="save"
-          data={itemImg["save"]}
-          disabled={userLogin ? false : true}
-        ></ToolItem>
-        <div className="toolList__separator"></div>
-        <ToolItem
-          purpose="saveFile"
-          data={itemImg["saveFile"]}
-          changeSelected={setSaveSelected}
-        ></ToolItem>
+            purpose="back"
+            data={itemImg["back"]}
+            disabled={userLogin === 1 ? false : true}
+          ></ToolItem>
+          <div className="toolList__separator"></div>
+          <ToolItem purpose="move" data={itemImg["move"]}></ToolItem>
+          <ToolItem
+            purpose="draw"
+            data={itemImg["draw"]}
+            changeSelected={setDrawSelected}
+          ></ToolItem>
+          <ToolItem purpose="step" data={itemImg["undo"]}></ToolItem>
+          <ToolItem purpose="step" data={itemImg["redo"]}></ToolItem>
+          <ToolItem purpose="figure" data={itemImg["figure"]}></ToolItem>
+        </div>
+        <div className="toolList__container">
+          <input
+            type="text"
+            maxLength="20"
+            className="toolList__title"
+            value={title}
+            onChange={handleTitleChange}
+          />
+        </div>
+        <div className="toolList__container">
+          <ToolItem
+            purpose="save"
+            data={itemImg["save"]}
+            disabled={userLogin === 1 ? false : true}
+          ></ToolItem>
+          <ToolItem
+            purpose="saveFile"
+            data={itemImg["saveFile"]}
+            changeSelected={setSaveSelected}
+          ></ToolItem>
+          <ToolItem
+            purpose="canvasRate"
+            data={itemImg["zoomIn"]}
+            disabled={canvasRate.current >= 500}
+          ></ToolItem>
+          <ToolItem
+            purpose="canvasRate"
+            data={itemImg["zoomOut"]}
+            disabled={canvasRate.current <= 50}
+          ></ToolItem>
+          <ToolItem
+            purpose="canvasRate"
+            data={itemImg["percent"]}
+            disabled={true}
+          >
+            <p className="percent">{canvasRate.current} %</p>
+          </ToolItem>
+        </div>
       </ActiveButtonContext.Provider>
     </div>
   );

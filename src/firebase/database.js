@@ -7,21 +7,42 @@ import {
   addDoc,
   setDoc,
   doc,
+  deleteDoc,
 } from "firebase/firestore";
 
 const db = getFirestore(app);
+
+async function getDataByUserId(userID) {
+  const result = [];
+  try {
+    const querySnapshot = await getDocs(collection(db, userID));
+    querySnapshot.forEach((doc) => {
+      // console.log(`---> ${doc.id} => ${doc.data()}`);
+      // console.log(typeof doc.data().createTime);
+      result.push({
+        fileId: doc.id,
+        title: doc.data().title,
+        createTime: doc.data().createTime,
+        updateTime: doc.data().updateTime,
+        data: doc.data().data,
+      });
+    });
+  } catch (error) {
+    console.log("error:", error);
+  }
+  return result;
+}
+
+async function getFiles(userID) {
+  const result = await getDataByUserId(userID);
+  // console.log("result", result);
+  return result.map((item) => item.fileId);
+}
 
 async function getUserRecord(userID) {
   const result = { result: false, dataID: "", data: [], message: "" };
   try {
     const querySnapshot = await getDocs(collection(db, userID));
-    // querySnapshot.forEach((document) => {
-    //   console.log(`${document.id} => ${document.data()}`);
-    // });
-    // console.log(querySnapshot.docs[0].data().data);
-    // const data = querySnapshot.docs[0].data().data;
-    // console.log(data == querySnapshot.docs[0].data().data);
-    // console.log(data);
     result.result = true;
     result.message = "讀取成功";
     if (querySnapshot.size > 0) {
@@ -43,7 +64,10 @@ async function getUserRecordByID(userID, docID) {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      console.log("Document data:", docSnap.data());
+      // console.log("Document data:", docSnap.data());
+      result.result = true;
+      result.dataID = docID;
+      result.data = docSnap.data();
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
@@ -59,7 +83,7 @@ async function addChartRecord(userID, data) {
   const result = { result: false, dataID: "", message: "寫入失敗" };
   try {
     const docRef = await addDoc(collection(db, userID), data);
-    console.log("Document written with ID: ", docRef.id);
+    // console.log("Document written with ID: ", docRef.id);
     result.result = true;
     result.message = "寫入成功";
     result.dataID = docRef.id;
@@ -71,7 +95,7 @@ async function addChartRecord(userID, data) {
 async function addChartRecordByID(userID, docID, data) {
   const result = { result: false, message: "寫入失敗" };
   try {
-    await setDoc(doc(db, userID, docID), data);
+    await setDoc(doc(db, userID, docID), data, { merge: true });
     result.result = true;
     result.message = "寫入成功";
   } catch (error) {
@@ -93,4 +117,24 @@ async function addChartRecordByID(userID, docID, data) {
 //   //   console.log("batch end ----->");
 // }
 
-export { getUserRecord, addChartRecord, addChartRecordByID };
+async function deleteFile(userID, docID) {
+  const result = { result: false, message: "刪除失敗" };
+  try {
+    await deleteDoc(doc(db, userID, docID));
+    result.result = true;
+    result.message = "刪除成功";
+  } catch (error) {
+    console.log(error);
+  }
+  return result;
+}
+
+export {
+  getUserRecord,
+  addChartRecord,
+  addChartRecordByID,
+  getFiles,
+  getUserRecordByID,
+  getDataByUserId,
+  deleteFile,
+};

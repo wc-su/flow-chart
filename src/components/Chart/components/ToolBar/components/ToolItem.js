@@ -1,4 +1,6 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
 import classNames from "classnames";
 // context
 import { DrawTypeContext } from "../../../index";
@@ -14,6 +16,8 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
   const { setDrawType } = useContext(DrawTypeContext);
   const { activeButton, setActiveButton, toolBarPop, setToolBarPop } =
     useContext(ActiveButtonContext);
+
+const navigate = useNavigate();
 
   let feature = data.info[data.selected].feature;
   const imgUrl = data.info[data.selected].imgUrl;
@@ -63,6 +67,9 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
       // }
       changeActiveButton();
       setToolBarPop("");
+      if(purpose === "back") {
+        navigate("/Files");
+      }
     }
   }
 

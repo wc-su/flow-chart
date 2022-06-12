@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 // import toImg from "react-svg-to-image";
 import saveSvgAsPng from "save-svg-as-png";
@@ -16,6 +16,7 @@ import {
   addChartRecord,
   addChartRecordByID,
   getUserRecord,
+  getUserRecordByID,
 } from "../../firebase/database";
 import { UserLoginContext } from "../../context/UserProvider";
 import { LoadingContext } from "../../context/LoadingProvider";
@@ -25,9 +26,11 @@ const DrawTypeContext = React.createContext();
 
 const Chart = () => {
   const navigate = useNavigate();
+  const { chartId } = useParams();
 
   const firstLogin = useRef(0);
   const docID = useRef("");
+  const docTitle = useRef("");
 
   const chartIndex = useRef(-1);
   const resizeDirection = useRef("");
@@ -63,27 +66,92 @@ const Chart = () => {
 
   const [toolBarPop, setToolBarPop] = useState("");
 
-  // useEffect(() => {
-  //   if (auth.currentUser) {
-  //   } else {
-  //     // navigate("/");
-  //   }
-  // }, []);
+  // if(chartId && !userLogin) {
+  // navigate("/Chart");}
 
   useEffect(() => {
-    if (userLogin && firstLogin.current === 0) {
-      // console.log("ssssss");
+    // console.log(
+    //   "Chart: useEffect []:",
+    //   userLogin,
+    //   firstLogin.current,
+    //   chartId
+    //   // auth.currentUser.uid
+    // );
+    // if(chartId) {
+    //   // firstLogin.current = 1;
+    //   getDataFromDB();
+    // }
+    // if (auth.currentUser && userLogin) {
+    //   getDataFromDB();
+    // }
+  }, []);
+
+  useEffect(() => {
+    // if (userLogin && firstLogin.current === 0) {
+    //   // console.log("ssssss");
+    //   firstLogin.current = 1;
+    //   // console.log("eeeee", auth.currentUser.uid);
+    //   getDataFromDB();
+    // }
+    // 使用者原本登入，後來登出 => 將畫布清掉
+    // if (!userLogin && firstLogin.current === 1) {
+    //   // console.log("ssssss");
+    //   firstLogin.current = 2;
+    //   // console.log("eeeee", auth.currentUser.uid);
+    //   setData([]);
+    // }
+    // console.log(
+    //   "Chart: useEffect every:",
+    //   " chartId:",
+    //   chartId,
+    //   "/ userLogin:",
+    //   userLogin,
+    //   "/ firstLogin:",
+    //   firstLogin.current,
+    //   // "/ auth:",
+    //   // auth.currentUser
+    // );
+    if (userLogin === 1 && chartId && firstLogin.current === 0) {
+      // if (userLogin === 1 && chartId) {
       firstLogin.current = 1;
-      // console.log("eeeee", auth.currentUser.uid);
       getDataFromDB();
-    }
-    if (!userLogin && firstLogin.current === 1) {
-      // console.log("ssssss");
-      firstLogin.current = 2;
-      // console.log("eeeee", auth.currentUser.uid);
+    } else if (userLogin === 2 && chartId) {
+      dataSelected.current = [];
       setData([]);
+      navigate("/Chart");
+      firstLogin.current = 0;
     }
   });
+
+  // console.log(
+  //   "Chart: into:",
+  //   userLogin,
+  //   firstLogin.current,
+  //   chartId,
+  // );
+
+  useEffect(() => {
+    // console.log(
+    //   "Chart: useEffect userLogin:",
+    //   " userLogin:",
+    //   userLogin,
+    //   "/ firstLogin:",
+    //   firstLogin.current,
+    //   "/ chartId:",
+    //   chartId
+    // );
+    if (!chartId && userLogin === 1) {
+      // console.log("start add new file");
+      addNewFile();
+      firstLogin.current = 0;
+    }
+    // else if (userLogin === 2 && chartId) {
+    //   dataSelected.current = [];
+    //   setData([]);
+    //   navigate("/Chart");
+    //   firstLogin.current = 0;
+    // }
+  }, [userLogin]);
 
   useEffect(() => {
     // console.log(
@@ -156,7 +224,7 @@ const Chart = () => {
           svgRef.current.children[1]
         );
         saveSvgAsPng
-          .saveSvgAsPng(svgRef.current, "chart", {
+          .saveSvgAsPng(svgRef.current, docTitle.current ? docTitle.current : "undefined", {
             scale: 100 / canvasRate.current,
           })
           .then(() => {
@@ -190,12 +258,16 @@ const Chart = () => {
         );
         // console.log(tttt, svgRef.current);
         saveSvgAsPng
-          .saveSvgAsPng(svgRef.current, "chart", {
-            encoderType: "image/jpeg",
-            encoderOptions: 0.8,
-            backgroundColor: "#fff",
-            scale: 100 / canvasRate.current,
-          })
+          .saveSvgAsPng(
+            svgRef.current,
+            docTitle.current ? docTitle.current : "undefined",
+            {
+              encoderType: "image/jpeg",
+              encoderOptions: 0.8,
+              backgroundColor: "#fff",
+              scale: 100 / canvasRate.current,
+            }
+          )
           .then(() => {
             // console.log("ok");
             // 將點選區塊加回
@@ -325,41 +397,73 @@ const Chart = () => {
   }, [drawType]);
 
   async function getDataFromDB() {
+    // console.log("getDataFromDB start: chartId:", chartId, auth.currentUser);
     setMessage("資料讀取中，請稍候...");
-    const result = await getUserRecord(auth.currentUser.uid);
-    // console.log(result);
+    const result = await getUserRecordByID(auth.currentUser.uid, chartId);
+    // console.log("getDataFromDB result:", result);
     if (result.result) {
       if (result.dataID) {
         docID.current = result.dataID;
-        setData(result.data);
+        docTitle.current = result.data.title;
+        // console.log("rrrrr", result.data, docTitle.current);
+        setData(result.data.data);
         // console.log(result.data);
       }
+    } else {
+      navigate("/Files");
     }
     setMessage("");
     // console.log(result.message, result);
   }
 
+  async function addNewFile() {
+    // console.log("sssss");
+    const today = new Date();
+    const result = await addChartRecord(auth.currentUser.uid, {
+      title: docTitle.current ? docTitle.current: "undefined",
+      data: data,
+      createTime: today.getTime(),
+      updateTime: today.getTime(),
+    });
+    console.log("add", result);
+    if (result.result) {
+      const fileId = result.dataID;
+      navigate(`/Chart/${fileId}`);
+    } else {
+    }
+  }
+
   async function saveToDB() {
     setMessage("資料儲存中，請稍候...");
     // console.log("this~~~~", auth.currentUser.uid);
+    const today = new Date();
     if (docID.current) {
       const result = await addChartRecordByID(
         auth.currentUser.uid,
         docID.current,
-        { data }
+        {
+          data,
+          updateTime: today.getTime(),
+          title: docTitle.current ? docTitle.current : "undefined",
+        }
       );
       if (result.result) {
       } else {
       }
       // console.log("byID", result.message, result);
-    } else {
-      const result = await addChartRecord(auth.currentUser.uid, { data });
-      if (result.result) {
-        docID.current = result.dataID;
-      } else {
-      }
-      // console.log("firstWrite", result.message, result);
     }
+    // else {
+    //   const result = await addChartRecord(auth.currentUser.uid, {
+    //     data,
+    //     createTime: today.getTime(),
+    //     updateTime: today.getTime(),
+    //   });
+    //   if (result.result) {
+    //     docID.current = result.dataID;
+    //   } else {
+    //   }
+    //   // console.log("firstWrite", result.message, result);
+    // }
     setMessage("");
   }
 
@@ -493,6 +597,7 @@ const Chart = () => {
             setActiveButton={setActiveButton}
             toolBarPop={toolBarPop}
             setToolBarPop={setToolBarPop}
+            docTitle={docTitle}
           />
           <div className="Chart__main" onClick={handleMainClick}>
             <Canvas

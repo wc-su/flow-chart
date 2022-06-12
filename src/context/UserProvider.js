@@ -11,7 +11,7 @@ const UserProvider = ({ children }) => {
   const outerRef = useRef();
 
   const [userAction, setUserAction] = useState("");
-  const [userLogin, setUserLogin] = useState(false);
+  const [userLogin, setUserLogin] = useState(0);
 
   useEffect(() => {
     // console.log("<<< Header >>>", auth.currentUser);
@@ -21,10 +21,10 @@ const UserProvider = ({ children }) => {
       onAuthStateChanged(auth, (user) => {
         // console.log("ppppp");
         if (user) {
-          setUserLogin(true);
+          setUserLogin(1);
           // console.log("sssss");
         } else {
-          setUserLogin(false);
+          setUserLogin(2);
         }
       });
     }

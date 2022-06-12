@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import "./index.scss";
 
@@ -10,6 +11,8 @@ const Login = ({ userAction, setUserAction, changeErrMsg }) => {
   const [password, setPassword] = useState("");
 
   const { message, setMessage } = useContext(LoadingContext);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     // 測試帳號
@@ -36,6 +39,7 @@ const Login = ({ userAction, setUserAction, changeErrMsg }) => {
     console.log("result:", result);
     if (result.result) {
       setUserAction("");
+      navigate("/Files");
     }
     changeErrMsg(result.message);
     setMessage("");
@@ -46,6 +50,7 @@ const Login = ({ userAction, setUserAction, changeErrMsg }) => {
     console.log("result:", result);
     if (result.result) {
       setUserAction("");
+      navigate("/Files");
     }
     changeErrMsg(result.message);
     setMessage("");

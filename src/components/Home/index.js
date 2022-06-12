@@ -2,13 +2,13 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 
 import "./index.scss";
-import { userActionContext } from "../../context/UserProvider";
-import header1 from "./images/header-1.png";
+import { UserLoginContext } from "../../context/UserProvider";
 
+// images
+import header1 from "./images/header-1.png";
 import icon4 from "./images/logo-icon.png";
 import githubIcon from "./images/github.png";
 import linkedinIcon from "./images/linkedin.png";
-
 import feature1 from "./images/feature-1.png";
 import feature2 from "./images/feature-2.png";
 import feature3 from "./images/feature-3.png";
@@ -17,14 +17,7 @@ const githubHref = "#";
 const linkedinHref = "#";
 
 const Home = () => {
-  const { setUserAction } = useContext(userActionContext);
-
-  function linkToChart(e) {
-    // if (!auth.currentUser) {
-    //   e.preventDefault();
-    //   setUserAction("login");
-    // }
-  }
+  const { userLogin } = useContext(UserLoginContext);
 
   return (
     <div className="Home">
@@ -39,7 +32,7 @@ const Home = () => {
                 <p>Draw a Flowchart</p>
               </div>
               <div className="header__link">
-                <Link to="/Chart" onClick={linkToChart}>
+                <Link to={userLogin === 1 ? "/Files" : "/Chart"}>
                   Try it free
                 </Link>
               </div>
@@ -113,14 +106,14 @@ const Home = () => {
         </div>
         <div className="startArea">
           <p>Start drawing</p>
-          <Link to="/Chart" className="link" onClick={linkToChart}>
+          <Link to={userLogin === 1 ? "/Files" : "/Chart"} className="link">
             Try it free
           </Link>
         </div>
       </div>
       <div className="footer">
         <div className="footer__content">
-          <Link to="/" className="footer__content-logo" onClick={linkToChart}>
+          <Link to="/" className="footer__content-logo">
             <img src={icon4} alt="logo" />
           </Link>
         </div>
