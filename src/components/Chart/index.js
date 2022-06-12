@@ -224,9 +224,13 @@ const Chart = () => {
           svgRef.current.children[1]
         );
         saveSvgAsPng
-          .saveSvgAsPng(svgRef.current, docTitle.current ? docTitle.current : "undefined", {
-            scale: 100 / canvasRate.current,
-          })
+          .saveSvgAsPng(
+            svgRef.current,
+            docTitle.current ? docTitle.current : "undefined",
+            {
+              scale: 100 / canvasRate.current,
+            }
+          )
           .then(() => {
             svgRef.current.appendChild(selectArea);
           });
@@ -420,7 +424,7 @@ const Chart = () => {
     // console.log("sssss");
     const today = new Date();
     const result = await addChartRecord(auth.currentUser.uid, {
-      title: docTitle.current ? docTitle.current: "undefined",
+      title: docTitle.current ? docTitle.current : "undefined",
       data: data,
       createTime: today.getTime(),
       updateTime: today.getTime(),

@@ -17,7 +17,7 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
   const { activeButton, setActiveButton, toolBarPop, setToolBarPop } =
     useContext(ActiveButtonContext);
 
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
   let feature = data.info[data.selected].feature;
   const imgUrl = data.info[data.selected].imgUrl;
@@ -67,7 +67,7 @@ const navigate = useNavigate();
       // }
       changeActiveButton();
       setToolBarPop("");
-      if(purpose === "back") {
+      if (purpose === "back") {
         navigate("/Files");
       }
     }
