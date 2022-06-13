@@ -38,7 +38,7 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
 
   useEffect(() => {
     // if (purpose === "draw") {
-    // console.log("ToolItem.js -> useEffect pop:", pop);
+    // console.log("ToolItem.js -> useEffect toolBarPop:", toolBarPop);
     // }
     if (isMounted.current) {
       // feature =  data.info[data.selected].feature;
