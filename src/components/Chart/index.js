@@ -30,7 +30,8 @@ const Chart = () => {
 
   const firstLogin = useRef(0);
   const docID = useRef("");
-  const docTitle = useRef("");
+  const docTitle = useRef("undefined");
+  const firstInitTitle = useRef(0);
 
   const chartIndex = useRef(-1);
   const resizeDirection = useRef("");
@@ -74,14 +75,17 @@ const Chart = () => {
       }
     } else if (userLogin === 2 && chartId) {
       dataSelected.current = [];
+      docTitle.current = "undefined";
+      firstInitTitle.current = 0;
       setData([]);
-      navigate("/Chart");
       firstLogin.current = 0;
+      handleRerender();
+      navigate("/Chart");
     }
   });
 
   useEffect(() => {
-    if (!chartId && userLogin === 1) {
+    if (!chartId && userLogin === 1 && isBrowser) {
       setMessage("新增資料中，請稍候...");
       addNewFile();
       firstLogin.current = 0;
@@ -324,6 +328,7 @@ const Chart = () => {
       if (result.dataID) {
         docID.current = result.dataID;
         docTitle.current = result.data.title;
+        firstInitTitle.current = 0;
         // console.log("rrrrr", result.data, docTitle.current);
         setData(result.data.data);
         // console.log(result.data);
@@ -517,6 +522,7 @@ const Chart = () => {
             toolBarPop={toolBarPop}
             setToolBarPop={setToolBarPop}
             docTitle={docTitle}
+            firstInitTitle={firstInitTitle}
           />
           <div className="Chart__main" onClick={handleMainClick}>
             <Canvas

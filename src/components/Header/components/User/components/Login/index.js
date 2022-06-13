@@ -40,7 +40,7 @@ const Login = ({ userAction, setUserAction, changeErrMsg }) => {
     console.log("result:", result);
     if (result.result) {
       setUserAction("");
-      if(location.pathname === "/") {
+      if (location.pathname === "/") {
         navigate("/Files");
       }
     }
@@ -53,7 +53,7 @@ const Login = ({ userAction, setUserAction, changeErrMsg }) => {
     console.log("result:", result);
     if (result.result) {
       setUserAction("");
-      if(location.pathname === "/") {
+      if (location.pathname === "/") {
         navigate("/Files");
       }
     }

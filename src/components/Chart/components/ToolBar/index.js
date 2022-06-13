@@ -34,13 +34,12 @@ const Toolbar = ({
   toolBarPop,
   setToolBarPop,
   docTitle,
+  firstInitTitle,
 }) => {
   const [drawSelected, setDrawSelected] = useState(0);
   const [saveSelected, setSaveSelected] = useState(0);
   const [title, setTitle] = useState("undefined");
   // console.log("zxxxxxxx", title, docTitle.current);
-
-  const firstInitTitle = useRef(0);
 
   const { drawType, setDrawType } = useContext(DrawTypeContext);
   const { userLogin, setUserLogin } = useContext(UserLoginContext);
@@ -81,7 +80,7 @@ const Toolbar = ({
     //     firstInitTitle.current = 2;
     //   }
     // }
-    if (firstInitTitle.current == 0 && docTitle.current) {
+    if (firstInitTitle.current == 0) {
       setTitle(docTitle.current);
       firstInitTitle.current = 1;
     }
@@ -185,7 +184,7 @@ const Toolbar = ({
           <ToolItem
             purpose="back"
             data={itemImg["back"]}
-            disabled={userLogin === 1 ? false : isMobile ? false : true}
+            disabled={userLogin === 1 ? false : true}
           ></ToolItem>
           <div className="toolList__separator"></div>
           <ToolItem
