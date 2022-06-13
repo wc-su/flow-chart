@@ -1,5 +1,5 @@
-# flow-chart
-flow-chart is a simple tool to draw flow chart.
+# FlowChart
+FlowChart is a simple tool to draw flow chart.
 
 
 # Front-end Technique
