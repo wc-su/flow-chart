@@ -185,19 +185,35 @@ const Toolbar = ({
           <ToolItem
             purpose="back"
             data={itemImg["back"]}
-            disabled={userLogin === 1 ? false : (isMobile? false :true)}
+            disabled={userLogin === 1 ? false : isMobile ? false : true}
           ></ToolItem>
           <div className="toolList__separator"></div>
-          <ToolItem purpose="move" data={itemImg["move"]} disabled={isMobile}></ToolItem>
+          <ToolItem
+            purpose="move"
+            data={itemImg["move"]}
+            disabled={isMobile}
+          ></ToolItem>
           <ToolItem
             purpose="draw"
             data={itemImg["draw"]}
             disabled={isMobile}
             changeSelected={setDrawSelected}
           ></ToolItem>
-          <ToolItem purpose="step" data={itemImg["undo"]} disabled={isMobile}></ToolItem>
-          <ToolItem purpose="step" data={itemImg["redo"]} disabled={isMobile}></ToolItem>
-          <ToolItem purpose="figure" data={itemImg["figure"]} disabled={isMobile}></ToolItem>
+          <ToolItem
+            purpose="step"
+            data={itemImg["undo"]}
+            disabled={isMobile}
+          ></ToolItem>
+          <ToolItem
+            purpose="step"
+            data={itemImg["redo"]}
+            disabled={isMobile}
+          ></ToolItem>
+          <ToolItem
+            purpose="figure"
+            data={itemImg["figure"]}
+            disabled={isMobile}
+          ></ToolItem>
         </div>
         <div className="toolList__container">
           <input
@@ -213,7 +229,7 @@ const Toolbar = ({
           <ToolItem
             purpose="save"
             data={itemImg["save"]}
-            disabled={isMobile ? true : (userLogin === 1 ? false : true)}
+            disabled={isMobile ? true : userLogin === 1 ? false : true}
           ></ToolItem>
           <ToolItem
             purpose="saveFile"

@@ -8,6 +8,8 @@ import {
   setDoc,
   doc,
   deleteDoc,
+  orderBy,
+  query,
 } from "firebase/firestore";
 
 const db = getFirestore(app);
@@ -15,10 +17,9 @@ const db = getFirestore(app);
 async function getDataByUserId(userID) {
   const result = [];
   try {
-    const querySnapshot = await getDocs(collection(db, userID));
+    const q = query(collection(db, userID), orderBy("updateTime", "desc"));
+    const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      // console.log(`---> ${doc.id} => ${doc.data()}`);
-      // console.log(typeof doc.data().createTime);
       result.push({
         fileId: doc.id,
         title: doc.data().title,
@@ -35,7 +36,6 @@ async function getDataByUserId(userID) {
 
 async function getFiles(userID) {
   const result = await getDataByUserId(userID);
-  // console.log("result", result);
   return result.map((item) => item.fileId);
 }
 
@@ -64,12 +64,10 @@ async function getUserRecordByID(userID, docID) {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      // console.log("Document data:", docSnap.data());
       result.result = true;
       result.dataID = docID;
       result.data = docSnap.data();
     } else {
-      // doc.data() will be undefined in this case
       console.log("No such document!");
     }
   } catch (error) {
@@ -83,7 +81,6 @@ async function addChartRecord(userID, data) {
   const result = { result: false, dataID: "", message: "寫入失敗" };
   try {
     const docRef = await addDoc(collection(db, userID), data);
-    // console.log("Document written with ID: ", docRef.id);
     result.result = true;
     result.message = "寫入成功";
     result.dataID = docRef.id;
@@ -103,19 +100,6 @@ async function addChartRecordByID(userID, docID, data) {
   }
   return result;
 }
-
-// async function addChartRecordBatch(userID, arrayData) {
-//   //   console.log("batch start ----->", arrayData);
-//   const batch = writeBatch(db);
-
-//   //   console.log("batch set start ----->");
-//   const nycRef = doc(db, userID, "1");
-//   batch.set(nycRef, arrayData);
-//   //   console.log("batch set end ----->");
-
-//   await batch.commit();
-//   //   console.log("batch end ----->");
-// }
 
 async function deleteFile(userID, docID) {
   const result = { result: false, message: "刪除失敗" };
