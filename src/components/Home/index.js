@@ -1,8 +1,9 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import "./index.scss";
 import { UserLoginContext } from "../../context/UserProvider";
+import { LoadingContext } from "../../context/LoadingProvider";
 
 // images
 import header1 from "./images/header-1.png";
@@ -13,11 +14,21 @@ import feature1 from "./images/feature-1.png";
 import feature2 from "./images/feature-2.png";
 import feature3 from "./images/feature-3.png";
 
-const githubHref = "#";
-const linkedinHref = "#";
+const githubHref = "https://github.com/wc-su/flow-chart";
+const linkedinHref =
+  "https://www.linkedin.com/in/%E9%9F%8B%E4%B8%9E-%E8%98%87-b14942126/";
 
 const Home = () => {
   const { userLogin } = useContext(UserLoginContext);
+  const { setMessage } = useContext(LoadingContext);
+
+  useEffect(() => {
+    if (userLogin === 0) {
+      setMessage("載入中，請稍候...");
+    } else {
+      setMessage("");
+    }
+  }, [userLogin]);
 
   return (
     <div className="Home">
@@ -121,10 +132,10 @@ const Home = () => {
           <p>Copyright © 2022 Eric Su</p>
         </div>
         <div className="footer__social">
-          <a href={githubHref}>
+          <a href={githubHref} target="_blank">
             <img src={githubIcon} alt="github icon" />
           </a>
-          <a href={linkedinHref}>
+          <a href={linkedinHref} target="_blank">
             <img src={linkedinIcon} alt="linkedin icon" />
           </a>
         </div>

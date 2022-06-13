@@ -20,15 +20,9 @@ import FileItem from "./components/FileItem";
 const Files = () => {
   const [files, setFiles] = useState([]);
   const { userLogin } = useContext(UserLoginContext);
-  const { message, setMessage, test, setTest } = useContext(LoadingContext);
+  const { setMessage } = useContext(LoadingContext);
 
-  //   const location = useLocation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // console.log("xxx");
-    // setMessage("載入中，請稍候...");
-  }, []);
 
   // useEffect(() => {
   //   console.log("Files -> useEffect files:", files, userLogin);
@@ -50,28 +44,20 @@ const Files = () => {
 
   useEffect(() => {
     // console.log("Files -> useEffect userLogin:", userLogin, files, message);
-    // console.log("start loading");
-    setMessage("載入中，請稍候...");
-    if (userLogin === 1) {
-      // console.log("login and get data");
-      getFilesFromDB();
-    } else {
-      navigate("/");
-      //   console.log("2");
-      //   setMessage("請先登入");
-      // setTimeout(() => {
-      //   // console.log("4");
-      //   navigate("/");
-      // }, 2000);
-      //   console.log("3");
+    if (userLogin === 0) {
+      setMessage("載入中，請稍候...");
     }
-    // console.log("end loading");
-    setMessage("");
+    if (userLogin === 1) {
+      getFilesFromDB();
+    } else if (userLogin == 2) {
+      navigate("/");
+    }
   }, [userLogin]);
 
   async function getFilesFromDB() {
     const result = await getDataByUserId(auth.currentUser.uid);
     setFiles(result);
+    setMessage("");
   }
 
   function setTimeLayout(timeModify) {
@@ -108,6 +94,9 @@ const Files = () => {
         </p>
       </div>
       <div className="files__content">
+        <div className="files__item files__item-add" onClick={addNewFile}>
+          <img src={iconAdd} alt="add"></img>
+        </div>
         {files.map((item) => {
           return (
             <FileItem
@@ -127,9 +116,6 @@ const Files = () => {
             </FileItem>
           );
         })}
-        <div className="files__item files__item-add" onClick={addNewFile}>
-          <img src={iconAdd} alt="add"></img>
-        </div>
       </div>
     </div>
   );
