@@ -66,51 +66,7 @@ const Chart = () => {
 
   const [toolBarPop, setToolBarPop] = useState("");
 
-  // if(chartId && !userLogin) {
-  // navigate("/Chart");}
-
   useEffect(() => {
-    // console.log(
-    //   "Chart: useEffect []:",
-    //   userLogin,
-    //   firstLogin.current,
-    //   chartId
-    //   // auth.currentUser.uid
-    // );
-    // if(chartId) {
-    //   // firstLogin.current = 1;
-    //   getDataFromDB();
-    // }
-    // if (auth.currentUser && userLogin) {
-    //   getDataFromDB();
-    // }
-  }, []);
-
-  useEffect(() => {
-    // if (userLogin && firstLogin.current === 0) {
-    //   // console.log("ssssss");
-    //   firstLogin.current = 1;
-    //   // console.log("eeeee", auth.currentUser.uid);
-    //   getDataFromDB();
-    // }
-    // 使用者原本登入，後來登出 => 將畫布清掉
-    // if (!userLogin && firstLogin.current === 1) {
-    //   // console.log("ssssss");
-    //   firstLogin.current = 2;
-    //   // console.log("eeeee", auth.currentUser.uid);
-    //   setData([]);
-    // }
-    // console.log(
-    //   "Chart: useEffect every:",
-    //   " chartId:",
-    //   chartId,
-    //   "/ userLogin:",
-    //   userLogin,
-    //   "/ firstLogin:",
-    //   firstLogin.current,
-    //   // "/ auth:",
-    //   // auth.currentUser
-    // );
     if (userLogin === 1 && chartId && firstLogin.current === 0) {
       if (isBrowser) {
         firstLogin.current = 1;
@@ -124,34 +80,12 @@ const Chart = () => {
     }
   });
 
-  // console.log(
-  //   "Chart: into:",
-  //   userLogin,
-  //   firstLogin.current,
-  //   chartId,
-  // );
-
   useEffect(() => {
-    // console.log(
-    //   "Chart: useEffect userLogin:",
-    //   " userLogin:",
-    //   userLogin,
-    //   "/ firstLogin:",
-    //   firstLogin.current,
-    //   "/ chartId:",
-    //   chartId
-    // );
     if (!chartId && userLogin === 1) {
-      // console.log("start add new file");
+      setMessage("新增資料中，請稍候...");
       addNewFile();
       firstLogin.current = 0;
     }
-    // else if (userLogin === 2 && chartId) {
-    //   dataSelected.current = [];
-    //   setData([]);
-    //   navigate("/Chart");
-    //   firstLogin.current = 0;
-    // }
   }, [userLogin]);
 
   useEffect(() => {

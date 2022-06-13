@@ -48,6 +48,7 @@ const Files = () => {
       setMessage("載入中，請稍候...");
     }
     if (userLogin === 1) {
+      setMessage("載入中，請稍候...");
       getFilesFromDB();
     } else if (userLogin == 2) {
       navigate("/");
