@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
+import { isMobile } from "react-device-detect";
 
 import "./index.scss";
 
@@ -184,18 +185,19 @@ const Toolbar = ({
           <ToolItem
             purpose="back"
             data={itemImg["back"]}
-            disabled={userLogin === 1 ? false : true}
+            disabled={userLogin === 1 ? false : (isMobile? false :true)}
           ></ToolItem>
           <div className="toolList__separator"></div>
-          <ToolItem purpose="move" data={itemImg["move"]}></ToolItem>
+          <ToolItem purpose="move" data={itemImg["move"]} disabled={isMobile}></ToolItem>
           <ToolItem
             purpose="draw"
             data={itemImg["draw"]}
+            disabled={isMobile}
             changeSelected={setDrawSelected}
           ></ToolItem>
-          <ToolItem purpose="step" data={itemImg["undo"]}></ToolItem>
-          <ToolItem purpose="step" data={itemImg["redo"]}></ToolItem>
-          <ToolItem purpose="figure" data={itemImg["figure"]}></ToolItem>
+          <ToolItem purpose="step" data={itemImg["undo"]} disabled={isMobile}></ToolItem>
+          <ToolItem purpose="step" data={itemImg["redo"]} disabled={isMobile}></ToolItem>
+          <ToolItem purpose="figure" data={itemImg["figure"]} disabled={isMobile}></ToolItem>
         </div>
         <div className="toolList__container">
           <input
@@ -204,28 +206,30 @@ const Toolbar = ({
             className="toolList__title"
             value={title}
             onChange={handleTitleChange}
+            disabled={isMobile}
           />
         </div>
         <div className="toolList__container">
           <ToolItem
             purpose="save"
             data={itemImg["save"]}
-            disabled={userLogin === 1 ? false : true}
+            disabled={isMobile ? true : (userLogin === 1 ? false : true)}
           ></ToolItem>
           <ToolItem
             purpose="saveFile"
             data={itemImg["saveFile"]}
             changeSelected={setSaveSelected}
+            disabled={isMobile}
           ></ToolItem>
           <ToolItem
             purpose="canvasRate"
             data={itemImg["zoomIn"]}
-            disabled={canvasRate.current >= 500}
+            disabled={isMobile || canvasRate.current >= 500}
           ></ToolItem>
           <ToolItem
             purpose="canvasRate"
             data={itemImg["zoomOut"]}
-            disabled={canvasRate.current <= 50}
+            disabled={isMobile || canvasRate.current <= 50}
           ></ToolItem>
           <ToolItem
             purpose="canvasRate"

@@ -1,12 +1,11 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate, useParams } from "react-router-dom";
-
-// import toImg from "react-svg-to-image";
+import { MobileView, isBrowser } from "react-device-detect";
 import saveSvgAsPng from "save-svg-as-png";
-// console.log(saveSvgAsPng);
 
 import "./index.scss";
+
 import Toolbar from "./components/ToolBar";
 import Canvas from "./components/Canvas";
 import CanvasStyle from "./components/Canvas/components/CanvasStyle";
@@ -18,6 +17,7 @@ import {
   getUserRecord,
   getUserRecordByID,
 } from "../../firebase/database";
+
 import { UserLoginContext } from "../../context/UserProvider";
 import { LoadingContext } from "../../context/LoadingProvider";
 
@@ -112,9 +112,10 @@ const Chart = () => {
     //   // auth.currentUser
     // );
     if (userLogin === 1 && chartId && firstLogin.current === 0) {
-      // if (userLogin === 1 && chartId) {
-      firstLogin.current = 1;
-      getDataFromDB();
+      if (isBrowser) {
+        firstLogin.current = 1;
+        getDataFromDB();
+      }
     } else if (userLogin === 2 && chartId) {
       dataSelected.current = [];
       setData([]);
@@ -234,33 +235,15 @@ const Chart = () => {
           .then(() => {
             svgRef.current.appendChild(selectArea);
           });
-        // saveSvgAsPng.saveSvgAsPng(svgRef.current, "name", {width: "", height: ""});
-        // saveSvgAsPng.saveSvgAsPng(svgRef.current, "name", {encoderType: "image/jpeg", encoderOptions: 0.8});
         setActiveButton({});
-
-        // // 會修改我的 html
-        // // console.log(document.querySelector('#svgXXX'));
-        // toImg("#svgXXX", "name", {
-        //   // scale: 3,
-        //   // format: 'svg',
-        //   // quality: 0.01,
-        //   // download: true,
-        //   // ignore: '.ignored'
-        // }).then((fileData) => {
-        //   console.log("2222", fileData);
-        //   //do something with the data
-        //   setActiveButton({});
-        // });
       } else if (
         activeButton.purpose === "saveFile" &&
         activeButton.feature === "jpg"
       ) {
-        // console.log(svgRef.current, svgRef.current.children);
         // 將點選區塊移除
         const selectArea = svgRef.current.removeChild(
           svgRef.current.children[1]
         );
-        // console.log(tttt, svgRef.current);
         saveSvgAsPng
           .saveSvgAsPng(
             svgRef.current,
@@ -273,11 +256,9 @@ const Chart = () => {
             }
           )
           .then(() => {
-            // console.log("ok");
             // 將點選區塊加回
             svgRef.current.appendChild(selectArea);
           });
-        // console.log("xxx");
         setActiveButton({});
       } else if (
         activeButton.purpose === "save" &&
@@ -620,6 +601,14 @@ const Chart = () => {
             />
             {/* <CanvasStyle chartIndex={chartIndex} /> */}
           </div>
+          <MobileView className="Chart__prompt">
+            <div className="Chart__prompt-container">
+              <p className="Chart__prompt-message1">Sorry!</p>
+              <p className="Chart__prompt-message2">
+                手機及平板尚不支援該功能，請改於電腦上操作，謝謝。
+              </p>
+            </div>
+          </MobileView>
         </DrawTypeContext.Provider>
       </DataContext.Provider>
     </div>
