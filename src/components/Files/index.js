@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { isMobile } from "react-device-detect";
 
 import "./index.scss";
 // import iconAdd from "./images/plus-sign.png";
@@ -73,17 +74,20 @@ const Files = () => {
   }
 
   async function addNewFile() {
-    const today = new Date();
-    const result = await addChartRecord(auth.currentUser.uid, {
-      title: "undefined",
-      data: [],
-      createTime: today.getTime(),
-      updateTime: today.getTime(),
-    });
-    if (result.result) {
-      const fileId = result.dataID;
-      navigate(`/Chart/${fileId}`);
+    if (isMobile) {
     } else {
+      const today = new Date();
+      const result = await addChartRecord(auth.currentUser.uid, {
+        title: "undefined",
+        data: [],
+        createTime: today.getTime(),
+        updateTime: today.getTime(),
+      });
+      if (result.result) {
+        const fileId = result.dataID;
+        navigate(`/Chart/${fileId}`);
+      } else {
+      }
     }
   }
 
