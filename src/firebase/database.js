@@ -22,6 +22,7 @@ async function getDataByUserId(userID) {
     querySnapshot.forEach((doc) => {
       result.push({
         fileId: doc.id,
+        imgId: doc.data().imgId,
         title: doc.data().title,
         createTime: doc.data().createTime,
         updateTime: doc.data().updateTime,
@@ -32,11 +33,6 @@ async function getDataByUserId(userID) {
     console.log("error:", error);
   }
   return result;
-}
-
-async function getFiles(userID) {
-  const result = await getDataByUserId(userID);
-  return result.map((item) => item.fileId);
 }
 
 async function getUserRecord(userID) {
@@ -117,7 +113,6 @@ export {
   getUserRecord,
   addChartRecord,
   addChartRecordByID,
-  getFiles,
   getUserRecordByID,
   getDataByUserId,
   deleteFile,

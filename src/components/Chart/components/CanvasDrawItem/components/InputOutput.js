@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 const InputOutput = ({ item }) => {
   const { x, y, width, height, pointerEvents } = item;

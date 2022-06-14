@@ -1,8 +1,8 @@
 import React from "react";
 
-import DrawItem from "./DrawItem";
+import CanvasDrawItem from "./CanvasDrawItem";
 
-const DrawList = ({
+const CanvasDrawList = ({
   data,
   canvasPosition,
   drawStatus,
@@ -13,7 +13,7 @@ const DrawList = ({
     <g>
       {data.map((item) => {
         return (
-          <DrawItem
+          <CanvasDrawItem
             key={item.index}
             item={item}
             canvasPosition={canvasPosition}
@@ -27,4 +27,4 @@ const DrawList = ({
   );
 };
 
-export default DrawList;
+export default CanvasDrawList;

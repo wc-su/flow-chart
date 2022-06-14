@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useContext, useState } from "react";
 
 import "./index.scss";
-import Signup from "./components/Signup";
-import Login from "./components/Login";
-import ForgotPwd from "./components/ForgotPwd";
+import Signup from "../Signup";
+import Login from "../Login";
+import ForgotPwd from "../ForgotPwd";
 
 import { userActionContext } from "../../../../context/UserProvider";
 

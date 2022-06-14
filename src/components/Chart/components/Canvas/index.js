@@ -1,18 +1,14 @@
 import React, { useRef, useState, useEffect, useContext } from "react";
 import { v4 as uuidv4 } from "uuid";
-import classNames from "classnames";
 
 import "./index.scss";
 
-// import { DataContext, DataSelectedContext, DrawTypeContext } from "../index";
 import { DataContext, DrawTypeContext } from "../../index";
-import DrawList from "./components/DrawList";
-// import CanvasStyle from "./CanvasStyle";
+import CanvasDrawList from "../CanvasDrawList";
 
 const Canvas = ({
   canvasRate,
   chartIndex,
-  // drawPoint,
   resizeDirection,
   needSaveStep,
   svgRef,
@@ -23,9 +19,7 @@ const Canvas = ({
   tempFlag,
   moveCanvas,
 }) => {
-  // const newRate = 100 / canvasRate.current;
   const newRate = canvasRate.current / 100;
-  // console.log("wwwww", canvasRate.current, newRate);
 
   // 取得畫布的起始座標
   const canvasRef = useRef();
@@ -42,27 +36,13 @@ const Canvas = ({
   const moveInitData = useRef();
 
   const { data, setData } = useContext(DataContext);
-  // const { dataSelected } = useContext(DataSelectedContext);
   const { drawType, setDrawType } = useContext(DrawTypeContext);
 
   const [screenSize, setScreenSize] = useState({
     screenWidth: window.innerWidth,
     screenHeight: window.innerHeight,
   });
-  // const [screenSizeMinusScroll, setScreenSizeMinusScroll] = useState({
-  //   width: window.innerWidth,
-  //   height: window.innerHeight,
-  // });
-  // const screenSizeMinusScroll = useRef({
-  //   width: canvasRef.current ? canvasRef.current.clientWidth : null
-  // });
 
-  // const canvasClass = classNames("canvas", {
-  //   crosshair: drawType !== "" && !moveCanvas,
-  //   grab:
-  // });
-
-  // console.log("eeee", drawType, moveCanvas, canvasRef.current);
   if (canvasRef.current) {
     if (drawType !== "" && !moveCanvas) {
       canvasRef.current.style.cursor = "crosshair";
@@ -73,26 +53,7 @@ const Canvas = ({
     }
   }
 
-  // console.log("this", drawType, canvasClass);
-  // const canvasOuterClass = {
-
-  // }
-
-  const canvasStyle = {
-    // width: "100%",
-    // height: "100%",
-    // display: "block",
-    // minWidth: `${screenSize.screenWidth}px`,
-    // minHeight: `${screenSize.screenHeight - canvasPosition.current.y}px`,
-    position: "absolute",
-    top: "0",
-    // top: "10px",
-    left: "0",
-    // cursor: "crosshair"
-  };
-
   const detectResize = () => {
-    // console.log("yyyy");
     setScreenSize({
       screenWidth: window.innerWidth,
       screenHeight: window.innerHeight,
@@ -100,31 +61,13 @@ const Canvas = ({
   };
 
   useEffect(() => {
-    // console.log("xxxx", screenSize, canvasRef.current);
     window.addEventListener("resize", detectResize);
     return () => {
       window.removeEventListener("resize", detectResize);
     };
   }, [screenSize]);
 
-  // const detectonScrollResize = () => {
-  //   // console.log("yyyy");
-  //   setScreenSizeMinusScroll({
-  //     screenWidth: window.innerWidth,
-  //     screenHeight: window.innerHeight,
-  //   });
-  // };
-
-  // useEffect(() => {
-  //   console.log("xxxx", screenSize, canvasRef.current, screenSizeMinusScroll.current);
-  //   window.addEventListener("onScroll", detectonScrollResize);
-  //   return () => {
-  //     window.removeEventListener("onScroll", detectonScrollResize);
-  //   };
-  // }, [screenSizeMinusScroll]);
-
   useEffect(() => {
-    // console.log("aaaas", canvasRef);
     if (canvasRef) {
       canvasPosition.current = canvasRef.current.getBoundingClientRect();
       svgPos.current = {
@@ -133,30 +76,8 @@ const Canvas = ({
         width: screenSize.screenWidth * 3,
         height: (screenSize.screenHeight - canvasPosition.current.y) * 2,
       };
-
-      // screenSizeMinusScroll.current.width = canvasRef.current.clientWidth;
-      // screenSizeMinusScroll.current.height = canvasRef.current.clientHeight;
-      // console.log("zzzz", canvasPosition.current, screenSizeMinusScroll.current);
     }
   }, [canvasRef]);
-
-  useEffect(() => {
-    // console.log(
-    //   "Canvas.js -> ussEffect data:",
-    //   drawStatus.current,
-    //   data.length,
-    //   data.length > 0 ? data[data.length - 1].index : -1
-    // );
-    // if (drawStatus.current === 2) {
-    //   // drawPoint();
-    // } else if (drawStatus.current === 5) {
-    //   drawPoint();
-    // } else if (drawStatus.current === 8) {
-    //   drawPoint();
-    // } else if (drawStatus.current === 9) {
-    //   drawPoint();
-    // }
-  }, [data]);
 
   function mouseDown(e) {
     console.log("Canvas.js -> mouse down", drawStatus.current, drawType);
@@ -167,7 +88,6 @@ const Canvas = ({
       canvasRef.current.style.cursor = "grabbing";
       drawStatus.current = 15;
       const canvasInset = getCanvasPos();
-      // console.log("sssss", canvasInset, e.clientX, e.clientY);
       moveInitData.current = {
         canvasInset: canvasInset,
         mouseStartX: e.clientX,
@@ -175,34 +95,11 @@ const Canvas = ({
       };
     } else {
       if (drawStatus.current === 0 && drawType) {
-        // console.log(
-        //   `Screen X/Y: ${e.screenX}, ${e.screenY}, Client X/Y: ${e.clientX}, ${
-        //     e.clientY
-        //   }, content X/Y: ${canvasPosition.current.x}, ${canvasPosition.current.y} => ${
-        //     e.clientX - canvasPosition.current.x
-        //   }, ${e.clientY - canvasPosition.current.y}`
-        // );
         const canvasInset = getCanvasPos();
-        // console.log(
-        //   `canvasPosition X/Y: ${canvasPosition.current.x}, ${canvasPosition.current.y}`
-        // );
-        // console.log(
-        //   `canvasInset Top/Left/Bottom/Right: ${canvasInset.top}, ${canvasInset.left}}`
-        // );
         drawStatus.current = 1;
         setData((preData) => {
-          // const x = (e.clientX - canvasPosition.current.x) * newRate;
-          // const y = (e.clientY - canvasPosition.current.y) * newRate;
-          // const x = (e.clientX - canvasInset.left) * newRate;
-          // const y = (e.clientY - canvasInset.top) * newRate;
-          // const x =
-          //   (e.clientX - canvasPosition.current.x - canvasInset.left) * newRate;
-          // const y =
-          //   (e.clientY - canvasPosition.current.y - canvasInset.top) * newRate;
           const x = e.clientX - canvasPosition.current.x - canvasInset.left;
           const y = e.clientY - canvasPosition.current.y - canvasInset.top;
-          // console.log(`start X/Y: ${x}, ${y}`);
-          // console.log(`mouse X/Y: ${e.clientX}, ${e.clientY}`);
           const newData = JSON.parse(JSON.stringify(preData));
           newData.push({
             index: uuidv4(),
@@ -231,7 +128,6 @@ const Canvas = ({
           return newData;
         });
       } else if (drawStatus.current === 5 || drawStatus.current === 8) {
-        // drawPoint();
         drawPoint2(data);
         handleRerender();
         moveInitData.current = {
@@ -247,26 +143,14 @@ const Canvas = ({
     }
   }
   function mouseMove(e) {
-    // console.log(
-    //   `Screen X/Y: ${e.screenX}, ${e.screenY}, Client X/Y: ${e.clientX}, ${e.clientY}`
-    // );
-    // console.log("mouse move:", drawStatus.current);
-
     if (drawStatus.current === 1) {
       const canvasInset = getCanvasPos();
-      // console.log("mouse move", chartIndex.current);
       setData((preData) => {
         const newData = JSON.parse(JSON.stringify(preData));
         const index = newData.length - 1;
 
-        // const endX =
-        //   (e.clientX - canvasPosition.current.x - canvasInset.left) * newRate;
-        //   const endY =
-        //   (e.clientY - canvasPosition.current.y - canvasInset.top) * newRate;
         const endX = e.clientX - canvasPosition.current.x - canvasInset.left;
         const endY = e.clientY - canvasPosition.current.y - canvasInset.top;
-        // let endX = (e.clientX - canvasPosition.current.x) * newRate;
-        // let endY = (e.clientY - canvasPosition.current.y) * newRate;
         newData[index].endX = endX;
         newData[index].endY = endY;
         if (endX >= newData[index].startX) {
@@ -281,15 +165,10 @@ const Canvas = ({
           newData[index].height = newData[index].startY - endY;
           newData[index].y = endY;
         }
-        // console.log(
-        //   `X/Y: ${newData[index].x}, ${newData[index].y}; end X/Y: ${endX}, ${endY}; W/H: ${newData[index].width}, ${newData[index].height}`
-        // );
         drawPoint2(newData);
         return newData;
       });
     } else if (drawStatus.current === 5) {
-      // const distancsX = (e.clientX - moveInitData.current.mouseStartX) * newRate;
-      // const distancsY = (e.clientY - moveInitData.current.mouseStartY) * newRate;
       const distancsX = e.clientX - moveInitData.current.mouseStartX;
       const distancsY = e.clientY - moveInitData.current.mouseStartY;
       const initItem = moveInitData.current.item;
@@ -346,8 +225,6 @@ const Canvas = ({
         }
 
         const canvasInset = getCanvasPos();
-        // let endX = (e.clientX - canvasPosition.current.x - canvasInset.left) * newRate;
-        // let endY = (e.clientY - canvasPosition.current.y - canvasInset.top) * newRate;
         const endX = e.clientX - canvasPosition.current.x - canvasInset.left;
         const endY = e.clientY - canvasPosition.current.y - canvasInset.top;
 
@@ -385,31 +262,14 @@ const Canvas = ({
         return newData;
       });
     } else if (drawStatus.current === 15) {
-      // console.log(`mouse init X/Y: ${moveInitData.current.mouseStartX}, ${moveInitData.current.mouseStartY}`);
-      // console.log(`mouse mow X/Y: ${e.clientX}, ${e.clientY}`);
-      // const distanceX = (e.clientX - moveInitData.current.mouseStartX) * newRate;
-      // const distanceY = (e.clientY - moveInitData.current.mouseStartY) * newRate;
       const distanceX = e.clientX - moveInitData.current.mouseStartX;
       const distanceY = e.clientY - moveInitData.current.mouseStartY;
-      // console.log("=> ", distanceX, distanceY);
       const canvasInset = moveInitData.current.canvasInset;
-      // console.log("=> ", canvasInset.left + distanceX, canvasInset.top + distanceY);
-      // canvasInset.top - distanceX;
-      // canvasInset.left + distanceY;
-      // canvasInset.bottom + distanceX;
-      // canvasInset.right - distanceY;
-      // console.log(canvasInset);
       canvasRef.current.style.top = `${canvasInset.top + distanceY}px`;
       canvasRef.current.style.left = `${canvasInset.left + distanceX}px`;
     }
   }
   function mouseUp(e) {
-    // console.log(
-    //   "Canvas.js -> mouse up",
-    //   drawStatus.current,
-    //   chartIndex.current,
-    //   drawType
-    // );
     if (drawStatus.current === 1) {
       setData((preData) => {
         const newData = JSON.parse(JSON.stringify(preData));
@@ -476,15 +336,6 @@ const Canvas = ({
     needSaveStep.current = true;
   }
   function click(e) {
-    // console.log(`click: ${e.target}, ${e.target.nodeName}`);
-    // console.log(
-    //   "Canvas.js -> click:",
-    //   drawStatus.current,
-    //   chartIndex.current
-    //   // e.target.nodeName
-    //   // e.target
-    // );
-
     if (drawStatus.current === 2) {
       chartIndex.current = data[data.length - 1].index;
     } else if (drawStatus.current === 3) {
@@ -497,7 +348,6 @@ const Canvas = ({
       chartIndex.current = -1;
     }
     drawStatus.current = 0;
-    // drawPoint();
     drawPoint2(data);
     handleRerender();
   }
@@ -511,8 +361,6 @@ const Canvas = ({
 
   return (
     <div
-      // width={screenSize.screenWidth}
-      // height={screenSize.screenHeight - canvasPosition.current.y}
       ref={canvasRef}
       className="canvas"
       style={{
@@ -529,26 +377,7 @@ const Canvas = ({
       onMouseUp={mouseUp}
       onClick={click}
     >
-      {/* <div className="canvasOuter"></div> */}
-      {/* <div
-        style={{
-          position: "absolute",
-          top: screenSize.screenHeight - canvasPosition.current.y,
-          // top: "10px",
-          left: screenSize.screenWidth,
-          // ledt: "10px",
-          backgroundColor: "#000",
-          width: screenSize.screenWidth,
-          height: screenSize.screenHeight - canvasPosition.current.y,
-        }}
-      ></div> */}
-      {/* <div className="canvas__svgBg" width="600" height="800"></div> */}
       <svg
-        // width={screenSize.screenWidth}
-        // height={screenSize.screenHeight - 110}
-        // viewBox={`0 0 ${screenSize.screenWidth} ${
-        //   screenSize.screenHeight - 110
-        // }`}
         className="canvas__svgBg"
         width={600 * newRate}
         height={800 * newRate}
@@ -558,7 +387,7 @@ const Canvas = ({
         xmlns="http://www.w3.org/2000/svg"
       >
         {/* 畫圖 */}
-        <DrawList
+        <CanvasDrawList
           data={data}
           canvasPosition={canvasPosition}
           drawStatus={drawStatus}
@@ -566,7 +395,7 @@ const Canvas = ({
           resizeDirection={resizeDirection}
         />
         {/* 點選 */}
-        <DrawList
+        <CanvasDrawList
           data={dataSelected.current}
           canvasPosition={canvasPosition}
           drawStatus={drawStatus}
@@ -574,7 +403,6 @@ const Canvas = ({
           resizeDirection={resizeDirection}
         />
       </svg>
-      {/* <CanvasStyle chartIndex={chartIndex} /> */}
     </div>
   );
 };

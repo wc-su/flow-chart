@@ -1,10 +1,10 @@
 import React, { useState, useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import "./index.scss";
 
-import { authUseGoogle, loginUseEmail } from "../../../../../../firebase/auth";
-import { LoadingContext } from "../../../../../../context/LoadingProvider";
+import { authUseGoogle, loginUseEmail } from "../../../../firebase/auth";
+import { LoadingContext } from "../../../../context/LoadingProvider";
 
 const Login = ({ userAction, setUserAction, changeErrMsg }) => {
   const [email, setEmail] = useState("");
@@ -13,6 +13,7 @@ const Login = ({ userAction, setUserAction, changeErrMsg }) => {
   const { message, setMessage } = useContext(LoadingContext);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // 測試帳號
@@ -39,7 +40,9 @@ const Login = ({ userAction, setUserAction, changeErrMsg }) => {
     console.log("result:", result);
     if (result.result) {
       setUserAction("");
-      navigate("/Files");
+      if (location.pathname === "/") {
+        navigate("/Files");
+      }
     }
     changeErrMsg(result.message);
     setMessage("");
@@ -50,7 +53,9 @@ const Login = ({ userAction, setUserAction, changeErrMsg }) => {
     console.log("result:", result);
     if (result.result) {
       setUserAction("");
-      navigate("/Files");
+      if (location.pathname === "/") {
+        navigate("/Files");
+      }
     }
     changeErrMsg(result.message);
     setMessage("");

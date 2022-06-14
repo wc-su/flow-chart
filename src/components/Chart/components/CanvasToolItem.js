@@ -1,16 +1,19 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-
 import classNames from "classnames";
 // context
-import { DrawTypeContext } from "../../../index";
-import { ActiveButtonContext } from "../index";
-// components
-import ToolDropdownItem from "./ToolDropdownItem";
+import { DrawTypeContext } from "../index";
+import { ActiveButtonContext } from "./CanvasToolBar";
 //images
 import iconSelectDown from "../images/down.png";
 
-const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
+const CanvasToolItem = ({
+  children,
+  purpose,
+  data,
+  changeSelected,
+  disabled,
+}) => {
   const isMounted = useRef(false);
 
   const { setDrawType } = useContext(DrawTypeContext);
@@ -30,41 +33,17 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
     "toolItem--hasDropdown": data.info.length > 1,
   });
 
-  // useEffect(()=>{
-  //   if(purpose==="draw") {
-  // console.log("poppppppppp", pop, data.selected);
-  //   }
-  // });
-
   useEffect(() => {
-    // if (purpose === "draw") {
-    // console.log("ToolItem.js -> useEffect toolBarPop:", toolBarPop);
-    // }
     if (isMounted.current) {
-      // feature =  data.info[data.selected].feature;
-      // console.log("xxxxx", feature);
-      // if(!false) {
       changeActiveButton();
       isMounted.current = false;
-      // }
     }
   }, [toolBarPop]);
 
   function handleItemclick(e) {
-    // console.log("handleItem:", purpose, feature);
     e.stopPropagation();
     if (disabled) {
     } else {
-      // setBtnClick((preSatae) => !preSatae);
-      // console.log(purpose, feature);
-      // if (purpose === "draw") {
-      //   setDrawType(feature);
-      // } else {
-      //   setDrawType("");
-      // }
-      // if(feature === "move") {
-      //   setMoveCanvas((preData) => !preData);
-      // }
       changeActiveButton();
       setToolBarPop("");
       if (purpose === "back") {
@@ -74,24 +53,20 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
   }
 
   function changeActiveButton() {
-    // console.log("wwww", activeButton, purpose, feature);
     if (purpose === "draw") {
       setDrawType(feature);
     } else {
       setDrawType("");
     }
     if (activeButton.purpose === purpose && activeButton.feature === feature) {
-      // console.log("zzzzz");
       setActiveButton({});
       setDrawType("");
     } else {
-      // console.log("yyyyy", purpose, feature);
       setActiveButton(() => ({ purpose: purpose, feature: feature }));
     }
   }
 
   function popDropdownList(e) {
-    // console.log("popDropdown", e.target);
     e.stopPropagation();
     setToolBarPop((preData) => {
       if (preData) {
@@ -100,11 +75,6 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
         return purpose;
       }
     });
-    // setToolBarPop(purpose);
-  }
-
-  function handlelDropListClick(e) {
-    console.log("handlelDropList:", e.target, purpose, feature);
   }
 
   return (
@@ -126,7 +96,7 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
         </div>
       )}
       {data.info.length > 1 && toolBarPop === purpose && (
-        <div className="toolItem__dropdown" onClick={handlelDropListClick}>
+        <div className="toolItem__dropdown">
           {data.info.map((item, index) => {
             return (
               <ToolDropdownItem
@@ -151,4 +121,28 @@ const ToolItem = ({ children, purpose, data, changeSelected, disabled }) => {
   );
 };
 
-export default ToolItem;
+const ToolDropdownItem = ({
+  children,
+  index,
+  changeSelected,
+  setToolBarPop,
+  isMounted,
+}) => {
+  function handleDropItemClick(e) {
+    console.log("handelDorpItem:");
+    e.stopPropagation();
+    if (changeSelected) {
+      isMounted.current = true;
+      changeSelected(index);
+      setToolBarPop("");
+    }
+  }
+
+  return (
+    <div className="toolItem__container" onClick={handleDropItemClick}>
+      {children}
+    </div>
+  );
+};
+
+export default CanvasToolItem;
