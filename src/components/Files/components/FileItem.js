@@ -14,7 +14,7 @@ const FileItem = ({ userId, item, setFiles }) => {
 
   const [imgStyle, setImgStyle] = useState();
 
-  const { fileId, imgId, title, createTime, updateTime } = item;
+  const { fileId, title, createTime, updateTime } = item;
 
   useEffect(() => {
     if (!imgStyle) {
@@ -33,7 +33,7 @@ const FileItem = ({ userId, item, setFiles }) => {
   async function deleteFileItem(userId, fileId) {
     setMessage("刪除中，請稍候...");
     const dbResult = await deleteFile(userId, fileId);
-    const storageResult = await deleteImg(`${userId}/${imgId}`);
+    const storageResult = await deleteImg(`${userId}/${fileId}`);
     if (dbResult.result) {
       setFiles((preData) => {
         return preData.filter((item) => item.fileId !== fileId);
@@ -43,7 +43,7 @@ const FileItem = ({ userId, item, setFiles }) => {
   }
 
   async function getImgUrl() {
-    const url = await getImg(`${userId}/${imgId}`);
+    const url = await getImg(`${userId}/${fileId}`);
     if (url) {
       setImgStyle((preData) => {
         return {
