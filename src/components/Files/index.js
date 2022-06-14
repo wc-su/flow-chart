@@ -40,6 +40,7 @@ const Files = () => {
   async function addNewFile() {
     if (isMobile) {
     } else {
+      setMessage("新增中，請稍候...");
       const today = new Date();
       const userUid = auth.currentUser.uid;
       const imgId = uuidv4();
@@ -55,6 +56,7 @@ const Files = () => {
         navigate(`/Chart/${fileId}`);
       } else {
       }
+      setMessage("");
     }
   }
 
