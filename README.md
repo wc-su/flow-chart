@@ -22,3 +22,4 @@ FlowChart is a simple tool to draw flow chart.
   - Hosting
   - Authentication
   - Cloud Firestore
+  - Storage
