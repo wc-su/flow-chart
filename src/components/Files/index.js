@@ -1,22 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
+import { useNavigate } from "react-router-dom";
 import { isMobile } from "react-device-detect";
-
-import "./index.scss";
-// import iconAdd from "./images/plus-sign.png";
-import iconAdd from "./images/plus.png";
-
-import { UserLoginContext } from "../../context/UserProvider";
-import { LoadingContext } from "../../context/LoadingProvider";
-
-import {
-  getFiles,
-  getDataByUserId,
-  addChartRecord,
-} from "../../firebase/database";
 import { auth } from "../../firebase/auth";
 
+import "./index.scss";
+import { UserLoginContext } from "../../context/UserProvider";
+import { LoadingContext } from "../../context/LoadingProvider";
+import { getDataByUserId, addChartRecord } from "../../firebase/database";
 import FileItem from "./components/FileItem";
+
+import iconAdd from "./images/plus.png";
 
 const Files = () => {
   const [files, setFiles] = useState([]);
@@ -25,26 +19,7 @@ const Files = () => {
 
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   console.log("Files -> useEffect files:", files, userLogin);
-  //   // setMessage("載入中，請稍候...");
-  //   // // console.log("1");
-  //   // if (userLogin) {
-  //   //     console.log("login and get data");
-  //   //     getFilesFromDB();
-  //   // } else {
-  //   // //   console.log("2");
-  //   //   setMessage("請先登入");
-  //   //   setTimeout(() => {
-  //   //     navigate("/");
-  //   //   }, 5000);
-  //   // }
-  //   // // console.log("3");
-  //   // setMessage("");
-  // }, [files]);
-
   useEffect(() => {
-    // console.log("Files -> useEffect userLogin:", userLogin, files, message);
     if (userLogin === 0) {
       setMessage("載入中，請稍候...");
     }
@@ -62,22 +37,14 @@ const Files = () => {
     setMessage("");
   }
 
-  function setTimeLayout(timeModify) {
-    const newDate = new Date(timeModify);
-    const year = newDate.getFullYear();
-    const month = newDate.getMonth().toString().padStart(2, "0");
-    const date = newDate.getDate().toString().padStart(2, "0");
-    const hours = newDate.getHours().toString().padStart(2, "0");
-    const minutes = newDate.getMinutes().toString().padStart(2, "0");
-    const seconds = newDate.getSeconds().toString().padStart(2, "0");
-    return `${year}/${month}/${date} ${hours}:${minutes}:${seconds}`;
-  }
-
   async function addNewFile() {
     if (isMobile) {
     } else {
       const today = new Date();
-      const result = await addChartRecord(auth.currentUser.uid, {
+      const userUid = auth.currentUser.uid;
+      const imgId = uuidv4();
+      const result = await addChartRecord(userUid, {
+        imgId,
         title: "undefined",
         data: [],
         createTime: today.getTime(),
@@ -107,18 +74,9 @@ const Files = () => {
             <FileItem
               key={item.fileId}
               userId={auth.currentUser ? auth.currentUser.uid : null}
-              fileId={item.fileId}
+              item={item}
               setFiles={setFiles}
-            >
-              <p className="files__item-title">{item.title}</p>
-              <p className="files__item-time">
-                建立時間：{setTimeLayout(item.createTime)}
-              </p>
-              <p className="files__item-time">
-                修改時間：{setTimeLayout(item.updateTime)}
-              </p>
-              <button className="files__item-btn">刪除</button>
-            </FileItem>
+            />
           );
         })}
       </div>

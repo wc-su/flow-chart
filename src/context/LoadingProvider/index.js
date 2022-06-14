@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import "./LoadingProvider.scss";
+import "./index.scss";
 
 const LoadingContext = React.createContext();
 

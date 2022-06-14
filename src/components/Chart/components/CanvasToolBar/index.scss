@@ -1,32 +1,9 @@
 .toolList {
   display: flex;
   align-items: center;
-  // justify-content: space-evenly;
   justify-content: space-between;
   height: 50px;
   background-color: #3d405b;
-  //   align-items: center;
-  //   &__wrap {
-  //     display: flex;
-  //     align-items: center;
-  //     height: 50px;
-  //     color: #fff;
-  //     cursor: pointer;
-  //     background-color: #3d405b;
-  //     padding: 0 2px;
-  //     &:hover {
-  //       background-color: lighten(#3d405b, 20%);
-  //     }
-  //   }
-  //   .separator {
-  //     width: 1px;
-  //     height: 20px;
-  //     background: #898989;
-  //     margin: 0 6px;
-  //   }
-  // &__container {
-  //   display: flex;
-  // }
   &__container {
     display: flex;
     height: 100%;
@@ -74,14 +51,11 @@
     background-color: #3d405b;
     padding: 0 10px;
     .toolItem--hasDropdown & {
-      //   padding: 0;
       &:nth-child(1) {
-        // padding-left: 8px;
         padding: 0 1px 0 10px;
       }
       &:nth-child(2) {
         padding: 0 10px 0 1px;
-        // padding-right: 8px;
       }
     }
     .toolItem:not(.toolItem--unactive) &:hover,
@@ -89,12 +63,6 @@
       background-color: lighten(#3d405b, 20%);
     }
   }
-  //   &__show {
-  //     height: 30px;
-  //     line-height: 30px;
-  //   }
-  //   &__select {
-  //   }
   &__img {
     object-fit: contain;
     width: 30px;

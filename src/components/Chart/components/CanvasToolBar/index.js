@@ -1,34 +1,31 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { isMobile } from "react-device-detect";
 
 import "./index.scss";
-
+import CanvasToolItem from "../CanvasToolItem";
 import { DrawTypeContext } from "../../index";
-import ToolItem from "./components/ToolItem";
-
 import { UserLoginContext } from "../../../../context/UserProvider";
 
-import saveAsJPG from "./images/save-as-jpg.png";
-import saveAsPNG from "./images/save-as-png.png";
-import upload from "./images/upload.png";
-import deleteDiagram from "./images/delete.png";
-import nextStep from "./images/next-step.png";
-import backStep from "./images/back-step.png";
-import iconFlowline from "./images/flowline.png";
-import iconInputOutput from "./images/inputOutput.png";
-import iconProcess from "./images/process.png";
-import iconTerminal from "./images/terminal.png";
-import iconDecision from "./images/decision.png";
-import iconZoomin from "./images/zoom-in.png";
-import iconZoomout from "./images/zoom-out.png";
-import iconMove from "./images/canvas-move.png";
-import iconBackFiles from "./images/back-files.png";
+import saveAsJPG from "../../images/save-as-jpg.png";
+import saveAsPNG from "../../images/save-as-png.png";
+import upload from "../../images/upload.png";
+import deleteDiagram from "../../images/delete.png";
+import nextStep from "../../images/next-step.png";
+import backStep from "../../images/back-step.png";
+import iconFlowline from "../../images/flowline.png";
+import iconInputOutput from "../../images/inputOutput.png";
+import iconProcess from "../../images/process.png";
+import iconTerminal from "../../images/terminal.png";
+import iconDecision from "../../images/decision.png";
+import iconZoomin from "../../images/zoom-in.png";
+import iconZoomout from "../../images/zoom-out.png";
+import iconMove from "../../images/canvas-move.png";
+import iconBackFiles from "../../images/back-files.png";
 
 const ActiveButtonContext = React.createContext();
 
-const Toolbar = ({
+const CanvasToolBar = ({
   canvasRate,
-  chartIndex,
   activeButton,
   setActiveButton,
   toolBarPop,
@@ -39,59 +36,16 @@ const Toolbar = ({
   const [drawSelected, setDrawSelected] = useState(0);
   const [saveSelected, setSaveSelected] = useState(0);
   const [title, setTitle] = useState("undefined");
-  // console.log("zxxxxxxx", title, docTitle.current);
 
-  const { drawType, setDrawType } = useContext(DrawTypeContext);
-  const { userLogin, setUserLogin } = useContext(UserLoginContext);
-
-  // if(firstInitTitle.current == 0) {
-  //   if(docTitle.current) {
-  //     console.log("11111");
-  //     setTitle(docTitle.current);
-  //     firstInitTitle.current == 1;
-  //   } else {
-  //     console.log("22222");
-  //     setTitle("undefined");
-  //     firstInitTitle.current == 1;
-  //   }
-  // }
+  const { setDrawType } = useContext(DrawTypeContext);
+  const { userLogin } = useContext(UserLoginContext);
 
   useEffect(() => {
-    // console.log("tttttt", title, docTitle.current);
-    // if (title === "") {
-    //   setTitle(docTitle.current);
-    // }
-    // if(firstInitTitle.current == 0) {
-    //   setTitle("undefined");
-    //     firstInitTitle.current = 1;
-    //   // if(docTitle.current) {
-    //   //   // console.log("11111");
-    //   //   setTitle(docTitle.current);
-    //   //   firstInitTitle.current = 1;
-    //   // } else {
-    //   //   // console.log("22222");
-    //   //   setTitle("undefined");
-    //   //   firstInitTitle.current = 1;
-    //   // }
-    // } else if(firstInitTitle.current === 1) {
-    //   if(docTitle.current) {
-    //     // console.log("11111");
-    //     setTitle(docTitle.current);
-    //     firstInitTitle.current = 2;
-    //   }
-    // }
     if (firstInitTitle.current == 0) {
       setTitle(docTitle.current);
       firstInitTitle.current = 1;
     }
   });
-
-  useEffect(() => {
-    // console.log("tttttt", title, docTitle.current);
-    // if (title === "") {
-    //   setTitle(docTitle.current);
-    // }
-  }, [title]);
 
   function click(e) {
     setActiveButton((preData) =>
@@ -181,38 +135,38 @@ const Toolbar = ({
         }}
       >
         <div className="toolList__container">
-          <ToolItem
+          <CanvasToolItem
             purpose="back"
             data={itemImg["back"]}
             disabled={userLogin === 1 ? false : true}
-          ></ToolItem>
+          ></CanvasToolItem>
           <div className="toolList__separator"></div>
-          <ToolItem
+          <CanvasToolItem
             purpose="move"
             data={itemImg["move"]}
             disabled={isMobile}
-          ></ToolItem>
-          <ToolItem
+          ></CanvasToolItem>
+          <CanvasToolItem
             purpose="draw"
             data={itemImg["draw"]}
             disabled={isMobile}
             changeSelected={setDrawSelected}
-          ></ToolItem>
-          <ToolItem
+          ></CanvasToolItem>
+          <CanvasToolItem
             purpose="step"
             data={itemImg["undo"]}
             disabled={isMobile}
-          ></ToolItem>
-          <ToolItem
+          ></CanvasToolItem>
+          <CanvasToolItem
             purpose="step"
             data={itemImg["redo"]}
             disabled={isMobile}
-          ></ToolItem>
-          <ToolItem
+          ></CanvasToolItem>
+          <CanvasToolItem
             purpose="figure"
             data={itemImg["figure"]}
             disabled={isMobile}
-          ></ToolItem>
+          ></CanvasToolItem>
         </div>
         <div className="toolList__container">
           <input
@@ -225,39 +179,39 @@ const Toolbar = ({
           />
         </div>
         <div className="toolList__container">
-          <ToolItem
+          <CanvasToolItem
             purpose="save"
             data={itemImg["save"]}
             disabled={isMobile ? true : userLogin === 1 ? false : true}
-          ></ToolItem>
-          <ToolItem
+          ></CanvasToolItem>
+          <CanvasToolItem
             purpose="saveFile"
             data={itemImg["saveFile"]}
             changeSelected={setSaveSelected}
             disabled={isMobile}
-          ></ToolItem>
-          <ToolItem
+          ></CanvasToolItem>
+          <CanvasToolItem
             purpose="canvasRate"
             data={itemImg["zoomIn"]}
             disabled={isMobile || canvasRate.current >= 500}
-          ></ToolItem>
-          <ToolItem
+          ></CanvasToolItem>
+          <CanvasToolItem
             purpose="canvasRate"
             data={itemImg["zoomOut"]}
             disabled={isMobile || canvasRate.current <= 50}
-          ></ToolItem>
-          <ToolItem
+          ></CanvasToolItem>
+          <CanvasToolItem
             purpose="canvasRate"
             data={itemImg["percent"]}
             disabled={true}
           >
             <p className="percent">{canvasRate.current} %</p>
-          </ToolItem>
+          </CanvasToolItem>
         </div>
       </ActiveButtonContext.Provider>
     </div>
   );
 };
 
-export default Toolbar;
+export default CanvasToolBar;
 export { ActiveButtonContext };

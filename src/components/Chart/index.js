@@ -2,24 +2,23 @@ import React, { useState, useRef, useEffect, useContext } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate, useParams } from "react-router-dom";
 import { MobileView, isBrowser } from "react-device-detect";
-import saveSvgAsPng from "save-svg-as-png";
+import { saveSvgAsPng, svgAsPngUri } from "save-svg-as-png";
 
 import "./index.scss";
 
-import Toolbar from "./components/ToolBar";
 import Canvas from "./components/Canvas";
-import CanvasStyle from "./components/Canvas/components/CanvasStyle";
+import CanvasToolBar from "./components/CanvasToolBar";
+
+import { UserLoginContext } from "../../context/UserProvider";
+import { LoadingContext } from "../../context/LoadingProvider";
 
 import { auth } from "../../firebase/auth";
 import {
   addChartRecord,
   addChartRecordByID,
-  getUserRecord,
   getUserRecordByID,
 } from "../../firebase/database";
-
-import { UserLoginContext } from "../../context/UserProvider";
-import { LoadingContext } from "../../context/LoadingProvider";
+import { uploadImg } from "../../firebase/storage";
 
 const DataContext = React.createContext();
 const DrawTypeContext = React.createContext();
@@ -31,6 +30,7 @@ const Chart = () => {
   const firstLogin = useRef(0);
   const docID = useRef("");
   const docTitle = useRef("undefined");
+  const docImgId = useRef();
   const firstInitTitle = useRef(0);
 
   const chartIndex = useRef(-1);
@@ -57,15 +57,27 @@ const Chart = () => {
   // 畫圖
   const [data, setData] = useState([]);
   // 點選
-  // const [dataSelected, setDataSelected] = useState([]);
   const dataSelected = useRef([]);
 
   const [rerender, setRerender] = useState(false);
 
-  const { userLogin, setUserLogin } = useContext(UserLoginContext);
-  const { message, setMessage } = useContext(LoadingContext);
+  const { userLogin } = useContext(UserLoginContext);
+  const { setMessage } = useContext(LoadingContext);
 
   const [toolBarPop, setToolBarPop] = useState("");
+
+  // refer to the npm tool: save-svg-as-png
+  // https://github.com/exupero/saveSvgAsPng/blob/gh-pages/src/saveSvgAsPng.js
+  const uriToBlob = (uri) => {
+    const byteString = window.atob(uri.split(",")[1]);
+    const mimeString = uri.split(",")[0].split(":")[1].split(";")[0];
+    const buffer = new ArrayBuffer(byteString.length);
+    const intArray = new Uint8Array(buffer);
+    for (let i = 0; i < byteString.length; i++) {
+      intArray[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([buffer], { type: mimeString });
+  };
 
   useEffect(() => {
     if (userLogin === 1 && chartId && firstLogin.current === 0) {
@@ -86,20 +98,12 @@ const Chart = () => {
 
   useEffect(() => {
     if (!chartId && userLogin === 1 && isBrowser) {
-      setMessage("新增資料中，請稍候...");
       addNewFile();
       firstLogin.current = 0;
     }
   }, [userLogin]);
 
   useEffect(() => {
-    // console.log(
-    //   "Chart.js -> ussEffect activeButton:",
-    //   activeButton,
-    //   Object.keys(activeButton).length,
-    //   chartIndex.current,
-    //   nowStep.current
-    // );
     setMoveCanvas(false);
     if (Object.keys(activeButton).length !== 0) {
       if (
@@ -155,24 +159,18 @@ const Chart = () => {
         activeButton.purpose === "saveFile" &&
         activeButton.feature === "png"
       ) {
-        // console.log("1111", svgRef.current);
-        // const ttt = svgRef.current.getAttribute("width");
-        // console.log(ttt);
-        // svgRef.current.setAttribute("width", ttt);
         const selectArea = svgRef.current.removeChild(
           svgRef.current.children[1]
         );
-        saveSvgAsPng
-          .saveSvgAsPng(
-            svgRef.current,
-            docTitle.current ? docTitle.current : "undefined",
-            {
-              scale: 100 / canvasRate.current,
-            }
-          )
-          .then(() => {
-            svgRef.current.appendChild(selectArea);
-          });
+        saveSvgAsPng(
+          svgRef.current,
+          docTitle.current ? docTitle.current : "undefined",
+          {
+            scale: 100 / canvasRate.current,
+          }
+        ).finally(() => {
+          svgRef.current.appendChild(selectArea);
+        });
         setActiveButton({});
       } else if (
         activeButton.purpose === "saveFile" &&
@@ -182,21 +180,19 @@ const Chart = () => {
         const selectArea = svgRef.current.removeChild(
           svgRef.current.children[1]
         );
-        saveSvgAsPng
-          .saveSvgAsPng(
-            svgRef.current,
-            docTitle.current ? docTitle.current : "undefined",
-            {
-              encoderType: "image/jpeg",
-              encoderOptions: 0.8,
-              backgroundColor: "#fff",
-              scale: 100 / canvasRate.current,
-            }
-          )
-          .then(() => {
-            // 將點選區塊加回
-            svgRef.current.appendChild(selectArea);
-          });
+        saveSvgAsPng(
+          svgRef.current,
+          docTitle.current ? docTitle.current : "undefined",
+          {
+            encoderType: "image/jpeg",
+            encoderOptions: 0.8,
+            backgroundColor: "#fff",
+            scale: 100 / canvasRate.current,
+          }
+        ).finally(() => {
+          // 將點選區塊加回
+          svgRef.current.appendChild(selectArea);
+        });
         setActiveButton({});
       } else if (
         activeButton.purpose === "save" &&
@@ -264,14 +260,6 @@ const Chart = () => {
   }, [activeButton]);
 
   useEffect(() => {
-    // console.log("Chart.js -> ussEffect data:", data);
-    // console.log(
-    //   "Chart.js -> ussEffect data:",
-    //   data.length,
-    //   needSaveStep.current,
-    //   nowStep.current
-    // );
-
     if (tempFlag.current) {
       if (
         activeButton.purpose === "figure" &&
@@ -279,20 +267,11 @@ const Chart = () => {
       ) {
         chartIndex.current = -1;
       }
-      // drawPoint();
       tempFlag.current = false;
       setActiveButton({});
     }
     // 儲存步驟
     if (needSaveStep.current) {
-      // console.log(
-      //   "Chart.js -> ussEffect data:",
-      //   needSaveStep.current,
-      //   nowStep.current,
-      //   stepRecord.current,
-      //   data.length
-      // );
-
       for (let i = nowStep.current + 1; i < stepRecord.current.length; i++) {
         stepRecord.current.pop();
       }
@@ -310,89 +289,87 @@ const Chart = () => {
         nowStep.current++;
       }
       console.log(" -> step:", nowStep.current);
-      // drawPoint();
       stepChangeData.current = false;
     }
   }, [data]);
 
-  useEffect(() => {
-    // console.log("Chart.js -> ussEffect drawType:", drawType);
-  }, [drawType]);
-
   async function getDataFromDB() {
-    // console.log("getDataFromDB start: chartId:", chartId, auth.currentUser);
     setMessage("資料讀取中，請稍候...");
     const result = await getUserRecordByID(auth.currentUser.uid, chartId);
-    // console.log("getDataFromDB result:", result);
     if (result.result) {
       if (result.dataID) {
         docID.current = result.dataID;
         docTitle.current = result.data.title;
+        docImgId.current = result.data.imgId;
         firstInitTitle.current = 0;
-        // console.log("rrrrr", result.data, docTitle.current);
         setData(result.data.data);
-        // console.log(result.data);
       }
     } else {
       navigate("/Files");
     }
     setMessage("");
-    // console.log(result.message, result);
   }
 
   async function addNewFile() {
-    // console.log("sssss");
+    setMessage("新增中，請稍候...");
     const today = new Date();
-    const result = await addChartRecord(auth.currentUser.uid, {
+    const userUid = auth.currentUser.uid;
+    const imgId = uuidv4();
+    const selectArea = svgRef.current.removeChild(svgRef.current.children[1]);
+    svgAsPngUri(svgRef.current, {
+      scale: 100 / canvasRate.current,
+    })
+      .then((uri) => {
+        const blob = uriToBlob(uri);
+        uploadImg(`/${userUid}/${imgId}`, blob);
+      })
+      .finally(() => {
+        svgRef.current.appendChild(selectArea);
+      });
+    const result = await addChartRecord(userUid, {
+      imgId,
       title: docTitle.current ? docTitle.current : "undefined",
       data: data,
       createTime: today.getTime(),
       updateTime: today.getTime(),
     });
-    console.log("add", result);
     if (result.result) {
       const fileId = result.dataID;
       navigate(`/Chart/${fileId}`);
     } else {
     }
+    setMessage("");
   }
 
   async function saveToDB() {
     setMessage("資料儲存中，請稍候...");
-    // console.log("this~~~~", auth.currentUser.uid);
     const today = new Date();
+    const userUid = auth.currentUser.uid;
+    const selectArea = svgRef.current.removeChild(svgRef.current.children[1]);
+    svgAsPngUri(svgRef.current, {
+      scale: 100 / canvasRate.current,
+    })
+      .then((uri) => {
+        const blob = uriToBlob(uri);
+        uploadImg(`/${userUid}/${docImgId.current}`, blob);
+      })
+      .finally(() => {
+        svgRef.current.appendChild(selectArea);
+      });
     if (docID.current) {
-      const result = await addChartRecordByID(
-        auth.currentUser.uid,
-        docID.current,
-        {
-          data,
-          updateTime: today.getTime(),
-          title: docTitle.current ? docTitle.current : "undefined",
-        }
-      );
+      const result = await addChartRecordByID(userUid, docID.current, {
+        title: docTitle.current ? docTitle.current : "undefined",
+        data,
+        updateTime: today.getTime(),
+      });
       if (result.result) {
       } else {
       }
-      // console.log("byID", result.message, result);
     }
-    // else {
-    //   const result = await addChartRecord(auth.currentUser.uid, {
-    //     data,
-    //     createTime: today.getTime(),
-    //     updateTime: today.getTime(),
-    //   });
-    //   if (result.result) {
-    //     docID.current = result.dataID;
-    //   } else {
-    //   }
-    //   // console.log("firstWrite", result.message, result);
-    // }
     setMessage("");
   }
 
   function drawPoint2(data) {
-    // console.log(chartIndex.current, data);
     let originItem = data.find((item) => item.index === chartIndex.current);
     if (chartIndex.current !== -1 && originItem) {
       const originData = JSON.parse(JSON.stringify(originItem));
@@ -514,7 +491,7 @@ const Chart = () => {
         <DrawTypeContext.Provider
           value={{ drawType: drawType, setDrawType: setDrawType }}
         >
-          <Toolbar
+          <CanvasToolBar
             canvasRate={canvasRate}
             chartIndex={chartIndex}
             activeButton={activeButton}

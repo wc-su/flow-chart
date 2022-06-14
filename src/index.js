@@ -9,8 +9,8 @@ import Home from "./components/Home";
 import Files from "./components/Files";
 import Chart from "./components/Chart";
 
-import UserProvider from "./context/UserProvider.js";
-import LoadingProvider from "./context/LoadingProvider.js";
+import UserProvider from "./context/UserProvider";
+import LoadingProvider from "./context/LoadingProvider";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

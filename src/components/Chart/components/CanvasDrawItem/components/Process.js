@@ -5,15 +5,6 @@ const Process = ({ item }) => {
   let { fill, fillOpacity, stroke, strokeWidth, strokeDasharray } =
     item.decorate;
 
-  // if (selected) {
-  //   x -= 4;
-  //   y -= 4;
-  //   width += 8;
-  //   height += 8;
-
-  //   strokeDasharray = "6";
-  // }
-
   return (
     <rect
       x={x}

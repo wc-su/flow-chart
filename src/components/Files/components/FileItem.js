@@ -1,17 +1,29 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { deleteFile } from "../../../firebase/database";
+import { getImg } from "../../../firebase/storage";
 import { LoadingContext } from "../../../context/LoadingProvider";
 
-const FileItem = ({ children, userId, fileId, setFiles }) => {
+import iconDelete from "../images/delete.png";
+
+const FileItem = ({ userId, item, setFiles }) => {
   const { setMessage } = useContext(LoadingContext);
 
   const navigate = useNavigate();
 
-  function linkToChart(e) {
-    // console.log(e.target.nodeName);
-    if (e.target.nodeName === "BUTTON") {
+  const [imgStyle, setImgStyle] = useState();
+
+  const { fileId, imgId, title, createTime, updateTime } = item;
+
+  useEffect(() => {
+    if (!imgStyle) {
+      getBgImg();
+    }
+  }, []);
+
+  function handleFileItemClick(e) {
+    if (["BUTTON", "IMG"].includes(e.target.nodeName)) {
       deleteFileItem(userId, fileId);
     } else {
       navigate(`/Chart/${fileId}`);
@@ -29,9 +41,46 @@ const FileItem = ({ children, userId, fileId, setFiles }) => {
     setMessage("");
   }
 
+  async function getBgImg() {
+    const url = await getImg(`${userId}/${imgId}`);
+    if (url) {
+      setImgStyle((preData) => {
+        return {
+          preData,
+          backgroundImage: `url(${url})`,
+        };
+      });
+    }
+  }
+
+  function setTimeLayout(timeModify) {
+    const newDate = new Date(timeModify);
+    const year = newDate.getFullYear();
+    const month = newDate.getMonth().toString().padStart(2, "0");
+    const date = newDate.getDate().toString().padStart(2, "0");
+    const hours = newDate.getHours().toString().padStart(2, "0");
+    const minutes = newDate.getMinutes().toString().padStart(2, "0");
+    const seconds = newDate.getSeconds().toString().padStart(2, "0");
+    return `${year}/${month}/${date} ${hours}:${minutes}:${seconds}`;
+  }
+
   return (
-    <div className="files__item" onClick={linkToChart}>
-      {children}
+    <div className="files__item" onClick={handleFileItemClick}>
+      <div className="files__item-img" style={imgStyle}></div>
+      <div className="files__item-container">
+        <div>
+          <p className="files__item-title">{title}</p>
+          <p className="files__item-time">
+            Created: {setTimeLayout(createTime)}
+          </p>
+          <p className="files__item-time">
+            Edited: {setTimeLayout(updateTime)}
+          </p>
+        </div>
+        <button className="files__item-btn">
+          <img src={iconDelete} alt="delete" />
+        </button>
+      </div>
     </div>
   );
 };
