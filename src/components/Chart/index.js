@@ -13,11 +13,7 @@ import { UserLoginContext } from "../../context/UserProvider";
 import { LoadingContext } from "../../context/LoadingProvider";
 
 import { auth } from "../../firebase/auth";
-import {
-  addChartRecord,
-  addChartRecordByID,
-  getUserRecordByID,
-} from "../../firebase/database";
+import { addChartRecordByID, getUserRecordByID } from "../../firebase/database";
 import { uploadImg } from "../../firebase/storage";
 
 const DataContext = React.createContext();
@@ -30,7 +26,6 @@ const Chart = () => {
   const firstLogin = useRef(0);
   const docID = useRef("");
   const docTitle = useRef("undefined");
-  const docImgId = useRef();
   const firstInitTitle = useRef(0);
 
   const chartIndex = useRef(-1);
@@ -300,7 +295,6 @@ const Chart = () => {
       if (result.dataID) {
         docID.current = result.dataID;
         docTitle.current = result.data.title;
-        docImgId.current = result.data.imgId;
         firstInitTitle.current = 0;
         setData(result.data.data);
       }
@@ -314,28 +308,26 @@ const Chart = () => {
     setMessage("新增中，請稍候...");
     const today = new Date();
     const userUid = auth.currentUser.uid;
-    const imgId = uuidv4();
+    docID.current = uuidv4();
     const selectArea = svgRef.current.removeChild(svgRef.current.children[1]);
     svgAsPngUri(svgRef.current, {
       scale: 100 / canvasRate.current,
     })
       .then((uri) => {
         const blob = uriToBlob(uri);
-        uploadImg(`/${userUid}/${imgId}`, blob);
+        uploadImg(`/${userUid}/${docID.current}`, blob);
       })
       .finally(() => {
         svgRef.current.appendChild(selectArea);
       });
-    const result = await addChartRecord(userUid, {
-      imgId,
+    const result = await addChartRecordByID(userUid, docID.current, {
       title: docTitle.current ? docTitle.current : "undefined",
       data: data,
       createTime: today.getTime(),
       updateTime: today.getTime(),
     });
     if (result.result) {
-      const fileId = result.dataID;
-      navigate(`/Chart/${fileId}`);
+      navigate(`/Chart/${docID.current}`);
     } else {
     }
     setMessage("");
@@ -351,7 +343,7 @@ const Chart = () => {
     })
       .then((uri) => {
         const blob = uriToBlob(uri);
-        uploadImg(`/${userUid}/${docImgId.current}`, blob);
+        uploadImg(`/${userUid}/${docID.current}`, blob);
       })
       .finally(() => {
         svgRef.current.appendChild(selectArea);

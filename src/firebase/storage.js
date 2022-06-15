@@ -1,5 +1,11 @@
 import { app } from "./app";
-import { getStorage, uploadBytes, ref, getDownloadURL } from "firebase/storage";
+import {
+  getStorage,
+  uploadBytes,
+  deleteObject,
+  ref,
+  getDownloadURL,
+} from "firebase/storage";
 
 const storage = getStorage(app);
 
@@ -25,4 +31,18 @@ async function getImg(imgName) {
   return downloadURL;
 }
 
-export { uploadImg, getImg };
+async function deleteImg(imgName) {
+  let result = false;
+  const desertRef = ref(storage, imgName);
+
+  deleteObject(desertRef)
+    .then(() => {
+      result = true;
+    })
+    .catch((error) => {
+      console.log("error:", error);
+    });
+  return result;
+}
+
+export { uploadImg, getImg, deleteImg };

@@ -7,7 +7,7 @@ import { auth } from "../../firebase/auth";
 import "./index.scss";
 import { UserLoginContext } from "../../context/UserProvider";
 import { LoadingContext } from "../../context/LoadingProvider";
-import { getDataByUserId, addChartRecord } from "../../firebase/database";
+import { getDataByUserId, addChartRecordByID } from "../../firebase/database";
 import FileItem from "./components/FileItem";
 
 import iconAdd from "./images/plus.png";
@@ -40,21 +40,21 @@ const Files = () => {
   async function addNewFile() {
     if (isMobile) {
     } else {
+      setMessage("新增中，請稍候...");
       const today = new Date();
       const userUid = auth.currentUser.uid;
-      const imgId = uuidv4();
-      const result = await addChartRecord(userUid, {
-        imgId,
+      const fileId = uuidv4();
+      const result = await addChartRecordByID(userUid, fileId, {
         title: "undefined",
         data: [],
         createTime: today.getTime(),
         updateTime: today.getTime(),
       });
       if (result.result) {
-        const fileId = result.dataID;
         navigate(`/Chart/${fileId}`);
       } else {
       }
+      setMessage("");
     }
   }
 

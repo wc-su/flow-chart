@@ -4,7 +4,6 @@ import {
   collection,
   getDocs,
   getDoc,
-  addDoc,
   setDoc,
   doc,
   deleteDoc,
@@ -22,7 +21,6 @@ async function getDataByUserId(userID) {
     querySnapshot.forEach((doc) => {
       result.push({
         fileId: doc.id,
-        imgId: doc.data().imgId,
         title: doc.data().title,
         createTime: doc.data().createTime,
         updateTime: doc.data().updateTime,
@@ -73,18 +71,6 @@ async function getUserRecordByID(userID, docID) {
   return result;
 }
 
-async function addChartRecord(userID, data) {
-  const result = { result: false, dataID: "", message: "寫入失敗" };
-  try {
-    const docRef = await addDoc(collection(db, userID), data);
-    result.result = true;
-    result.message = "寫入成功";
-    result.dataID = docRef.id;
-  } catch (error) {
-    console.log("error:", error);
-  }
-  return result;
-}
 async function addChartRecordByID(userID, docID, data) {
   const result = { result: false, message: "寫入失敗" };
   try {
@@ -111,7 +97,6 @@ async function deleteFile(userID, docID) {
 
 export {
   getUserRecord,
-  addChartRecord,
   addChartRecordByID,
   getUserRecordByID,
   getDataByUserId,
