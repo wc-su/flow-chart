@@ -5,18 +5,14 @@ import { logout as fLogout } from "../../firebase/auth";
 
 import "./index.scss";
 import User from "./components/User";
-import {
-  userActionContext,
-  UserLoginContext,
-} from "../../context/UserProvider";
+import { UserContext } from "../../context/UserProvider";
 import { LoadingContext } from "../../context/LoadingProvider";
 
 import menuIcon from "./images/menu.png";
 import closeIcon from "./images/close.png";
 
-const Header = () => {
-  const { userAction, setUserAction } = useContext(userActionContext);
-  const { userLogin } = useContext(UserLoginContext);
+const Header = ({ outerRef }) => {
+  const { userLogin, userAction, setUserAction } = useContext(UserContext);
   const { setMessage } = useContext(LoadingContext);
 
   const menuRef = useRef();
@@ -29,10 +25,21 @@ const Header = () => {
   });
 
   useEffect(() => {
-    if (!userAction) {
+    if (userAction) {
+      stopScroll(true);
+    } else {
+      stopScroll(false);
       menuRef.current.classList.remove("Header__menu--display");
     }
   }, [userAction]);
+
+  function stopScroll(stopFlag) {
+    if (stopFlag) {
+      outerRef.current.classList.add("outer");
+    } else {
+      outerRef.current.classList.remove("outer");
+    }
+  }
 
   function clickMenu(e) {
     if (e.target.nodeName === "A") {

@@ -5,7 +5,7 @@ import { isMobile } from "react-device-detect";
 import { auth } from "../../firebase/auth";
 
 import "./index.scss";
-import { UserLoginContext } from "../../context/UserProvider";
+import { UserContext } from "../../context/UserProvider";
 import { LoadingContext } from "../../context/LoadingProvider";
 import { getDataByUserId, addChartRecordByID } from "../../firebase/database";
 import FileItem from "./components/FileItem";
@@ -14,7 +14,7 @@ import iconAdd from "./images/plus.png";
 
 const Files = () => {
   const [files, setFiles] = useState([]);
-  const { userLogin } = useContext(UserLoginContext);
+  const { userLogin } = useContext(UserContext);
   const { setMessage } = useContext(LoadingContext);
 
   const navigate = useNavigate();

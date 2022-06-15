@@ -4,7 +4,7 @@ import { isMobile } from "react-device-detect";
 import "./index.scss";
 import CanvasToolItem from "../CanvasToolItem";
 import { DrawTypeContext } from "../../index";
-import { UserLoginContext } from "../../../../context/UserProvider";
+import { UserContext } from "../../../../context/UserProvider";
 
 import saveAsJPG from "../../images/save-as-jpg.png";
 import saveAsPNG from "../../images/save-as-png.png";
@@ -38,7 +38,7 @@ const CanvasToolBar = ({
   const [title, setTitle] = useState("undefined");
 
   const { setDrawType } = useContext(DrawTypeContext);
-  const { userLogin } = useContext(UserLoginContext);
+  const { userLogin } = useContext(UserContext);
 
   useEffect(() => {
     if (firstInitTitle.current == 0) {

@@ -5,14 +5,14 @@ import Signup from "../Signup";
 import Login from "../Login";
 import ForgotPwd from "../ForgotPwd";
 
-import { userActionContext } from "../../../../context/UserProvider";
+import { UserContext } from "../../../../context/UserProvider";
 
 const User = ({}) => {
   const clickAction = useRef(false);
 
   const [errMsg, setErrMsg] = useState("");
 
-  const { userAction, setUserAction } = useContext(userActionContext);
+  const { userAction, setUserAction } = useContext(UserContext);
 
   useEffect(() => {
     changeErrMsg("");

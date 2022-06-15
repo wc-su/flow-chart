@@ -9,7 +9,7 @@ import "./index.scss";
 import Canvas from "./components/Canvas";
 import CanvasToolBar from "./components/CanvasToolBar";
 
-import { UserLoginContext } from "../../context/UserProvider";
+import { UserContext } from "../../context/UserProvider";
 import { LoadingContext } from "../../context/LoadingProvider";
 
 import { auth } from "../../firebase/auth";
@@ -56,7 +56,7 @@ const Chart = () => {
 
   const [rerender, setRerender] = useState(false);
 
-  const { userLogin } = useContext(UserLoginContext);
+  const { userLogin } = useContext(UserContext);
   const { setMessage } = useContext(LoadingContext);
 
   const [toolBarPop, setToolBarPop] = useState("");
