@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import "./index.scss";
 
@@ -15,14 +15,14 @@ import LoadingProvider from "./context/LoadingProvider";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <HashRouter>
+    <BrowserRouter>
       <UserProvider>
         <LoadingProvider>
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="Files" element={<Files />} />
-            <Route path="/Chart" element={<Chart />}>
+            <Route path="Chart" element={<Chart />}>
               <Route path=":chartId" element={<Chart />} />
             </Route>
             <Route
@@ -36,6 +36,6 @@ root.render(
           </Routes>
         </LoadingProvider>
       </UserProvider>
-    </HashRouter>
+    </BrowserRouter>
   </React.StrictMode>
 );

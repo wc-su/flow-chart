@@ -13,10 +13,7 @@ import { UserLoginContext } from "../../context/UserProvider";
 import { LoadingContext } from "../../context/LoadingProvider";
 
 import { auth } from "../../firebase/auth";
-import {
-  addChartRecordByID,
-  getUserRecordByID,
-} from "../../firebase/database";
+import { addChartRecordByID, getUserRecordByID } from "../../firebase/database";
 import { uploadImg } from "../../firebase/storage";
 
 const DataContext = React.createContext();
