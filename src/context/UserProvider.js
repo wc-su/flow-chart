@@ -5,7 +5,6 @@ import { auth, onAuthStateChanged } from "../firebase/auth";
 const UserContext = React.createContext();
 
 const UserProvider = ({ children }) => {
-  const [userAction, setUserAction] = useState("");
   const [userLogin, setUserLogin] = useState(0);
 
   useEffect(() => {
@@ -21,8 +20,6 @@ const UserProvider = ({ children }) => {
   return (
     <UserContext.Provider
       value={{
-        userAction: userAction,
-        setUserAction: setUserAction,
         userLogin: userLogin,
         setUserLogin: setUserLogin,
       }}

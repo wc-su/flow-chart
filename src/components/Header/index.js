@@ -1,5 +1,5 @@
-import React, { useContext, useRef, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import React, { useContext, useRef, useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import classNames from "classnames";
 import { logout as fLogout } from "../../firebase/auth";
 
@@ -12,13 +12,13 @@ import menuIcon from "./images/menu.png";
 import closeIcon from "./images/close.png";
 
 const Header = ({ outerRef }) => {
-  const { userLogin, userAction, setUserAction } = useContext(UserContext);
+  const { userLogin } = useContext(UserContext);
   const { setMessage } = useContext(LoadingContext);
 
   const menuRef = useRef();
+  const [userAction, setUserAction] = useState("");
 
   const location = useLocation();
-  const navigate = useNavigate();
 
   const logoClass = classNames("Header__logo", {
     "Header--isIndex": location.pathname === "/",
@@ -49,9 +49,6 @@ const Header = ({ outerRef }) => {
       if (action === "logout") {
         setMessage("登出中，請稍候...");
         logout();
-        // if (location.pathname === "/Chart") {
-        //   navigate("/");
-        // }
         setMessage("");
       }
     }
