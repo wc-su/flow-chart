@@ -12,7 +12,6 @@ const Canvas = ({
   resizeDirection,
   needSaveStep,
   svgRef,
-  canvasBlockRange,
   dataSelected,
   drawPoint2,
   handleRerender,
@@ -281,23 +280,6 @@ const Canvas = ({
           newData[index].endY = newData[index].y + newData[index].height;
         }
 
-        canvasBlockRange.current.minX = Math.min(
-          newData[index].startX,
-          newData[index].endX
-        );
-        canvasBlockRange.current.minY = Math.min(
-          newData[index].startY,
-          newData[index].endY
-        );
-        canvasBlockRange.current.maxX = Math.max(
-          newData[index].startX,
-          newData[index].endX
-        );
-        canvasBlockRange.current.maxY = Math.max(
-          newData[index].startY,
-          newData[index].endY
-        );
-
         if (newData[index].width === 0 || newData[index].height === 0) {
           newData.pop();
           drawStatus.current = 3;
@@ -316,14 +298,12 @@ const Canvas = ({
           (element) => element.index == chartIndex.current
         );
         if (newItem.type !== "flowline") {
-          console.log("change");
           newItem.startX = newItem.x;
           newItem.startY = newItem.y;
           newItem.endX = newItem.x + newItem.width;
           newItem.endY = newItem.y + newItem.height;
         }
 
-        resizeDirection.current = "";
         if (newItem.width === 0 || newItem.height === 0) {
           drawStatus.current = 10;
         } else {
@@ -332,8 +312,8 @@ const Canvas = ({
         drawPoint2(newData);
         return newData;
       });
+      resizeDirection.current = "";
     }
-    needSaveStep.current = true;
   }
   function click(e) {
     if (drawStatus.current === 2) {

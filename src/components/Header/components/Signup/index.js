@@ -21,7 +21,6 @@ const SignUp = ({ setUserAction, changeErrMsg }) => {
   async function signUpByGoogle() {
     setMessage("請操作跳出視窗進行註冊");
     const result = await authUseGoogle();
-    console.log("result:", result);
     if (result.result) {
       setUserAction("");
     }
@@ -31,7 +30,6 @@ const SignUp = ({ setUserAction, changeErrMsg }) => {
 
   async function signUpByEmail() {
     const result = await SignupUseEmail(email, password);
-    console.log("result:", result);
     if (result.result) {
       setUserAction("");
     }

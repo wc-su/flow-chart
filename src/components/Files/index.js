@@ -13,7 +13,7 @@ import FileItem from "./components/FileItem";
 import iconAdd from "./images/plus.png";
 
 const Files = () => {
-  const userLogin = useSelector((state) => state.userLogin);
+  const userStatus = useSelector((state) => state.userStatus);
 
   const [files, setFiles] = useState([]);
   const { setMessage } = useContext(LoadingContext);
@@ -21,16 +21,16 @@ const Files = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (userLogin === 0) {
+    if (userStatus === 0) {
       setMessage("載入中，請稍候...");
     }
-    if (userLogin === 1) {
+    if (userStatus === 1) {
       setMessage("載入中，請稍候...");
       getFilesFromDB();
-    } else if (userLogin == 2) {
+    } else if (userStatus == 2) {
       navigate("/");
     }
-  }, [userLogin]);
+  }, [userStatus]);
 
   async function getFilesFromDB() {
     const result = await getDataByUserId(auth.currentUser.uid);
@@ -63,7 +63,7 @@ const Files = () => {
     <div className="files">
       <div className="files__banner">
         <p className="files__banner-userEmail">
-          {userLogin === 1 && auth.currentUser.email}
+          {userStatus === 1 && auth.currentUser.email}
         </p>
       </div>
       <div className="files__content">

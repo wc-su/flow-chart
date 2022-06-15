@@ -14,7 +14,7 @@ import closeIcon from "./images/close.png";
 const Header = ({ outerRef }) => {
   const location = useLocation();
 
-  const userLogin = useSelector((state) => state.userLogin);
+  const userStatus = useSelector((state) => state.userStatus);
   const { setMessage } = useContext(LoadingContext);
 
   const menuRef = useRef();
@@ -26,20 +26,13 @@ const Header = ({ outerRef }) => {
 
   useEffect(() => {
     if (userAction) {
-      stopScroll(true);
-    } else {
-      stopScroll(false);
-      menuRef.current.classList.remove("Header__menu--display");
-    }
-  }, [userAction]);
-
-  function stopScroll(stopFlag) {
-    if (stopFlag) {
       outerRef.current.classList.add("outer");
     } else {
       outerRef.current.classList.remove("outer");
+      // in tablet/mobile, menu fit all screen
+      menuRef.current.classList.remove("Header__menu--display");
     }
-  }
+  }, [userAction]);
 
   function clickMenu(e) {
     if (e.target.nodeName === "A") {
@@ -96,7 +89,7 @@ const Header = ({ outerRef }) => {
             <img src={closeIcon} alt="close icon"></img>
           </div>
           <ul onClick={clickMenu}>
-            {userLogin === 1 ? (
+            {userStatus === 1 ? (
               <li>
                 <a href="#" data-action="logout">
                   Log Out
@@ -119,7 +112,7 @@ const Header = ({ outerRef }) => {
           </ul>
         </div>
       </div>
-      {!(userLogin === 1) && userAction && (
+      {!(userStatus === 1) && userAction && (
         <User userAction={userAction} setUserAction={setUserAction} />
       )}
     </div>

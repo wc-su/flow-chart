@@ -32,7 +32,6 @@ const Login = ({ setUserAction, changeErrMsg }) => {
   async function loginByGoogle() {
     setMessage("請操作跳出視窗進行登入");
     const result = await authUseGoogle();
-    console.log("result:", result);
     if (result.result) {
       setUserAction("");
       if (location.pathname === "/") {
@@ -45,7 +44,6 @@ const Login = ({ setUserAction, changeErrMsg }) => {
   async function loginByEmail() {
     setMessage("登入中，請稍候...");
     const result = await loginUseEmail(email, password);
-    console.log("result:", result);
     if (result.result) {
       setUserAction("");
       if (location.pathname === "/") {

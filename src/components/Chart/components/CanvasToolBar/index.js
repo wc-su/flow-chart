@@ -31,9 +31,9 @@ const CanvasToolBar = ({
   toolBarPop,
   setToolBarPop,
   docTitle,
-  firstInitTitle,
+  docTitleInitFlag,
 }) => {
-  const userLogin = useSelector((state) => state.userLogin);
+  const userStatus = useSelector((state) => state.userStatus);
 
   const [drawSelected, setDrawSelected] = useState(0);
   const [saveSelected, setSaveSelected] = useState(0);
@@ -42,13 +42,13 @@ const CanvasToolBar = ({
   const { setDrawType } = useContext(DrawTypeContext);
 
   useEffect(() => {
-    if (firstInitTitle.current == 0) {
+    if (docTitleInitFlag.current == 0) {
       setTitle(docTitle.current);
-      firstInitTitle.current = 1;
+      docTitleInitFlag.current = 1;
     }
   });
 
-  function click(e) {
+  function handleToolListClick(e) {
     setActiveButton((preData) =>
       preData.purpose || preData.feature ? {} : preData
     );
@@ -126,7 +126,7 @@ const CanvasToolBar = ({
   }
 
   return (
-    <div className="toolList" onClick={click}>
+    <div className="toolList" onClick={handleToolListClick}>
       <ActiveButtonContext.Provider
         value={{
           activeButton: activeButton,
@@ -139,7 +139,7 @@ const CanvasToolBar = ({
           <CanvasToolItem
             purpose="back"
             data={itemImg["back"]}
-            disabled={userLogin === 1 ? false : true}
+            disabled={userStatus === 1 ? false : true}
           ></CanvasToolItem>
           <div className="toolList__separator"></div>
           <CanvasToolItem
@@ -183,7 +183,7 @@ const CanvasToolBar = ({
           <CanvasToolItem
             purpose="save"
             data={itemImg["save"]}
-            disabled={isMobile ? true : userLogin === 1 ? false : true}
+            disabled={isMobile ? true : userStatus === 1 ? false : true}
           ></CanvasToolItem>
           <CanvasToolItem
             purpose="saveFile"

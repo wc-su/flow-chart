@@ -129,7 +129,6 @@ const ToolDropdownItem = ({
   isMounted,
 }) => {
   function handleDropItemClick(e) {
-    console.log("handelDorpItem:");
     e.stopPropagation();
     if (changeSelected) {
       isMounted.current = true;

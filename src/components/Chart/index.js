@@ -20,7 +20,7 @@ const DataContext = React.createContext();
 const DrawTypeContext = React.createContext();
 
 const Chart = () => {
-  const userLogin = useSelector((state) => state.userLogin);
+  const userStatus = useSelector((state) => state.userStatus);
 
   const navigate = useNavigate();
   const { chartId } = useParams();
@@ -28,12 +28,11 @@ const Chart = () => {
   const firstLogin = useRef(0);
   const docID = useRef("");
   const docTitle = useRef("undefined");
-  const firstInitTitle = useRef(0);
+  const docTitleInitFlag = useRef(0);
 
   const chartIndex = useRef(-1);
   const resizeDirection = useRef("");
   const tempFlag = useRef(false);
-  const canvasBlockRange = useRef({ minX: 0, minY: 0, maxX: 0, maxY: 0 });
 
   const canvasRate = useRef(100);
 
@@ -76,15 +75,15 @@ const Chart = () => {
   };
 
   useEffect(() => {
-    if (userLogin === 1 && chartId && firstLogin.current === 0) {
+    if (userStatus === 1 && chartId && firstLogin.current === 0) {
       if (isBrowser) {
         firstLogin.current = 1;
         getDataFromDB();
       }
-    } else if (userLogin === 2 && chartId) {
+    } else if (userStatus === 2 && chartId) {
       dataSelected.current = [];
       docTitle.current = "undefined";
-      firstInitTitle.current = 0;
+      docTitleInitFlag.current = 0;
       setData([]);
       firstLogin.current = 0;
       handleRerender();
@@ -93,11 +92,11 @@ const Chart = () => {
   });
 
   useEffect(() => {
-    if (!chartId && userLogin === 1 && isBrowser) {
+    if (!chartId && userStatus === 1 && isBrowser) {
       addNewFile();
       firstLogin.current = 0;
     }
-  }, [userLogin]);
+  }, [userStatus]);
 
   useEffect(() => {
     setMoveCanvas(false);
@@ -296,7 +295,7 @@ const Chart = () => {
       if (result.dataID) {
         docID.current = result.dataID;
         docTitle.current = result.data.title;
-        firstInitTitle.current = 0;
+        docTitleInitFlag.current = 0;
         setData(result.data.data);
       }
     } else {
@@ -492,17 +491,15 @@ const Chart = () => {
             toolBarPop={toolBarPop}
             setToolBarPop={setToolBarPop}
             docTitle={docTitle}
-            firstInitTitle={firstInitTitle}
+            docTitleInitFlag={docTitleInitFlag}
           />
           <div className="Chart__main" onClick={handleMainClick}>
             <Canvas
               canvasRate={canvasRate}
               chartIndex={chartIndex}
-              // drawPoint={drawPoint}
               resizeDirection={resizeDirection}
               needSaveStep={needSaveStep}
               svgRef={svgRef}
-              canvasBlockRange={canvasBlockRange}
               dataSelected={dataSelected}
               drawPoint2={drawPoint2}
               handleRerender={handleRerender}

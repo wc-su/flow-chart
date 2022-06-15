@@ -25,8 +25,7 @@ const App = () => {
         dispatch(userActions.logout());
       }
     });
-  }),
-    [];
+  }, []);
 
   return (
     <div ref={outerRef}>
