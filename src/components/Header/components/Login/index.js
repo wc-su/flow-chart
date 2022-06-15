@@ -4,28 +4,23 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "./index.scss";
 
 import { authUseGoogle, loginUseEmail } from "../../../../firebase/auth";
+
 import { LoadingContext } from "../../../../context/LoadingProvider";
 
-const Login = ({ userAction, setUserAction, changeErrMsg }) => {
+const Login = ({ setUserAction, changeErrMsg }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { message, setMessage } = useContext(LoadingContext);
+  const { setMessage } = useContext(LoadingContext);
 
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    // 測試帳號
+    // test account
     setEmail("demo@test.com");
     setPassword("123456");
   }, []);
-
-  useEffect(() => {
-    console.log("Login: useEffect userAction:", userAction);
-    if (!userAction) {
-    }
-  }, [userAction]);
 
   function handleEmailChange(e) {
     setEmail(e.target.value);

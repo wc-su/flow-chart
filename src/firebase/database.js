@@ -33,24 +33,6 @@ async function getDataByUserId(userID) {
   return result;
 }
 
-async function getUserRecord(userID) {
-  const result = { result: false, dataID: "", data: [], message: "" };
-  try {
-    const querySnapshot = await getDocs(collection(db, userID));
-    result.result = true;
-    result.message = "讀取成功";
-    if (querySnapshot.size > 0) {
-      // 取第一筆
-      const document = querySnapshot.docs[0];
-      result.dataID = document.id;
-      result.data = document.data().data;
-    }
-  } catch (error) {
-    console.log("error:", error);
-    result.message = "讀取失敗";
-  }
-  return result;
-}
 async function getUserRecordByID(userID, docID) {
   const result = { result: false, dataID: "", data: [], message: "" };
   try {
@@ -95,10 +77,4 @@ async function deleteFile(userID, docID) {
   return result;
 }
 
-export {
-  getUserRecord,
-  addChartRecordByID,
-  getUserRecordByID,
-  getDataByUserId,
-  deleteFile,
-};
+export { addChartRecordByID, getUserRecordByID, getDataByUserId, deleteFile };

@@ -15,7 +15,7 @@ const metadata = {
 
 function uploadImg(imgName, img) {
   const storageRef = ref(storage, imgName);
-  const uploadTask = uploadBytes(storageRef, img, metadata).then((snapshot) => {
+  uploadBytes(storageRef, img, metadata).then((snapshot) => {
     console.log("Uploaded a blob or file!");
   });
 }

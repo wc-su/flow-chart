@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { isMobile } from "react-device-detect";
 
 import "./index.scss";
 import CanvasToolItem from "../CanvasToolItem";
 import { DrawTypeContext } from "../../index";
-import { UserContext } from "../../../../context/UserProvider";
 
 import saveAsJPG from "../../images/save-as-jpg.png";
 import saveAsPNG from "../../images/save-as-png.png";
@@ -33,12 +33,13 @@ const CanvasToolBar = ({
   docTitle,
   firstInitTitle,
 }) => {
+  const userLogin = useSelector((state) => state.userLogin);
+
   const [drawSelected, setDrawSelected] = useState(0);
   const [saveSelected, setSaveSelected] = useState(0);
   const [title, setTitle] = useState("undefined");
 
   const { setDrawType } = useContext(DrawTypeContext);
-  const { userLogin } = useContext(UserContext);
 
   useEffect(() => {
     if (firstInitTitle.current == 0) {

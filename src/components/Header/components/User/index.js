@@ -1,11 +1,11 @@
-import React, { useRef, useEffect, useContext, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 
 import "./index.scss";
 import Signup from "../Signup";
 import Login from "../Login";
 import ForgotPwd from "../ForgotPwd";
 
-const User = ({userAction, setUserAction}) => {
+const User = ({ userAction, setUserAction }) => {
   const clickAction = useRef(false);
 
   const [errMsg, setErrMsg] = useState("");

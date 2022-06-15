@@ -1,24 +1,24 @@
 import React, { useContext, useRef, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import classNames from "classnames";
 import { logout as fLogout } from "../../firebase/auth";
 
 import "./index.scss";
 import User from "./components/User";
-import { UserContext } from "../../context/UserProvider";
 import { LoadingContext } from "../../context/LoadingProvider";
 
 import menuIcon from "./images/menu.png";
 import closeIcon from "./images/close.png";
 
 const Header = ({ outerRef }) => {
-  const { userLogin } = useContext(UserContext);
+  const location = useLocation();
+
+  const userLogin = useSelector((state) => state.userLogin);
   const { setMessage } = useContext(LoadingContext);
 
   const menuRef = useRef();
   const [userAction, setUserAction] = useState("");
-
-  const location = useLocation();
 
   const logoClass = classNames("Header__logo", {
     "Header--isIndex": location.pathname === "/",

@@ -9,7 +9,7 @@ const SignUp = ({ setUserAction, changeErrMsg }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { message, setMessage } = useContext(LoadingContext);
+  const { setMessage } = useContext(LoadingContext);
 
   function handleEmailChange(e) {
     setEmail(e.target.value);

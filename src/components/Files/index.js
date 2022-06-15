@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 import { isMobile } from "react-device-detect";
 import { auth } from "../../firebase/auth";
 
 import "./index.scss";
-import { UserContext } from "../../context/UserProvider";
 import { LoadingContext } from "../../context/LoadingProvider";
 import { getDataByUserId, addChartRecordByID } from "../../firebase/database";
 import FileItem from "./components/FileItem";
@@ -13,8 +13,9 @@ import FileItem from "./components/FileItem";
 import iconAdd from "./images/plus.png";
 
 const Files = () => {
+  const userLogin = useSelector((state) => state.userLogin);
+
   const [files, setFiles] = useState([]);
-  const { userLogin } = useContext(UserContext);
   const { setMessage } = useContext(LoadingContext);
 
   const navigate = useNavigate();

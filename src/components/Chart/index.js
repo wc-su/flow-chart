@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
+import { useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate, useParams } from "react-router-dom";
 import { MobileView, isBrowser } from "react-device-detect";
@@ -9,7 +10,6 @@ import "./index.scss";
 import Canvas from "./components/Canvas";
 import CanvasToolBar from "./components/CanvasToolBar";
 
-import { UserContext } from "../../context/UserProvider";
 import { LoadingContext } from "../../context/LoadingProvider";
 
 import { auth } from "../../firebase/auth";
@@ -20,6 +20,8 @@ const DataContext = React.createContext();
 const DrawTypeContext = React.createContext();
 
 const Chart = () => {
+  const userLogin = useSelector((state) => state.userLogin);
+
   const navigate = useNavigate();
   const { chartId } = useParams();
 
@@ -56,7 +58,6 @@ const Chart = () => {
 
   const [rerender, setRerender] = useState(false);
 
-  const { userLogin } = useContext(UserContext);
   const { setMessage } = useContext(LoadingContext);
 
   const [toolBarPop, setToolBarPop] = useState("");

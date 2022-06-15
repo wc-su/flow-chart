@@ -1,8 +1,8 @@
 import React, { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import "./index.scss";
-import { UserContext } from "../../context/UserProvider";
 import { LoadingContext } from "../../context/LoadingProvider";
 
 // images
@@ -19,7 +19,8 @@ const linkedinHref =
   "https://www.linkedin.com/in/%E9%9F%8B%E4%B8%9E-%E8%98%87-b14942126/";
 
 const Home = () => {
-  const { userLogin } = useContext(UserContext);
+  const userLogin = useSelector((state) => state.userLogin);
+
   const { setMessage } = useContext(LoadingContext);
 
   useEffect(() => {

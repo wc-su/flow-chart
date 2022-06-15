@@ -6,150 +6,70 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
-  deleteUser,
-  sendEmailVerification,
   signOut,
   sendPasswordResetEmail,
 } from "firebase/auth";
 
 const provider = new GoogleAuthProvider();
 const auth = getAuth(app);
-// console.log("uuuuu", auth.currentUser, auth);
 
 async function authUseGoogle() {
-  const returnResult = { result: false, data: {}, message: "系統錯誤" };
-  // console.log("this~~~");
+  const returnResult = { result: false, message: "系統錯誤" };
   try {
-    const result = await signInWithPopup(auth, provider);
-    // This gives you a Google Access Token. You can use it to access the Google API.
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const token = credential.accessToken;
-    // The signed-in user info.
-    const user = result.user;
-    // console.log("token:", token);
-    // console.log("user:", user);
-    // console.log(" --> ", user.email, user.uid);
-    // const ttt = await user.getIdToken();
-    // console.log("ttt:", ttt);
+    await signInWithPopup(auth, provider);
     returnResult.result = true;
-    // returnResult.data = {
-    //   uid: user.uid,
-    //   email: user.email,
-    // };
     returnResult.message = "登入成功";
   } catch (error) {
-    // Handle Errors here.
     const errorCode = error.code;
-    const errorMessage = error.message;
-    // The email of the user's account used.
-    const email = error.customData.email;
-    // The AuthCredential type that was used.
-    const credential = GoogleAuthProvider.credentialFromError(error);
-    // console.log("yyy", errorCode, errorMessage, email, credential);
-    // console.log(errorCode, errorMessage, email, credential);
     returnResult.message = errorCode.replace("auth/", "");
   }
-
-  // console.log("end~~~");
   return returnResult;
 }
 
 async function SignupUseEmail(email, password) {
-  const returnResult = { result: false, data: {}, message: "系統錯誤" };
+  const returnResult = { result: false, message: "系統錯誤" };
   try {
-    // Signed in
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    const user = userCredential.user;
-    // console.log("xxx2", user);
+    await createUserWithEmailAndPassword(auth, email, password);
     returnResult.result = true;
-    // returnResult.data = {
-    //   uid: user.uid,
-    //   email: user.email,
-    // };
     returnResult.message = "登入成功";
-
-    // await verifyEmail();
   } catch (error) {
     const errorCode = error.code;
-    const errorMessage = error.message;
-    // console.log(errorCode, errorMessage);
     returnResult.message = errorCode.replace("auth/", "");
   }
   return returnResult;
 }
 
 async function loginUseEmail(email, password) {
-  const returnResult = { result: false, data: {}, message: "系統錯誤" };
+  const returnResult = { result: false, message: "系統錯誤" };
   try {
-    // Signed in
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    const user = userCredential.user;
+    await signInWithEmailAndPassword(auth, email, password);
     returnResult.result = true;
-    // returnResult.data = {
-    //   uid: user.uid,
-    //   email: user.email,
-    // };
     returnResult.message = "登入成功";
-    // console.log("xxx3", user);
   } catch (error) {
     const errorCode = error.code;
-    const errorMessage = error.message;
-    // console.log(errorCode, errorMessage);
     returnResult.message = errorCode.replace("auth/", "");
   }
   return returnResult;
 }
 
 async function logout() {
-  const returnResult = { result: false, data: {}, message: "系統錯誤" };
+  const returnResult = { result: false, message: "系統錯誤" };
   try {
     if (auth.currentUser) {
       await signOut(auth);
-      // console.log("Sign-out successful", auth);
       returnResult.result = true;
       returnResult.message = "登出成功";
     } else {
-      // console.log("have been Sign-out", auth);
     }
   } catch (error) {
-    const errorCode = error.code;
     const errorMessage = error.message;
-    // console.log("yyy3", errorCode, errorMessage);
     returnResult.message = errorMessage;
   }
-  //   await signOut(auth)
-  //     .then(() => {
-  //       // Sign-out successful.
-  //       console.log("Sign-out successful", auth);
-  //       returnResult.result = true;
-  //       returnResult.message = "登出成功";
-  //     })
-  //     .catch((error) => {
-  //       // An error ocurred
-  //       // ...
-  //       console.log("error", error);
-  //     });
   return returnResult;
 }
 
-async function verifyEmail() {
-  sendEmailVerification(auth.currentUser).then(() => {
-    // Email verification sent!
-    // ...
-    // console.log("what happaned");
-  });
-}
-
 async function resetPassword(email) {
-  const returnResult = { result: false, data: {}, message: "系統錯誤" };
+  const returnResult = { result: false, message: "系統錯誤" };
   await sendPasswordResetEmail(auth, email)
     .then(() => {
       returnResult.result = "ok";
@@ -157,8 +77,6 @@ async function resetPassword(email) {
     })
     .catch((error) => {
       const errorCode = error.code;
-      const errorMessage = error.message;
-      // console.log(error.code, error.message);
       returnResult.message = errorCode.replace("auth/", "");
     });
   return returnResult;
@@ -170,7 +88,6 @@ export {
   loginUseEmail,
   SignupUseEmail,
   logout,
-  verifyEmail,
   onAuthStateChanged,
   resetPassword,
 };
