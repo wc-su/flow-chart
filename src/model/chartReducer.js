@@ -36,8 +36,8 @@ const chartReducer = createSlice({
       );
     },
     nextStep(state, action) {
-      state.data = state.stepRecord[state.step - 1];
       state.step++;
+      state.data = state.stepRecord[state.step - 1];
       // redraw targetData
       state.targetData = drawTarget(
         state.data,
@@ -46,8 +46,8 @@ const chartReducer = createSlice({
       );
     },
     backStep(state, action) {
-      state.data = state.stepRecord[state.step - 1];
       state.step--;
+      state.data = state.stepRecord[state.step - 1];
       // redraw targetData
       state.targetData = drawTarget(
         state.data,
