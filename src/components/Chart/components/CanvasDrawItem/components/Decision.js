@@ -1,15 +1,17 @@
 import React from "react";
 
-const Decision = ({ item }) => {
+const Decision = ({ item, newRate }) => {
   const { x, y, width, height, pointerEvents } = item;
   const { fill, fillOpacity, stroke, strokeWidth, strokeMiterlimit } =
     item.decorate;
 
   return (
     <path
-      d={`M ${x + width / 2} ${y} L ${x + width} ${y + height / 2} L ${
-        x + width / 2
-      } ${y + height} L ${x} ${y + height / 2} Z`}
+      d={`M ${(x + width / 2) * newRate} ${y * newRate} L ${
+        (x + width) * newRate
+      } ${(y + height / 2) * newRate} L ${(x + width / 2) * newRate} ${
+        (y + height) * newRate
+      } L ${x * newRate} ${(y + height / 2) * newRate} Z`}
       fill={fill}
       fillOpacity={fillOpacity}
       stroke={stroke}

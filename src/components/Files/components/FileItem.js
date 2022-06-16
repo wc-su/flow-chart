@@ -13,6 +13,7 @@ const FileItem = ({ userId, item, setFiles }) => {
   const navigate = useNavigate();
 
   const [imgStyle, setImgStyle] = useState();
+  const [imgLoadMsg, setImgLoadMsg] = useState("Loading");
 
   const { fileId, title, createTime, updateTime } = item;
 
@@ -51,6 +52,9 @@ const FileItem = ({ userId, item, setFiles }) => {
           backgroundImage: `url(${url})`,
         };
       });
+      setImgLoadMsg("");
+    } else {
+      setImgLoadMsg("Missing");
     }
   }
 
@@ -67,7 +71,9 @@ const FileItem = ({ userId, item, setFiles }) => {
 
   return (
     <div className="files__item" onClick={handleFileItemClick}>
-      <div className="files__item-img" style={imgStyle}></div>
+      <div className="files__item-img" style={imgStyle}>
+        {imgLoadMsg && <p>{imgLoadMsg}</p>}
+      </div>
       <div className="files__item-container">
         <div>
           <p className="files__item-title">{title}</p>

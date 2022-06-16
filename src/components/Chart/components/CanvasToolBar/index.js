@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { isMobile } from "react-device-detect";
 
 import "./index.scss";
 import CanvasToolItem from "../CanvasToolItem";
 import { DrawTypeContext } from "../../index";
-import { UserLoginContext } from "../../../../context/UserProvider";
 
 import saveAsJPG from "../../images/save-as-jpg.png";
 import saveAsPNG from "../../images/save-as-png.png";
@@ -31,23 +31,26 @@ const CanvasToolBar = ({
   toolBarPop,
   setToolBarPop,
   docTitle,
-  firstInitTitle,
+  docTitleInitFlag,
+  targetIndex,
 }) => {
+  const { userStatus } = useSelector((state) => state.user);
+  const { step, stepRecord } = useSelector((state) => state.chart);
+
   const [drawSelected, setDrawSelected] = useState(0);
   const [saveSelected, setSaveSelected] = useState(0);
   const [title, setTitle] = useState("undefined");
 
   const { setDrawType } = useContext(DrawTypeContext);
-  const { userLogin } = useContext(UserLoginContext);
 
   useEffect(() => {
-    if (firstInitTitle.current == 0) {
+    if (docTitleInitFlag.current == 0) {
       setTitle(docTitle.current);
-      firstInitTitle.current = 1;
+      docTitleInitFlag.current = 1;
     }
   });
 
-  function click(e) {
+  function handleToolListClick(e) {
     setActiveButton((preData) =>
       preData.purpose || preData.feature ? {} : preData
     );
@@ -125,7 +128,7 @@ const CanvasToolBar = ({
   }
 
   return (
-    <div className="toolList" onClick={click}>
+    <div className="toolList" onClick={handleToolListClick}>
       <ActiveButtonContext.Provider
         value={{
           activeButton: activeButton,
@@ -138,7 +141,7 @@ const CanvasToolBar = ({
           <CanvasToolItem
             purpose="back"
             data={itemImg["back"]}
-            disabled={userLogin === 1 ? false : true}
+            disabled={userStatus === 1 ? false : true}
           ></CanvasToolItem>
           <div className="toolList__separator"></div>
           <CanvasToolItem
@@ -155,17 +158,17 @@ const CanvasToolBar = ({
           <CanvasToolItem
             purpose="step"
             data={itemImg["undo"]}
-            disabled={isMobile}
+            disabled={isMobile || step <= 1}
           ></CanvasToolItem>
           <CanvasToolItem
             purpose="step"
             data={itemImg["redo"]}
-            disabled={isMobile}
+            disabled={isMobile || step === stepRecord.length}
           ></CanvasToolItem>
           <CanvasToolItem
             purpose="figure"
             data={itemImg["figure"]}
-            disabled={isMobile}
+            disabled={isMobile || targetIndex.current === -1}
           ></CanvasToolItem>
         </div>
         <div className="toolList__container">
@@ -182,7 +185,7 @@ const CanvasToolBar = ({
           <CanvasToolItem
             purpose="save"
             data={itemImg["save"]}
-            disabled={isMobile ? true : userLogin === 1 ? false : true}
+            disabled={isMobile ? true : userStatus === 1 ? false : true}
           ></CanvasToolItem>
           <CanvasToolItem
             purpose="saveFile"

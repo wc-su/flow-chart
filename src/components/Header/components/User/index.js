@@ -1,18 +1,14 @@
-import React, { useRef, useEffect, useContext, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 
 import "./index.scss";
 import Signup from "../Signup";
 import Login from "../Login";
 import ForgotPwd from "../ForgotPwd";
 
-import { userActionContext } from "../../../../context/UserProvider";
-
-const User = ({}) => {
+const User = ({ userAction, setUserAction }) => {
   const clickAction = useRef(false);
 
   const [errMsg, setErrMsg] = useState("");
-
-  const { userAction, setUserAction } = useContext(userActionContext);
 
   useEffect(() => {
     changeErrMsg("");

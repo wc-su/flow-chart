@@ -7,7 +7,13 @@ import Decision from "./components/Decision";
 import Flowline from "./components/Flowline";
 import Ellipse from "./components/Ellipse";
 
-const CanvasDrawItem = ({ item, drawStatus, chartIndex, resizeDirection }) => {
+const CanvasDrawItem = ({
+  item,
+  drawStatus,
+  targetIndex,
+  targetPoint,
+  newRate,
+}) => {
   const isItemClicked = useRef(false);
 
   const gStyle = { cursor: item.cursor, display: item.display };
@@ -20,32 +26,32 @@ const CanvasDrawItem = ({ item, drawStatus, chartIndex, resizeDirection }) => {
     isItemClicked.current = true;
     if (item.type !== "ellipse") {
       drawStatus.current = 5;
-      chartIndex.current = item.index;
+      targetIndex.current = item.index;
     } else {
       drawStatus.current = 8;
-      resizeDirection.current = item.cursor;
+      targetPoint.current = item.cursor;
     }
   }
 
   let drawItem;
   switch (item.type) {
     case "terminal":
-      drawItem = <Terminal item={item} />;
+      drawItem = <Terminal item={item} newRate={newRate} />;
       break;
     case "process":
-      drawItem = <Process item={item} />;
+      drawItem = <Process item={item} newRate={newRate} />;
       break;
     case "inputOutput":
-      drawItem = <InputOutput item={item} />;
+      drawItem = <InputOutput item={item} newRate={newRate} />;
       break;
     case "decision":
-      drawItem = <Decision item={item} />;
+      drawItem = <Decision item={item} newRate={newRate} />;
       break;
     case "flowline":
-      drawItem = <Flowline item={item} />;
+      drawItem = <Flowline item={item} newRate={newRate} />;
       break;
     case "ellipse":
-      drawItem = <Ellipse item={item} />;
+      drawItem = <Ellipse item={item} newRate={newRate} />;
       break;
   }
   return (

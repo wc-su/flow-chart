@@ -1,6 +1,6 @@
 import React from "react";
 
-const Flowline = ({ item }) => {
+const Flowline = ({ item, newRate }) => {
   const { startX, startY, endX, endY, pointerEvents } = item;
   const { fill, stroke, strokeWidth, strokeMiterlimit } = item.decorate;
 
@@ -18,7 +18,9 @@ const Flowline = ({ item }) => {
   return (
     <g>
       <path
-        d={`M ${startX} ${startY} L ${endX} ${endY}`}
+        d={`M ${startX * newRate} ${startY * newRate} L ${endX * newRate} ${
+          endY * newRate
+        }`}
         fill={fill}
         stroke={stroke}
         strokeWidth={strokeWidth}
@@ -27,7 +29,9 @@ const Flowline = ({ item }) => {
       ></path>
       {distance > 0 && (
         <path
-          d={`M ${endX} ${endY} L ${arrowX1} ${arrowY1} L ${arrowX2} ${arrowY2} Z`}
+          d={`M ${endX * newRate} ${endY * newRate} L ${arrowX1 * newRate} ${
+            arrowY1 * newRate
+          } L ${arrowX2 * newRate} ${arrowY2 * newRate} Z`}
           fill="rgb(0, 0, 0)"
           stroke={stroke}
           strokeWidth={strokeWidth}

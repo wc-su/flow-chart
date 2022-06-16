@@ -1,8 +1,8 @@
 import React, { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import "./index.scss";
-import { UserLoginContext } from "../../context/UserProvider";
 import { LoadingContext } from "../../context/LoadingProvider";
 
 // images
@@ -19,16 +19,17 @@ const linkedinHref =
   "https://www.linkedin.com/in/%E9%9F%8B%E4%B8%9E-%E8%98%87-b14942126/";
 
 const Home = () => {
-  const { userLogin } = useContext(UserLoginContext);
+  const { userStatus } = useSelector((state) => state.user);
+
   const { setMessage } = useContext(LoadingContext);
 
   useEffect(() => {
-    if (userLogin === 0) {
+    if (userStatus === 0) {
       setMessage("載入中，請稍候...");
     } else {
       setMessage("");
     }
-  }, [userLogin]);
+  }, [userStatus]);
 
   return (
     <div className="Home">
@@ -43,7 +44,7 @@ const Home = () => {
                 <p>Draw a Flowchart</p>
               </div>
               <div className="header__link">
-                <Link to={userLogin === 1 ? "/Files" : "/Chart"}>
+                <Link to={userStatus === 1 ? "/Files" : "/Chart"}>
                   Try it free
                 </Link>
               </div>
@@ -117,7 +118,7 @@ const Home = () => {
         </div>
         <div className="startArea">
           <p>Start drawing</p>
-          <Link to={userLogin === 1 ? "/Files" : "/Chart"} className="link">
+          <Link to={userStatus === 1 ? "/Files" : "/Chart"} className="link">
             Try it free
           </Link>
         </div>
