@@ -63,8 +63,12 @@ const Chart = () => {
   };
 
   useEffect(() => {
-    if (userStatus === 1 && isBrowser && [0, 2].includes(pageCheckFlag.current)) {
-      if(chartId) {
+    if (
+      userStatus === 1 &&
+      isBrowser &&
+      [0, 2].includes(pageCheckFlag.current)
+    ) {
+      if (chartId) {
         getDataFromDB();
       } else {
         addNewFile();
