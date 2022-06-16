@@ -19,7 +19,7 @@ const linkedinHref =
   "https://www.linkedin.com/in/%E9%9F%8B%E4%B8%9E-%E8%98%87-b14942126/";
 
 const Home = () => {
-  const userStatus = useSelector((state) => state.userStatus);
+  const { userStatus } = useSelector((state) => state.user);
 
   const { setMessage } = useContext(LoadingContext);
 

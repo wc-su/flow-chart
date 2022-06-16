@@ -1,16 +1,17 @@
 import React, { useRef, useState, useEffect, useContext } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 
 import "./index.scss";
 
-import { DataContext, DrawTypeContext } from "../../index";
+import { DrawTypeContext } from "../../index";
 import CanvasDrawList from "../CanvasDrawList";
+import { chartActions } from "../../../../model/chartReducer";
 
 const Canvas = ({
   canvasRate,
   chartIndex,
   resizeDirection,
-  needSaveStep,
   svgRef,
   dataSelected,
   drawPoint2,
@@ -18,7 +19,10 @@ const Canvas = ({
   tempFlag,
   moveCanvas,
 }) => {
+  const dispatch = useDispatch();
   const newRate = canvasRate.current / 100;
+
+  const { data } = useSelector((state) => state.chart);
 
   // 取得畫布的起始座標
   const canvasRef = useRef();
@@ -34,7 +38,6 @@ const Canvas = ({
 
   const moveInitData = useRef();
 
-  const { data, setData } = useContext(DataContext);
   const { drawType, setDrawType } = useContext(DrawTypeContext);
 
   const [screenSize, setScreenSize] = useState({
@@ -96,36 +99,35 @@ const Canvas = ({
       if (drawStatus.current === 0 && drawType) {
         const canvasInset = getCanvasPos();
         drawStatus.current = 1;
-        setData((preData) => {
-          const x = e.clientX - canvasPosition.current.x - canvasInset.left;
-          const y = e.clientY - canvasPosition.current.y - canvasInset.top;
-          const newData = JSON.parse(JSON.stringify(preData));
-          newData.push({
-            index: uuidv4(),
-            startX: x,
-            startY: y,
-            endX: x,
-            endY: y,
-            x: x,
-            y: y,
-            width: 0,
-            height: 0,
-            type: drawType,
-            decorate: {
-              fill: "#FFFFFF",
-              fillOpacity: "0",
-              stroke: "#000000",
-              strokeWidth: "1.3",
-              strokeMiterlimit: 10,
-              strokeDasharray: "0",
-            },
-            cursor: "move",
-            pointerEvents: "all",
-            display: "block",
-          });
-          drawPoint2(newData);
-          return newData;
+
+        const x = e.clientX - canvasPosition.current.x - canvasInset.left;
+        const y = e.clientY - canvasPosition.current.y - canvasInset.top;
+        const newData = JSON.parse(JSON.stringify(data));
+        newData.push({
+          index: uuidv4(),
+          startX: x,
+          startY: y,
+          endX: x,
+          endY: y,
+          x: x,
+          y: y,
+          width: 0,
+          height: 0,
+          type: drawType,
+          decorate: {
+            fill: "#FFFFFF",
+            fillOpacity: "0",
+            stroke: "#000000",
+            strokeWidth: "1.3",
+            strokeMiterlimit: 10,
+            strokeDasharray: "0",
+          },
+          cursor: "move",
+          pointerEvents: "all",
+          display: "block",
         });
+        drawPoint2(newData);
+        dispatch(chartActions.startDraw(newData));
       } else if (drawStatus.current === 5 || drawStatus.current === 8) {
         drawPoint2(data);
         handleRerender();
@@ -144,122 +146,116 @@ const Canvas = ({
   function mouseMove(e) {
     if (drawStatus.current === 1) {
       const canvasInset = getCanvasPos();
-      setData((preData) => {
-        const newData = JSON.parse(JSON.stringify(preData));
-        const index = newData.length - 1;
+      const newData = JSON.parse(JSON.stringify(data));
+      const index = newData.length - 1;
 
-        const endX = e.clientX - canvasPosition.current.x - canvasInset.left;
-        const endY = e.clientY - canvasPosition.current.y - canvasInset.top;
-        newData[index].endX = endX;
-        newData[index].endY = endY;
-        if (endX >= newData[index].startX) {
-          newData[index].width = endX - newData[index].x;
-        } else {
-          newData[index].width = newData[index].startX - endX;
-          newData[index].x = endX;
-        }
-        if (endY >= newData[index].startY) {
-          newData[index].height = endY - newData[index].y;
-        } else {
-          newData[index].height = newData[index].startY - endY;
-          newData[index].y = endY;
-        }
-        drawPoint2(newData);
-        return newData;
-      });
+      const endX = e.clientX - canvasPosition.current.x - canvasInset.left;
+      const endY = e.clientY - canvasPosition.current.y - canvasInset.top;
+      newData[index].endX = endX;
+      newData[index].endY = endY;
+      if (endX >= newData[index].startX) {
+        newData[index].width = endX - newData[index].x;
+      } else {
+        newData[index].width = newData[index].startX - endX;
+        newData[index].x = endX;
+      }
+      if (endY >= newData[index].startY) {
+        newData[index].height = endY - newData[index].y;
+      } else {
+        newData[index].height = newData[index].startY - endY;
+        newData[index].y = endY;
+      }
+      drawPoint2(newData);
+      dispatch(chartActions.drawing(newData));
     } else if (drawStatus.current === 5) {
       const distancsX = e.clientX - moveInitData.current.mouseStartX;
       const distancsY = e.clientY - moveInitData.current.mouseStartY;
       const initItem = moveInitData.current.item;
-      setData((preData) => {
-        const newData = JSON.parse(JSON.stringify(preData));
-        const newItem = newData.find(
-          (element) => element.index == initItem.index
-        );
-        newItem.x = initItem.x + distancsX;
-        newItem.y = initItem.y + distancsY;
-        newItem.startX = initItem.startX + distancsX;
-        newItem.startY = initItem.startY + distancsY;
-        newItem.endX = initItem.endX + distancsX;
-        newItem.endY = initItem.endY + distancsY;
-        drawPoint2(newData);
-        return newData;
-      });
+      const newData = JSON.parse(JSON.stringify(data));
+      const newItem = newData.find(
+        (element) => element.index == initItem.index
+      );
+      newItem.x = initItem.x + distancsX;
+      newItem.y = initItem.y + distancsY;
+      newItem.startX = initItem.startX + distancsX;
+      newItem.startY = initItem.startY + distancsY;
+      newItem.endX = initItem.endX + distancsX;
+      newItem.endY = initItem.endY + distancsY;
+      drawPoint2(newData);
+      dispatch(chartActions.changeData(newData));
     } else if (drawStatus.current === 8) {
-      setData((preData) => {
-        const newData = JSON.parse(JSON.stringify(preData));
-        const newItem = newData.find(
-          (element) => element.index == chartIndex.current
-        );
-        const initItem = moveInitData.current.item;
-        switch (resizeDirection.current) {
-          case "nw-resize":
-            newItem.x = initItem.endX;
-            newItem.y = initItem.endY;
-            newItem.startX = initItem.endX;
-            newItem.startY = initItem.endY;
-            break;
-          case "n-resize":
-            newItem.y = initItem.endY;
-            newItem.startY = initItem.endY;
-            break;
-          case "ne-resize":
-            newItem.y = initItem.endY;
-            newItem.startY = initItem.endY;
-            break;
-          case "w-resize":
-            newItem.x = initItem.endX;
-            newItem.startX = initItem.endX;
-            break;
-          case "e-resize":
-            break;
-          case "sw-resize":
-            newItem.x = initItem.endX;
-            newItem.startX = initItem.endX;
-            break;
-          case "s-resize":
-            break;
-          case "se-resize":
-            break;
-        }
+      const newData = JSON.parse(JSON.stringify(data));
+      const newItem = newData.find(
+        (element) => element.index === chartIndex.current
+      );
+      const initItem = moveInitData.current.item;
+      switch (resizeDirection.current) {
+        case "nw-resize":
+          newItem.x = initItem.endX;
+          newItem.y = initItem.endY;
+          newItem.startX = initItem.endX;
+          newItem.startY = initItem.endY;
+          break;
+        case "n-resize":
+          newItem.y = initItem.endY;
+          newItem.startY = initItem.endY;
+          break;
+        case "ne-resize":
+          newItem.y = initItem.endY;
+          newItem.startY = initItem.endY;
+          break;
+        case "w-resize":
+          newItem.x = initItem.endX;
+          newItem.startX = initItem.endX;
+          break;
+        case "e-resize":
+          break;
+        case "sw-resize":
+          newItem.x = initItem.endX;
+          newItem.startX = initItem.endX;
+          break;
+        case "s-resize":
+          break;
+        case "se-resize":
+          break;
+      }
 
-        const canvasInset = getCanvasPos();
-        const endX = e.clientX - canvasPosition.current.x - canvasInset.left;
-        const endY = e.clientY - canvasPosition.current.y - canvasInset.top;
+      const canvasInset = getCanvasPos();
+      const endX = e.clientX - canvasPosition.current.x - canvasInset.left;
+      const endY = e.clientY - canvasPosition.current.y - canvasInset.top;
 
-        if (resizeDirection.current === "start-resize") {
-          newItem.startX = endX;
-          newItem.startY = endY;
-        } else if (resizeDirection.current === "end-resize") {
-          newItem.endX = endX;
-          newItem.endY = endY;
+      if (resizeDirection.current === "start-resize") {
+        newItem.startX = endX;
+        newItem.startY = endY;
+      } else if (resizeDirection.current === "end-resize") {
+        newItem.endX = endX;
+        newItem.endY = endY;
+      } else {
+        newItem.endX = endX;
+        newItem.endY = endY;
+      }
+      if (!["n-resize", "s-resize"].includes(resizeDirection.current)) {
+        if (endX >= newItem.startX) {
+          newItem.width = endX - newItem.startX;
         } else {
-          newItem.endX = endX;
-          newItem.endY = endY;
+          newItem.width = newItem.startX - endX;
+          newItem.x = endX;
         }
-        if (!["n-resize", "s-resize"].includes(resizeDirection.current)) {
-          if (endX >= newItem.startX) {
-            newItem.width = endX - newItem.startX;
-          } else {
-            newItem.width = newItem.startX - endX;
-            newItem.x = endX;
-          }
+      }
+      if (!["w-resize", "e-resize"].includes(resizeDirection.current)) {
+        if (endY >= newItem.startY) {
+          newItem.height = endY - newItem.startY;
+        } else {
+          newItem.height = newItem.startY - endY;
+          newItem.y = endY;
         }
-        if (!["w-resize", "e-resize"].includes(resizeDirection.current)) {
-          if (endY >= newItem.startY) {
-            newItem.height = endY - newItem.startY;
-          } else {
-            newItem.height = newItem.startY - endY;
-            newItem.y = endY;
-          }
-        }
-        if (resizeDirection.current === "start-resize") {
-          newItem.width = Math.abs(newItem.startX - newItem.endX);
-          newItem.height = Math.abs(newItem.startY - newItem.endY);
-        }
-        drawPoint2(newData);
-        return newData;
-      });
+      }
+      if (resizeDirection.current === "start-resize") {
+        newItem.width = Math.abs(newItem.startX - newItem.endX);
+        newItem.height = Math.abs(newItem.startY - newItem.endY);
+      }
+      drawPoint2(newData);
+      dispatch(chartActions.changeData(newData));
     } else if (drawStatus.current === 15) {
       const distanceX = e.clientX - moveInitData.current.mouseStartX;
       const distanceY = e.clientY - moveInitData.current.mouseStartY;
@@ -270,49 +266,45 @@ const Canvas = ({
   }
   function mouseUp(e) {
     if (drawStatus.current === 1) {
-      setData((preData) => {
-        const newData = JSON.parse(JSON.stringify(preData));
-        const index = newData.length - 1;
-        if (drawType !== "flowline") {
-          newData[index].startX = newData[index].x;
-          newData[index].startY = newData[index].y;
-          newData[index].endX = newData[index].x + newData[index].width;
-          newData[index].endY = newData[index].y + newData[index].height;
-        }
+      const newData = JSON.parse(JSON.stringify(data));
+      const index = newData.length - 1;
+      if (drawType !== "flowline") {
+        newData[index].startX = newData[index].x;
+        newData[index].startY = newData[index].y;
+        newData[index].endX = newData[index].x + newData[index].width;
+        newData[index].endY = newData[index].y + newData[index].height;
+      }
 
-        if (newData[index].width === 0 || newData[index].height === 0) {
-          newData.pop();
-          drawStatus.current = 3;
-        } else {
-          drawStatus.current = 2;
-        }
-        drawPoint2(newData);
-        return newData;
-      });
+      if (newData[index].width === 0 || newData[index].height === 0) {
+        newData.pop();
+        drawStatus.current = 3;
+      } else {
+        drawStatus.current = 2;
+      }
+      drawPoint2(newData);
+      dispatch(chartActions.endDraw(newData));
       tempFlag.current = true;
       setDrawType("");
     } else if (drawStatus.current === 8) {
-      setData((preData) => {
-        const newData = JSON.parse(JSON.stringify(preData));
-        const newItem = newData.find(
-          (element) => element.index == chartIndex.current
-        );
-        if (newItem.type !== "flowline") {
-          newItem.startX = newItem.x;
-          newItem.startY = newItem.y;
-          newItem.endX = newItem.x + newItem.width;
-          newItem.endY = newItem.y + newItem.height;
-        }
+      const newData = JSON.parse(JSON.stringify(data));
+      const newItem = newData.find(
+        (element) => element.index == chartIndex.current
+      );
+      if (newItem.type !== "flowline") {
+        newItem.startX = newItem.x;
+        newItem.startY = newItem.y;
+        newItem.endX = newItem.x + newItem.width;
+        newItem.endY = newItem.y + newItem.height;
+      }
 
-        if (newItem.width === 0 || newItem.height === 0) {
-          drawStatus.current = 10;
-        } else {
-          drawStatus.current = 9;
-        }
-        drawPoint2(newData);
-        return newData;
-      });
+      if (newItem.width === 0 || newItem.height === 0) {
+        drawStatus.current = 10;
+      } else {
+        drawStatus.current = 9;
+      }
       resizeDirection.current = "";
+      drawPoint2(newData);
+      dispatch(chartActions.endDraw(newData));
     }
   }
   function click(e) {

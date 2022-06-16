@@ -14,7 +14,7 @@ import closeIcon from "./images/close.png";
 const Header = ({ outerRef }) => {
   const location = useLocation();
 
-  const userStatus = useSelector((state) => state.userStatus);
+  const { userStatus } = useSelector((state) => state.user);
   const { setMessage } = useContext(LoadingContext);
 
   const menuRef = useRef();

@@ -33,7 +33,8 @@ const CanvasToolBar = ({
   docTitle,
   docTitleInitFlag,
 }) => {
-  const userStatus = useSelector((state) => state.userStatus);
+  const { userStatus } = useSelector((state) => state.user);
+  const { step, stepRecord } = useSelector((state) => state.chart);
 
   const [drawSelected, setDrawSelected] = useState(0);
   const [saveSelected, setSaveSelected] = useState(0);
@@ -156,12 +157,12 @@ const CanvasToolBar = ({
           <CanvasToolItem
             purpose="step"
             data={itemImg["undo"]}
-            disabled={isMobile}
+            disabled={isMobile || step === 1}
           ></CanvasToolItem>
           <CanvasToolItem
             purpose="step"
             data={itemImg["redo"]}
-            disabled={isMobile}
+            disabled={isMobile || step === stepRecord.length}
           ></CanvasToolItem>
           <CanvasToolItem
             purpose="figure"

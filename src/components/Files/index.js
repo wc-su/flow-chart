@@ -13,7 +13,7 @@ import FileItem from "./components/FileItem";
 import iconAdd from "./images/plus.png";
 
 const Files = () => {
-  const userStatus = useSelector((state) => state.userStatus);
+  const { userStatus } = useSelector((state) => state.user);
 
   const [files, setFiles] = useState([]);
   const { setMessage } = useContext(LoadingContext);
