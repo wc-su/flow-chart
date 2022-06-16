@@ -4,8 +4,9 @@ FlowChart is a simple tool to draw flow chart.
 [Live Demo](https://flow-chart-f5582.web.app/)
 
 ## Front-end Technique
-- React, React Hook
+- React Hooks
 - React Router
+- Redux Toolkit
 - Webpack
 - Babel
 - Sass/SCSS
