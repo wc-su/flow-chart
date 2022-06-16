@@ -6,8 +6,9 @@ const CanvasDrawList = ({
   data,
   canvasPosition,
   drawStatus,
-  chartIndex,
-  resizeDirection,
+  targetIndex,
+  targetPoint,
+  newRate,
 }) => {
   return (
     <g>
@@ -18,8 +19,9 @@ const CanvasDrawList = ({
             item={item}
             canvasPosition={canvasPosition}
             drawStatus={drawStatus}
-            chartIndex={chartIndex}
-            resizeDirection={resizeDirection}
+            targetIndex={targetIndex}
+            targetPoint={targetPoint}
+            newRate={newRate}
           />
         );
       })}

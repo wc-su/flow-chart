@@ -1,64 +1,122 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {} from "../drawFunction";
+import { startDrawFun, drawTarget } from "../drawFunction";
 
-const initialState = { data: [], targetData: [], step: 0, stepRecord: [] };
-
-function deepCopy(ary) {
-  return JSON.parse(JSON.stringify(ary));
-}
+const initialState = {
+  data: [],
+  targetData: [],
+  step: 0,
+  stepRecord: [],
+};
 
 const chartReducer = createSlice({
   name: "chart",
   initialState,
   reducers: {
+    // init & deleteData & endDraw is same...
     init(state, action) {
-      state.data.push(action.payload);
+      state.data = action.payload.data;
       state.step++;
       state.stepRecord.push(state.data);
+      // redraw targetData
+      state.targetData = drawTarget(
+        state.data,
+        action.payload.targetIndex,
+        action.payload.targetPoint
+      );
     },
-    addStep(state) {
+    deleteData(state, action) {
+      state.data = action.payload.data;
       state.step++;
+      state.stepRecord.push(state.data);
+      // redraw targetData
+      state.targetData = drawTarget(
+        state.data,
+        action.payload.targetIndex,
+        action.payload.targetPoint
+      );
     },
-    nextStep(state) {
-      state.step++;
+    nextStep(state, action) {
       state.data = state.stepRecord[state.step - 1];
+      state.step++;
+      // redraw targetData
+      state.targetData = drawTarget(
+        state.data,
+        action.payload.targetIndex,
+        action.payload.targetPoint
+      );
     },
-    backStep(state) {
+    backStep(state, action) {
+      state.data = state.stepRecord[state.step - 1];
       state.step--;
-      state.data = state.stepRecord[state.step - 1];
+      // redraw targetData
+      state.targetData = drawTarget(
+        state.data,
+        action.payload.targetIndex,
+        action.payload.targetPoint
+      );
     },
     startDraw(state, action) {
-      // 需再多放倍率進來，畫圖時需要加上倍率
-      // state.data.push(deepCopy(action.data));
-      // console.log("start draw", action.payload);
-      // state.data.push(action.payload);
-      state.data = action.payload;
+      // adjust stepRecord by step
+      state.stepRecord.splice(state.step, state.stepRecord.length - state.step);
+      // add new data item
+      state.data.push(
+        startDrawFun(
+          action.payload.x,
+          action.payload.y,
+          action.payload.drawType
+        )
+      );
+      // redraw targetData
+      state.targetData = drawTarget(
+        state.data,
+        action.payload.targetIndex,
+        action.payload.targetPoint
+      );
     },
     drawing(state, action) {
-      // state.data.pop();
-      // state.data.push(deepCopy(action.data));
-      // console.log("drawing", action.payload);
-      // state.data.push(action.payload);
-      state.data = action.payload;
+      state.data = action.payload.data;
+      // redraw targetData
+      state.targetData = drawTarget(
+        state.data,
+        action.payload.targetIndex,
+        action.payload.targetPoint
+      );
     },
     endDraw(state, action) {
-      // state.data.pop();
-      // state.data.push(deepCopy(action.data));
-      // console.log("start end", action.payload);
-      // state.data.push(action.payload);
-      state.data = action.payload;
+      state.data = action.payload.data;
+      // add step
       state.step++;
-      state.stepRecord.push(action.payload);
+      state.stepRecord.push(state.data);
+      // redraw targetData
+      state.targetData = drawTarget(
+        state.data,
+        action.payload.targetIndex,
+        action.payload.targetPoint
+      );
     },
-    // changeRate(state, action) {
-    //   state.data = deepCopy(action.data);
-    // }
     changeData(state, action) {
-      state.data.pop();
-      // state.data.push(deepCopy(action.data));
-      // console.log("change draw", action.payload);
-      // state.data.push(action.payload);
-      state.data = action.payload;
+      state.data = action.payload.data;
+      // redraw targetData
+      state.targetData = drawTarget(
+        state.data,
+        action.payload.targetIndex,
+        action.payload.targetPoint
+      );
+    },
+    drawTargetData(state, action) {
+      // redraw targetData
+      state.targetData = drawTarget(
+        state.data,
+        action.payload.targetIndex,
+        action.payload.targetPoint
+      );
+    },
+    clear(state) {
+      // reset all state
+      state.data = [];
+      state.targetData = [];
+      state.step = 0;
+      state.stepRecord = [];
     },
   },
 });

@@ -28,31 +28,22 @@ const Chart = () => {
 
   const { chartId } = useParams();
 
-  const firstLogin = useRef(0);
+  const pageCheckFlag = useRef(0);
+
   const docID = useRef("");
   const docTitle = useRef("undefined");
   const docTitleInitFlag = useRef(0);
 
-  const chartIndex = useRef(-1);
-  const resizeDirection = useRef("");
-  const tempFlag = useRef(false);
+  const targetIndex = useRef(-1);
+  const targetPoint = useRef("");
 
   const canvasRate = useRef(100);
 
   const svgRef = useRef();
 
-  // 需要存取紀錄註記
-  const needSaveStep = useRef(true);
-  //
-  const stepChangeData = useRef(false);
-
   const [drawType, setDrawType] = useState("");
   const [moveCanvas, setMoveCanvas] = useState(false);
   const [activeButton, setActiveButton] = useState({});
-  // 點選
-  const dataSelected = useRef([]);
-
-  const [rerender, setRerender] = useState(false);
 
   const { setMessage } = useContext(LoadingContext);
 
@@ -72,87 +63,64 @@ const Chart = () => {
   };
 
   useEffect(() => {
-    if (firstLogin.current === 0) {
-      if (userStatus === 1) {
-        if (isBrowser) {
-          firstLogin.current = 1;
-          getDataFromDB();
-        }
-      } else if (userStatus === 2) {
-        if (chartId) {
-          dataSelected.current = [];
-          docTitle.current = "undefined";
-          docTitleInitFlag.current = 0;
-          firstLogin.current = 0;
-          handleRerender();
-          navigate("/Chart");
-        } else {
-          firstLogin.current = 1;
-          dispatch(
-            chartActions.init({
-              index: uuidv4(),
-            })
-          );
-        }
+    if (userStatus === 1 && isBrowser && [0, 2].includes(pageCheckFlag.current)) {
+      if(chartId) {
+        getDataFromDB();
+      } else {
+        addNewFile();
       }
+      pageCheckFlag.current = 1; // 0: first enter page / 1: user logout -> login
+    } else if (userStatus === 2 && [0, 1].includes(pageCheckFlag.current)) {
+      if (chartId) {
+        dispatch(chartActions.clear());
+        docTitle.current = "undefined";
+        docTitleInitFlag.current = 0;
+        navigate("/Chart");
+      } else {
+        dispatch(chartActions.init({ data: [{ index: uuidv4() }] }));
+      }
+      pageCheckFlag.current = 2; // 0: first enter page / 1: user login -> logout
     }
   });
-
-  useEffect(() => {
-    console.log("step:", step);
-  }, [step]);
-
-  useEffect(() => {
-    if (!chartId && userStatus === 1 && isBrowser) {
-      addNewFile();
-      firstLogin.current = 0;
-    }
-  }, [userStatus]);
 
   useEffect(() => {
     setMoveCanvas(false);
     if (Object.keys(activeButton).length !== 0) {
       if (
         activeButton.purpose === "figure" &&
-        activeButton.feature === "delete" &&
-        chartIndex.current !== -1
+        activeButton.feature === "delete"
       ) {
-        tempFlag.current = true;
-        const newData = preData.filter(
-          (item) => item.index !== chartIndex.current
+        const newData = data.filter(
+          (item) => item.index !== targetIndex.current
         );
-        drawPoint2(newData);
-        dispatch(chartActions.addStep(newData));
+        dispatch(chartActions.deleteData({ data: newData }));
+        setActiveButton({});
       } else if (
         activeButton.purpose === "step" &&
         activeButton.feature === "undo"
       ) {
-        console.log(" -> undo", step, stepRecord, chartIndex.current);
-        tempFlag.current = true;
         if (step > 0) {
-          stepChangeData.current = true;
-          drawPoint2(stepRecord[step - 2]);
-          dispatch(chartActions.backStep());
-        } else {
-          console.log("no step records - undo");
-          tempFlag.current = false;
-          setActiveButton({});
+          dispatch(
+            chartActions.backStep({
+              targetIndex: targetIndex.current,
+              targetPoint: targetPoint.current,
+            })
+          );
         }
+        setActiveButton({});
       } else if (
         activeButton.purpose === "step" &&
         activeButton.feature === "redo"
       ) {
-        console.log(" -> redo", step, stepRecord, chartIndex.current);
-        tempFlag.current = true;
-        if (step >= stepRecord.length) {
-          console.log("no step records - redo");
-          tempFlag.current = false;
-          setActiveButton({});
-        } else {
-          stepChangeData.current = true;
-          drawPoint2(stepRecord[step]);
-          dispatch(chartActions.nextStep());
+        if (step < stepRecord.length) {
+          dispatch(
+            chartActions.nextStep({
+              targetIndex: targetIndex.current,
+              targetPoint: targetPoint.current,
+            })
+          );
         }
+        setActiveButton({});
       } else if (
         activeButton.purpose === "saveFile" &&
         activeButton.feature === "png"
@@ -202,51 +170,13 @@ const Chart = () => {
         activeButton.purpose === "canvasRate" &&
         activeButton.feature === "zoomIn"
       ) {
-        const oldRate = canvasRate.current / 100;
         canvasRate.current += 10;
-        const newRate = canvasRate.current / 100 / oldRate;
-        // setData((preData) => {
-        //   let newData = JSON.parse(JSON.stringify(preData));
-        //   newData = newData.map((item) => {
-        //     item.startX *= newRate;
-        //     item.startY *= newRate;
-        //     item.endX *= newRate;
-        //     item.endY *= newRate;
-        //     item.y *= newRate;
-        //     item.x *= newRate;
-        //     item.height *= newRate;
-        //     item.width *= newRate;
-        //     item.decorate.strokeWidth *= newRate;
-        //     return item;
-        //   });
-        //   drawPoint2(newData);
-        //   return newData;
-        // });
         setActiveButton({});
       } else if (
         activeButton.purpose === "canvasRate" &&
         activeButton.feature === "zoomOut"
       ) {
-        const oldRate = canvasRate.current / 100;
         canvasRate.current -= 10;
-        const newRate = canvasRate.current / 100 / oldRate;
-        // setData((preData) => {
-        //   let newData = JSON.parse(JSON.stringify(preData));
-        //   newData = newData.map((item) => {
-        //     item.startX *= newRate;
-        //     item.startY *= newRate;
-        //     item.endX *= newRate;
-        //     item.endY *= newRate;
-        //     item.y *= newRate;
-        //     item.x *= newRate;
-        //     item.height *= newRate;
-        //     item.width *= newRate;
-        //     item.decorate.strokeWidth *= newRate;
-        //     return item;
-        //   });
-        //   drawPoint2(newData);
-        //   return newData;
-        // });
         setActiveButton({});
       } else if (
         activeButton.purpose === "move" &&
@@ -257,29 +187,6 @@ const Chart = () => {
     }
   }, [activeButton]);
 
-  useEffect(() => {
-    if (tempFlag.current) {
-      if (
-        activeButton.purpose === "figure" &&
-        activeButton.feature === "delete"
-      ) {
-        chartIndex.current = -1;
-      }
-      tempFlag.current = false;
-      setActiveButton({});
-    }
-    // 讀取步驟，重新畫 points
-    // if (stepChangeData.current) {
-    //   if (activeButton.feature === "undo") {
-    //     nowStep.current--;
-    //   } else if (activeButton.feature === "redo") {
-    //     nowStep.current++;
-    //   }
-    //   console.log(" -> step:", nowStep.current);
-    //   stepChangeData.current = false;
-    // }
-  }, [data]);
-
   async function getDataFromDB() {
     setMessage("資料讀取中，請稍候...");
     const result = await getUserRecordByID(auth.currentUser.uid, chartId);
@@ -288,7 +195,7 @@ const Chart = () => {
         docID.current = result.dataID;
         docTitle.current = result.data.title;
         docTitleInitFlag.current = 0;
-        dispatch(chartActions.init(result.data.data));
+        dispatch(chartActions.init({ data: result.data.data }));
       }
     } else {
       navigate("/Files");
@@ -353,121 +260,6 @@ const Chart = () => {
     setMessage("");
   }
 
-  function drawPoint2(data) {
-    let originItem = data.find((item) => item.index === chartIndex.current);
-    if (chartIndex.current !== -1 && originItem) {
-      const originData = JSON.parse(JSON.stringify(originItem));
-      if (originData.type !== "flowline") {
-        const newStartX = Math.min(originData.startX, originData.endX);
-        const newStartY = Math.min(originData.startY, originData.endY);
-        const newEndX = Math.max(originData.startY, originData.endY);
-        const newEndY = Math.max(originData.startY, originData.endY);
-        originData.startX = newStartX;
-        originData.startY = newStartY;
-        originData.x = newStartX;
-        originData.y = newStartY;
-        originData.endX = newEndX;
-        originData.endY = newEndY;
-      }
-
-      const initPoint = JSON.parse(JSON.stringify(originData));
-
-      if (originData.type !== "flowline") {
-        originData.type = "process";
-        originData.decorate.stroke = "#00a8ff";
-        originData.decorate.strokeDasharray = "3";
-        originData.pointerEvents = "none";
-      }
-
-      const newData = [];
-      if (resizeDirection.current !== "") {
-        originData.display = "none";
-      }
-      newData.push(originData);
-
-      const pointWidth = initPoint.width;
-      const pointHeight = initPoint.height;
-      initPoint.decorate.fill = "#00a8ff";
-      initPoint.decorate.stroke = "none";
-      initPoint.type = "ellipse";
-      initPoint.width = 4;
-      initPoint.height = 4;
-
-      const pointConfig = [
-        { cursor: "nw-resize", x: 0, y: 0 },
-        { cursor: "n-resize", x: 0.5, y: 0 },
-        { cursor: "ne-resize", x: 1, y: 0 },
-        { cursor: "w-resize", x: 0, y: 0.5 },
-        { cursor: "e-resize", x: 1, y: 0.5 },
-        { cursor: "sw-resize", x: 0, y: 1 },
-        { cursor: "s-resize", x: 0.5, y: 1 },
-        { cursor: "se-resize", x: 1, y: 1 },
-      ];
-      const linePointConfig = [
-        { cursor: "start-resize", x: 0, y: 0 },
-        { cursor: "end-resize", x: 1, y: 1 },
-      ];
-      if (originData.type === "flowline") {
-        newData.push({ ...initPoint });
-        newData[1].index = uuidv4();
-        newData[1].cursor = linePointConfig[0].cursor;
-        newData[1].x = newData[1].startX;
-        newData[1].y = newData[1].startY;
-        newData[1].endX = newData[1].startX;
-        newData[1].endY = newData[1].startY;
-        if (
-          resizeDirection.current &&
-          resizeDirection.current !== linePointConfig[0].cursor
-        ) {
-          newData[1].display = "none";
-        }
-        newData.push({ ...initPoint });
-        newData[2].index = uuidv4();
-        newData[2].cursor = linePointConfig[1].cursor;
-        newData[2].startX = newData[2].endX;
-        newData[2].startY = newData[2].endY;
-        newData[2].x = newData[2].endX;
-        newData[2].y = newData[2].endY;
-        if (
-          resizeDirection.current &&
-          resizeDirection.current !== linePointConfig[1].cursor
-        ) {
-          newData[2].display = "none";
-        }
-      } else {
-        for (let i = 1; i <= pointConfig.length; i++) {
-          newData.push({ ...initPoint });
-          newData[i].index = uuidv4();
-          newData[i].cursor = pointConfig[i - 1].cursor;
-          newData[i].startX += pointWidth * pointConfig[i - 1].x;
-          newData[i].startY += pointHeight * pointConfig[i - 1].y;
-          newData[i].x = newData[i].startX;
-          newData[i].y = newData[i].startY;
-          newData[i].endX = newData[i].startX;
-          newData[i].endY = newData[i].startY;
-          if (resizeDirection.current) {
-            newData[i].display =
-              pointConfig[i - 1].cursor === resizeDirection.current
-                ? "block"
-                : "none";
-          }
-        }
-      }
-      dataSelected.current = newData;
-    } else {
-      if (dataSelected.current.length > 0) {
-        dataSelected.current = [];
-      }
-      if (chartIndex.current !== -1) {
-        chartIndex.current = -1;
-      }
-    }
-  }
-
-  function handleRerender() {
-    setRerender((preData) => !preData);
-  }
-
   function handleMainClick() {
     setToolBarPop("");
   }
@@ -485,18 +277,16 @@ const Chart = () => {
           setToolBarPop={setToolBarPop}
           docTitle={docTitle}
           docTitleInitFlag={docTitleInitFlag}
+          targetIndex={targetIndex}
         />
         <div className="Chart__main" onClick={handleMainClick}>
           <Canvas
             canvasRate={canvasRate}
-            chartIndex={chartIndex}
-            resizeDirection={resizeDirection}
             svgRef={svgRef}
-            dataSelected={dataSelected}
-            drawPoint2={drawPoint2}
-            handleRerender={handleRerender}
-            tempFlag={tempFlag}
             moveCanvas={moveCanvas}
+            setActiveButton={setActiveButton}
+            targetIndex={targetIndex}
+            targetPoint={targetPoint}
           />
         </div>
         <MobileView className="Chart__prompt">

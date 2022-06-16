@@ -32,6 +32,7 @@ const CanvasToolBar = ({
   setToolBarPop,
   docTitle,
   docTitleInitFlag,
+  targetIndex,
 }) => {
   const { userStatus } = useSelector((state) => state.user);
   const { step, stepRecord } = useSelector((state) => state.chart);
@@ -157,7 +158,7 @@ const CanvasToolBar = ({
           <CanvasToolItem
             purpose="step"
             data={itemImg["undo"]}
-            disabled={isMobile || step === 1}
+            disabled={isMobile || step <= 1}
           ></CanvasToolItem>
           <CanvasToolItem
             purpose="step"
@@ -167,7 +168,7 @@ const CanvasToolBar = ({
           <CanvasToolItem
             purpose="figure"
             data={itemImg["figure"]}
-            disabled={isMobile}
+            disabled={isMobile || targetIndex.current === -1}
           ></CanvasToolItem>
         </div>
         <div className="toolList__container">

@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect, useContext } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { v4 as uuidv4 } from "uuid";
 
 import "./index.scss";
 
@@ -10,19 +9,16 @@ import { chartActions } from "../../../../model/chartReducer";
 
 const Canvas = ({
   canvasRate,
-  chartIndex,
-  resizeDirection,
   svgRef,
-  dataSelected,
-  drawPoint2,
-  handleRerender,
-  tempFlag,
   moveCanvas,
+  setActiveButton,
+  targetIndex,
+  targetPoint,
 }) => {
   const dispatch = useDispatch();
   const newRate = canvasRate.current / 100;
 
-  const { data } = useSelector((state) => state.chart);
+  const { data, targetData } = useSelector((state) => state.chart);
 
   // 取得畫布的起始座標
   const canvasRef = useRef();
@@ -82,7 +78,6 @@ const Canvas = ({
   }, [canvasRef]);
 
   function mouseDown(e) {
-    console.log("Canvas.js -> mouse down", drawStatus.current, drawType);
     if (![5, 8].includes(drawStatus.current)) {
       drawStatus.current = 0;
     }
@@ -100,46 +95,35 @@ const Canvas = ({
         const canvasInset = getCanvasPos();
         drawStatus.current = 1;
 
-        const x = e.clientX - canvasPosition.current.x - canvasInset.left;
-        const y = e.clientY - canvasPosition.current.y - canvasInset.top;
-        const newData = JSON.parse(JSON.stringify(data));
-        newData.push({
-          index: uuidv4(),
-          startX: x,
-          startY: y,
-          endX: x,
-          endY: y,
-          x: x,
-          y: y,
-          width: 0,
-          height: 0,
-          type: drawType,
-          decorate: {
-            fill: "#FFFFFF",
-            fillOpacity: "0",
-            stroke: "#000000",
-            strokeWidth: "1.3",
-            strokeMiterlimit: 10,
-            strokeDasharray: "0",
-          },
-          cursor: "move",
-          pointerEvents: "all",
-          display: "block",
-        });
-        drawPoint2(newData);
-        dispatch(chartActions.startDraw(newData));
+        const x =
+          (e.clientX - canvasPosition.current.x - canvasInset.left) / newRate;
+        const y =
+          (e.clientY - canvasPosition.current.y - canvasInset.top) / newRate;
+        dispatch(
+          chartActions.startDraw({
+            x,
+            y,
+            drawType,
+            targetIndex: targetIndex.current,
+            targetPoint: targetPoint.current,
+          })
+        );
       } else if (drawStatus.current === 5 || drawStatus.current === 8) {
-        drawPoint2(data);
-        handleRerender();
         moveInitData.current = {
           item: JSON.parse(
             JSON.stringify(
-              data.find((element) => element.index === chartIndex.current)
+              data.find((element) => element.index === targetIndex.current)
             )
           ),
           mouseStartX: e.clientX,
           mouseStartY: e.clientY,
         };
+        dispatch(
+          chartActions.drawTargetData({
+            targetIndex: targetIndex.current,
+            targetPoint: targetPoint.current,
+          })
+        );
       }
     }
   }
@@ -149,8 +133,10 @@ const Canvas = ({
       const newData = JSON.parse(JSON.stringify(data));
       const index = newData.length - 1;
 
-      const endX = e.clientX - canvasPosition.current.x - canvasInset.left;
-      const endY = e.clientY - canvasPosition.current.y - canvasInset.top;
+      const endX =
+        (e.clientX - canvasPosition.current.x - canvasInset.left) / newRate;
+      const endY =
+        (e.clientY - canvasPosition.current.y - canvasInset.top) / newRate;
       newData[index].endX = endX;
       newData[index].endY = endY;
       if (endX >= newData[index].startX) {
@@ -165,11 +151,18 @@ const Canvas = ({
         newData[index].height = newData[index].startY - endY;
         newData[index].y = endY;
       }
-      drawPoint2(newData);
-      dispatch(chartActions.drawing(newData));
+      dispatch(
+        chartActions.drawing({
+          data: newData,
+          targetIndex: targetIndex.current,
+          targetPoint: targetPoint.current,
+        })
+      );
     } else if (drawStatus.current === 5) {
-      const distancsX = e.clientX - moveInitData.current.mouseStartX;
-      const distancsY = e.clientY - moveInitData.current.mouseStartY;
+      const distancsX =
+        (e.clientX - moveInitData.current.mouseStartX) / newRate;
+      const distancsY =
+        (e.clientY - moveInitData.current.mouseStartY) / newRate;
       const initItem = moveInitData.current.item;
       const newData = JSON.parse(JSON.stringify(data));
       const newItem = newData.find(
@@ -181,15 +174,20 @@ const Canvas = ({
       newItem.startY = initItem.startY + distancsY;
       newItem.endX = initItem.endX + distancsX;
       newItem.endY = initItem.endY + distancsY;
-      drawPoint2(newData);
-      dispatch(chartActions.changeData(newData));
+      dispatch(
+        chartActions.changeData({
+          data: newData,
+          targetIndex: targetIndex.current,
+          targetPoint: targetPoint.current,
+        })
+      );
     } else if (drawStatus.current === 8) {
       const newData = JSON.parse(JSON.stringify(data));
       const newItem = newData.find(
-        (element) => element.index === chartIndex.current
+        (element) => element.index === targetIndex.current
       );
       const initItem = moveInitData.current.item;
-      switch (resizeDirection.current) {
+      switch (targetPoint.current) {
         case "nw-resize":
           newItem.x = initItem.endX;
           newItem.y = initItem.endY;
@@ -221,20 +219,22 @@ const Canvas = ({
       }
 
       const canvasInset = getCanvasPos();
-      const endX = e.clientX - canvasPosition.current.x - canvasInset.left;
-      const endY = e.clientY - canvasPosition.current.y - canvasInset.top;
+      const endX =
+        (e.clientX - canvasPosition.current.x - canvasInset.left) / newRate;
+      const endY =
+        (e.clientY - canvasPosition.current.y - canvasInset.top) / newRate;
 
-      if (resizeDirection.current === "start-resize") {
+      if (targetPoint.current === "start-resize") {
         newItem.startX = endX;
         newItem.startY = endY;
-      } else if (resizeDirection.current === "end-resize") {
+      } else if (targetPoint.current === "end-resize") {
         newItem.endX = endX;
         newItem.endY = endY;
       } else {
         newItem.endX = endX;
         newItem.endY = endY;
       }
-      if (!["n-resize", "s-resize"].includes(resizeDirection.current)) {
+      if (!["n-resize", "s-resize"].includes(targetPoint.current)) {
         if (endX >= newItem.startX) {
           newItem.width = endX - newItem.startX;
         } else {
@@ -242,7 +242,7 @@ const Canvas = ({
           newItem.x = endX;
         }
       }
-      if (!["w-resize", "e-resize"].includes(resizeDirection.current)) {
+      if (!["w-resize", "e-resize"].includes(targetPoint.current)) {
         if (endY >= newItem.startY) {
           newItem.height = endY - newItem.startY;
         } else {
@@ -250,12 +250,17 @@ const Canvas = ({
           newItem.y = endY;
         }
       }
-      if (resizeDirection.current === "start-resize") {
+      if (targetPoint.current === "start-resize") {
         newItem.width = Math.abs(newItem.startX - newItem.endX);
         newItem.height = Math.abs(newItem.startY - newItem.endY);
       }
-      drawPoint2(newData);
-      dispatch(chartActions.changeData(newData));
+      dispatch(
+        chartActions.changeData({
+          data: newData,
+          targetIndex: targetIndex.current,
+          targetPoint: targetPoint.current,
+        })
+      );
     } else if (drawStatus.current === 15) {
       const distanceX = e.clientX - moveInitData.current.mouseStartX;
       const distanceY = e.clientY - moveInitData.current.mouseStartY;
@@ -281,14 +286,37 @@ const Canvas = ({
       } else {
         drawStatus.current = 2;
       }
-      drawPoint2(newData);
-      dispatch(chartActions.endDraw(newData));
-      tempFlag.current = true;
+      dispatch(
+        chartActions.endDraw({
+          data: newData,
+          targetIndex: targetIndex.current,
+          targetPoint: targetPoint.current,
+        })
+      );
+      setActiveButton({});
       setDrawType("");
+    } else if (drawStatus.current === 5) {
+      const oldItem = moveInitData.current.item;
+      const newItem = data.find((item) => item.index === targetIndex.current);
+      if (
+        oldItem.x === newItem.x &&
+        oldItem.y === newItem.y &&
+        oldItem.width === newItem.width &&
+        oldItem.height === newItem.height
+      ) {
+      } else {
+        dispatch(
+          chartActions.endDraw({
+            data,
+            targetIndex: targetIndex.current,
+            targetPoint: targetPoint.current,
+          })
+        );
+      }
     } else if (drawStatus.current === 8) {
       const newData = JSON.parse(JSON.stringify(data));
       const newItem = newData.find(
-        (element) => element.index == chartIndex.current
+        (element) => element.index == targetIndex.current
       );
       if (newItem.type !== "flowline") {
         newItem.startX = newItem.x;
@@ -302,26 +330,40 @@ const Canvas = ({
       } else {
         drawStatus.current = 9;
       }
-      resizeDirection.current = "";
-      drawPoint2(newData);
-      dispatch(chartActions.endDraw(newData));
+      targetPoint.current = "";
+      dispatch(
+        chartActions.endDraw({
+          data: newData,
+          targetIndex: targetIndex.current,
+          targetPoint: targetPoint.current,
+        })
+      );
     }
   }
   function click(e) {
+    let changeTargetIndex = false;
     if (drawStatus.current === 2) {
-      chartIndex.current = data[data.length - 1].index;
+      targetIndex.current = data[data.length - 1].index;
+      changeTargetIndex = true;
     } else if (drawStatus.current === 3) {
-      chartIndex.current = -1;
-    } else if (drawStatus.current === 5) {
-    } else if (drawStatus.current === 9) {
+      targetIndex.current = -1;
+      changeTargetIndex = true;
     } else if (drawStatus.current === 10) {
-      chartIndex.current = -1;
+      targetIndex.current = -1;
+      changeTargetIndex = true;
     } else if (drawStatus.current === 0) {
-      chartIndex.current = -1;
+      targetIndex.current = -1;
+      changeTargetIndex = true;
+    }
+    if (changeTargetIndex) {
+      dispatch(
+        chartActions.drawTargetData({
+          targetIndex: targetIndex.current,
+          targetPoint: targetPoint.current,
+        })
+      );
     }
     drawStatus.current = 0;
-    drawPoint2(data);
-    handleRerender();
   }
 
   function getCanvasPos() {
@@ -363,16 +405,18 @@ const Canvas = ({
           data={data}
           canvasPosition={canvasPosition}
           drawStatus={drawStatus}
-          chartIndex={chartIndex}
-          resizeDirection={resizeDirection}
+          targetIndex={targetIndex}
+          targetPoint={targetPoint}
+          newRate={newRate}
         />
         {/* 點選 */}
         <CanvasDrawList
-          data={dataSelected.current}
+          data={targetData}
           canvasPosition={canvasPosition}
           drawStatus={drawStatus}
-          chartIndex={chartIndex}
-          resizeDirection={resizeDirection}
+          targetIndex={targetIndex}
+          targetPoint={targetPoint}
+          newRate={newRate}
         />
       </svg>
     </div>

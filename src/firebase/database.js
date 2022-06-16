@@ -72,7 +72,7 @@ async function deleteFile(userID, docID) {
     result.result = true;
     result.message = "刪除成功";
   } catch (error) {
-    console.log(error);
+    console.log("error:", error);
   }
   return result;
 }
