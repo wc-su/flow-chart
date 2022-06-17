@@ -2,7 +2,7 @@
 A simple tool to draw flowchart
 
 ## Demo
-- [Demo](https://flow-chart-f5582.web.app/)
+- [Live Demo](https://flow-chart-f5582.web.app/)
 - Test account: `demo@test.com` / Password: `123456`
 
 ## Features
@@ -16,9 +16,9 @@ A simple tool to draw flowchart
 |React Router|implement SPA|
 |Redux Toolkit|global states|
 |SVG|draw graphics|
-|Webpack|bundle js files|
-|Babel|compile js|
-|Sass/SCSS|css for js|
+|Webpack|bundle JavaScript files|
+|Babel|compile JavaScript|
+|Sass/SCSS|css for JavaScript|
 |prettier|code formatter|
 |Third-Party Modules|uuid, save-svg-as-png, react-device-detect|
 
