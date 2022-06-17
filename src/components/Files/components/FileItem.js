@@ -6,6 +6,8 @@ import { getImg, deleteImg } from "../../../firebase/storage";
 import { LoadingContext } from "../../../context/LoadingProvider";
 
 import iconDelete from "../images/delete.png";
+import iconYes from "../images/yes.png";
+import iconNo from "../images/no.png";
 
 const FileItem = ({ userId, item, setFiles }) => {
   const { setMessage } = useContext(LoadingContext);
@@ -14,6 +16,7 @@ const FileItem = ({ userId, item, setFiles }) => {
 
   const [imgStyle, setImgStyle] = useState();
   const [imgLoadMsg, setImgLoadMsg] = useState("Loading");
+  const [delCheckMsg, setDelCheckMsg] = useState("");
 
   const { fileId, title, createTime, updateTime } = item;
 
@@ -25,9 +28,21 @@ const FileItem = ({ userId, item, setFiles }) => {
 
   function handleFileItemClick(e) {
     if (["BUTTON", "IMG"].includes(e.target.nodeName)) {
-      deleteFileItem(userId, fileId);
+      setDelCheckMsg("確認要刪除檔案?");
     } else {
       navigate(`/Chart/${fileId}`);
+    }
+  }
+
+  function handleDelCheckArea(e) {
+    e.stopPropagation();
+    setDelCheckMsg("");
+  }
+
+  function handleDelCheckAns(deleteAns) {
+    setDelCheckMsg("");
+    if (deleteAns) {
+      deleteFileItem(userId, fileId);
     }
   }
 
@@ -88,6 +103,25 @@ const FileItem = ({ userId, item, setFiles }) => {
           <img src={iconDelete} alt="delete" />
         </button>
       </div>
+      {delCheckMsg && (
+        <div className="files__item-delCheck" onClick={handleDelCheckArea}>
+          <div className="files__item-delCheck-container">
+            <div className="files__item-delCheck-msg">{delCheckMsg}</div>
+            <div className="files__item-delCheck-btn">
+              <img
+                src={iconYes}
+                alt="yes"
+                onClick={() => handleDelCheckAns(true)}
+              ></img>
+              <img
+                src={iconNo}
+                alt="no"
+                onClick={() => handleDelCheckAns(false)}
+              ></img>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
