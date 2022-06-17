@@ -67,10 +67,8 @@ const FileItem = ({ userId, item, setFiles }) => {
           backgroundImage: `url(${url})`,
         };
       });
-      setImgLoadMsg("");
-    } else {
-      setImgLoadMsg("Missing");
     }
+    setImgLoadMsg("");
   }
 
   function setTimeLayout(timeModify) {

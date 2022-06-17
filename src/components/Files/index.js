@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
-import { isBrowser } from "react-device-detect";
+import { isMobile } from "react-device-detect";
 import { auth } from "../../firebase/auth";
 
 import "./index.scss";
@@ -39,7 +39,7 @@ const Files = () => {
   }
 
   async function addNewFile() {
-    if (isBrowser) {
+    if (!isMobile) {
       setMessage("新增中，請稍候...");
       const today = new Date();
       const userUid = auth.currentUser.uid;
@@ -65,8 +65,11 @@ const Files = () => {
           {userStatus === 1 && auth.currentUser.email}
         </p>
       </div>
+      {isMobile && userStatus === 1 && files.length === 0 && (
+        <p className="files__nodata">no file</p>
+      )}
       <div className="files__content">
-        {isBrowser && (
+        {!isMobile && (
           <div className="files__item files__item-add" onClick={addNewFile}>
             <img src={iconAdd} alt="add"></img>
           </div>
