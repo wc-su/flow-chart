@@ -22,6 +22,7 @@ A simple tool to draw flow chart.
 
 ### RWD
 ![RWD](https://user-images.githubusercontent.com/89247843/174329061-8d49289b-41ca-4ed9-9049-60e146e761e6.gif)
+![RWD](https://user-images.githubusercontent.com/89247843/174330348-4efae994-fc26-4b16-a984-975e6c5cf129.gif)
 
 ### SVG
 
