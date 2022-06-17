@@ -17,7 +17,7 @@ const LoadingProvider = ({ children }) => {
       }}
     >
       {children}
-      {show ? (
+      {show && (
         <div className="Loading">
           <div className="Loading__container">
             <span className="Loading__message">{message}</span>
@@ -30,8 +30,6 @@ const LoadingProvider = ({ children }) => {
             </div>
           </div>
         </div>
-      ) : (
-        <></>
       )}
     </LoadingContext.Provider>
   );
