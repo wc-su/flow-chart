@@ -7,7 +7,7 @@ import Home from "./components/Home";
 import Files from "./components/Files";
 import Chart from "./components/Chart";
 
-import { userActions } from "./model/userReducer";
+import { userActions } from "./redux/userReducer";
 import { auth, onAuthStateChanged } from "./firebase/auth";
 
 import LoadingProvider from "./context/LoadingProvider";

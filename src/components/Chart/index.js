@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate, useParams } from "react-router-dom";
-import { MobileView, isBrowser } from "react-device-detect";
+import { MobileView, isMobile } from "react-device-detect";
 import { saveSvgAsPng, svgAsPngUri } from "save-svg-as-png";
 
 import "./index.scss";
@@ -15,7 +15,7 @@ import { LoadingContext } from "../../context/LoadingProvider";
 import { auth } from "../../firebase/auth";
 import { addChartRecordByID, getUserRecordByID } from "../../firebase/database";
 import { uploadImg } from "../../firebase/storage";
-import { chartActions } from "../../model/chartReducer";
+import { chartActions } from "../../redux/chartReducer";
 
 const DrawTypeContext = React.createContext();
 
@@ -64,7 +64,7 @@ const Chart = () => {
   useEffect(() => {
     if (
       userStatus === 1 &&
-      isBrowser &&
+      !isMobile &&
       [0, 2].includes(pageCheckFlag.current)
     ) {
       if (chartId) {

@@ -5,7 +5,7 @@ import "./index.scss";
 
 import { DrawTypeContext } from "../../index";
 import CanvasDrawList from "../CanvasDrawList";
-import { chartActions } from "../../../../model/chartReducer";
+import { chartActions } from "../../../../redux/chartReducer";
 
 const Canvas = ({
   canvasRate,

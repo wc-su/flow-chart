@@ -26,6 +26,13 @@
     padding: 20px 30px;
     margin: 0 auto;
   }
+  &__nodata {
+    color: gray;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 50px;
+  }
 }
 .files__item {
   box-shadow: 0 0 0 1px #f2f2f2;
