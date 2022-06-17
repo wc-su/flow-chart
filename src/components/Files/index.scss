@@ -104,6 +104,7 @@
     inset: 0;
     background: #00000033;
     z-index: 20;
+    cursor: default;
     &-container {
       width: 300px;
       margin: 150px auto;
@@ -123,6 +124,10 @@
       img {
         width: 40px;
         height: 40px;
+        cursor: pointer;
+        &:hover {
+          opacity: 0.7;
+        }
       }
     }
   }

@@ -26,9 +26,9 @@ const Chart = () => {
   const { userStatus } = useSelector((state) => state.user);
   const { data, step, stepRecord } = useSelector((state) => state.chart);
 
-  const { chartId } = useParams();
+  const { chartId } = useParams(); // url's parameter
 
-  const pageCheckFlag = useRef(0);
+  const pageCheckFlag = useRef(0); // check what to do while load
 
   const docID = useRef("");
   const docTitle = useRef("undefined");
@@ -37,10 +37,9 @@ const Chart = () => {
   const targetIndex = useRef(-1);
   const targetPoint = useRef("");
 
-  const canvasRate = useRef(100);
-
   const svgRef = useRef();
 
+  const canvasRate = useRef(100);
   const [drawType, setDrawType] = useState("");
   const [moveCanvas, setMoveCanvas] = useState(false);
   const [activeButton, setActiveButton] = useState({});
@@ -187,6 +186,13 @@ const Chart = () => {
         activeButton.feature === "move"
       ) {
         setMoveCanvas(true);
+      } else if (
+        activeButton.purpose === "back" &&
+        activeButton.feature === "back"
+      ) {
+        setActiveButton({});
+        dispatch(chartActions.clear());
+        navigate("/Files");
       }
     }
   }, [activeButton]);
