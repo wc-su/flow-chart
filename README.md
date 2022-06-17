@@ -21,8 +21,7 @@ A simple tool to draw flow chart.
 ![React Components Structure](https://user-images.githubusercontent.com/89247843/174321111-b6f0e054-c2f4-45a3-89fe-3128ee02bcb9.jpg)
 
 ### RWD
-![RWD](https://user-images.githubusercontent.com/89247843/174329061-8d49289b-41ca-4ed9-9049-60e146e761e6.gif)
-![RWD](https://user-images.githubusercontent.com/89247843/174330348-4efae994-fc26-4b16-a984-975e6c5cf129.gif)
+![RWD](https://user-images.githubusercontent.com/89247843/174330864-5cce969b-de76-4f09-a037-19afd2a16e14.gif)
 
 ### SVG
 
