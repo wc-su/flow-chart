@@ -1,8 +1,5 @@
 import React, { useContext, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import classNames from "classnames";
-import { chartActions } from "../../../model/chartReducer";
-import { useDispatch } from "react-redux";
 // context
 import { DrawTypeContext } from "../index";
 import { ActiveButtonContext } from "./CanvasToolBar";
@@ -16,14 +13,11 @@ const CanvasToolItem = ({
   changeSelected,
   disabled,
 }) => {
-  const dispatch = useDispatch();
   const isMounted = useRef(false);
 
   const { setDrawType } = useContext(DrawTypeContext);
   const { activeButton, setActiveButton, toolBarPop, setToolBarPop } =
     useContext(ActiveButtonContext);
-
-  const navigate = useNavigate();
 
   let feature = data.info[data.selected].feature;
   const imgUrl = data.info[data.selected].imgUrl;
@@ -49,10 +43,6 @@ const CanvasToolItem = ({
     } else {
       changeActiveButton();
       setToolBarPop("");
-      if (purpose === "back") {
-        dispatch(chartActions.clear());
-        navigate("/Files");
-      }
     }
   }
 
