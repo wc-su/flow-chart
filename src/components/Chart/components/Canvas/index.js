@@ -270,74 +270,78 @@ const Canvas = ({
     }
   }
   function mouseUp(e) {
-    if (drawStatus.current === 1) {
-      const newData = JSON.parse(JSON.stringify(data));
-      const index = newData.length - 1;
-      if (drawType !== "flowline") {
-        newData[index].startX = newData[index].x;
-        newData[index].startY = newData[index].y;
-        newData[index].endX = newData[index].x + newData[index].width;
-        newData[index].endY = newData[index].y + newData[index].height;
-      }
+    if (moveCanvas) {
+      canvasRef.current.style.cursor = "grab";
+    } else {
+      if (drawStatus.current === 1) {
+        const newData = JSON.parse(JSON.stringify(data));
+        const index = newData.length - 1;
+        if (drawType !== "flowline") {
+          newData[index].startX = newData[index].x;
+          newData[index].startY = newData[index].y;
+          newData[index].endX = newData[index].x + newData[index].width;
+          newData[index].endY = newData[index].y + newData[index].height;
+        }
 
-      if (newData[index].width === 0 || newData[index].height === 0) {
-        newData.pop();
-        drawStatus.current = 3;
-      } else {
-        drawStatus.current = 2;
-      }
-      dispatch(
-        chartActions.endDraw({
-          data: newData,
-          targetIndex: targetIndex.current,
-          targetPoint: targetPoint.current,
-        })
-      );
-      setActiveButton({});
-      setDrawType("");
-    } else if (drawStatus.current === 5) {
-      const oldItem = moveInitData.current.item;
-      const newItem = data.find((item) => item.index === targetIndex.current);
-      if (
-        oldItem.x === newItem.x &&
-        oldItem.y === newItem.y &&
-        oldItem.width === newItem.width &&
-        oldItem.height === newItem.height
-      ) {
-      } else {
+        if (newData[index].width === 0 || newData[index].height === 0) {
+          newData.pop();
+          drawStatus.current = 3;
+        } else {
+          drawStatus.current = 2;
+        }
         dispatch(
           chartActions.endDraw({
-            data,
+            data: newData,
+            targetIndex: targetIndex.current,
+            targetPoint: targetPoint.current,
+          })
+        );
+        setActiveButton({});
+        setDrawType("");
+      } else if (drawStatus.current === 5) {
+        const oldItem = moveInitData.current.item;
+        const newItem = data.find((item) => item.index === targetIndex.current);
+        if (
+          oldItem.x === newItem.x &&
+          oldItem.y === newItem.y &&
+          oldItem.width === newItem.width &&
+          oldItem.height === newItem.height
+        ) {
+        } else {
+          dispatch(
+            chartActions.endDraw({
+              data,
+              targetIndex: targetIndex.current,
+              targetPoint: targetPoint.current,
+            })
+          );
+        }
+      } else if (drawStatus.current === 8) {
+        const newData = JSON.parse(JSON.stringify(data));
+        const newItem = newData.find(
+          (element) => element.index == targetIndex.current
+        );
+        if (newItem.type !== "flowline") {
+          newItem.startX = newItem.x;
+          newItem.startY = newItem.y;
+          newItem.endX = newItem.x + newItem.width;
+          newItem.endY = newItem.y + newItem.height;
+        }
+
+        if (newItem.width === 0 || newItem.height === 0) {
+          drawStatus.current = 10;
+        } else {
+          drawStatus.current = 9;
+        }
+        targetPoint.current = "";
+        dispatch(
+          chartActions.endDraw({
+            data: newData,
             targetIndex: targetIndex.current,
             targetPoint: targetPoint.current,
           })
         );
       }
-    } else if (drawStatus.current === 8) {
-      const newData = JSON.parse(JSON.stringify(data));
-      const newItem = newData.find(
-        (element) => element.index == targetIndex.current
-      );
-      if (newItem.type !== "flowline") {
-        newItem.startX = newItem.x;
-        newItem.startY = newItem.y;
-        newItem.endX = newItem.x + newItem.width;
-        newItem.endY = newItem.y + newItem.height;
-      }
-
-      if (newItem.width === 0 || newItem.height === 0) {
-        drawStatus.current = 10;
-      } else {
-        drawStatus.current = 9;
-      }
-      targetPoint.current = "";
-      dispatch(
-        chartActions.endDraw({
-          data: newData,
-          targetIndex: targetIndex.current,
-          targetPoint: targetPoint.current,
-        })
-      );
     }
   }
   function click(e) {

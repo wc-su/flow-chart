@@ -65,9 +65,9 @@ const Files = () => {
           {userStatus === 1 && auth.currentUser.email}
         </p>
       </div>
-        {isMobile && userStatus === 1 && files.length === 0 && (
-          <p className="files__nodata">no file</p>
-        )}
+      {isMobile && userStatus === 1 && files.length === 0 && (
+        <p className="files__nodata">no file</p>
+      )}
       <div className="files__content">
         {!isMobile && (
           <div className="files__item files__item-add" onClick={addNewFile}>
