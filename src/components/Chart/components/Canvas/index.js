@@ -23,7 +23,6 @@ const Canvas = ({
   // 取得畫布的起始座標
   const canvasRef = useRef();
   const canvasPosition = useRef({});
-  const svgPos = useRef({});
 
   // 狀態：
   // 0: 初始
@@ -36,11 +35,6 @@ const Canvas = ({
 
   const { drawType, setDrawType } = useContext(DrawTypeContext);
 
-  const [screenSize, setScreenSize] = useState({
-    screenWidth: window.innerWidth,
-    screenHeight: window.innerHeight,
-  });
-
   if (canvasRef.current) {
     if (drawType !== "" && !moveCanvas) {
       canvasRef.current.style.cursor = "crosshair";
@@ -51,29 +45,9 @@ const Canvas = ({
     }
   }
 
-  const detectResize = () => {
-    setScreenSize({
-      screenWidth: window.innerWidth,
-      screenHeight: window.innerHeight,
-    });
-  };
-
-  useEffect(() => {
-    window.addEventListener("resize", detectResize);
-    return () => {
-      window.removeEventListener("resize", detectResize);
-    };
-  }, [screenSize]);
-
   useEffect(() => {
     if (canvasRef) {
       canvasPosition.current = canvasRef.current.getBoundingClientRect();
-      svgPos.current = {
-        x: screenSize.screenWidth,
-        y: screenSize.screenHeight - canvasPosition.current.y,
-        width: screenSize.screenWidth * 3,
-        height: (screenSize.screenHeight - canvasPosition.current.y) * 2,
-      };
     }
   }, [canvasRef]);
 
