@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 .env
+# Claude Code 個人設定
+CLAUDE.local.md
