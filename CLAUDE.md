@@ -27,3 +27,11 @@ React 19 · Vite · Redux Toolkit + redux-undo · React Router v7 · Firebase ·
 
 - 測試檔放在被測檔案旁邊（`xxx.test.js`）
 - 預期值用手算的數字，不在測試裡用程式的公式重算
+
+## 資料與狀態（遷移中確認的規則，陸續補充）
+
+- 座標：`x`、`y` 一律是 start、end 中比較小的（左上角），`width`、`height` 一律是正數。
+  畫圖中、縮放中 start 可能比 end 大；放開滑鼠（`endDraw`）後，flowline 以外會整理成
+  start 左上、end 右下，flowline 保留畫的方向（箭頭）
+- redux-undo 的 filter 只收 `init`、`deleteData`、`endDraw`；`drawing`、`changeData`
+  是過程中的即時更新、`clear` 放進去會讓清空可以被 undo，都不能放進 filter
