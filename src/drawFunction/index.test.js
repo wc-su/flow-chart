@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createShape, buildSelectionOverlay } from './index';
 
-const testData = [
+const testShapes = [
   // 開新檔 init 時放入的佔位資料，只有 id
   { id: 'test-uuid-init' },
   {
@@ -15,7 +15,7 @@ const testData = [
     width: 100,
     height: 50,
     type: 'terminal',
-    decorate: {
+    style: {
       fill: '#FFFFFF',
       fillOpacity: '0',
       stroke: '#000000',
@@ -38,7 +38,7 @@ const testData = [
     width: 100,
     height: 50,
     type: 'terminal',
-    decorate: {
+    style: {
       fill: '#FFFFFF',
       fillOpacity: '0',
       stroke: '#000000',
@@ -61,7 +61,7 @@ const testData = [
     width: 100,
     height: 40,
     type: 'flowline',
-    decorate: {
+    style: {
       fill: '#FFFFFF',
       fillOpacity: '0',
       stroke: '#000000',
@@ -84,7 +84,7 @@ const testData = [
     width: 100,
     height: 40,
     type: 'flowline',
-    decorate: {
+    style: {
       fill: '#FFFFFF',
       fillOpacity: '0',
       stroke: '#000000',
@@ -118,25 +118,25 @@ describe('createShape: 繪製新圖形的第一步', () => {
 
 describe('buildSelectionOverlay: 產生圖形選取框、控制點 (線沒有選取框)', () => {
   it('沒有選取圖形：回傳空陣列', () => {
-    const output = buildSelectionOverlay(testData, null, '');
+    const output = buildSelectionOverlay(testShapes, null, '');
 
     expect(output).toEqual([]);
   });
 
   it('找不到圖形：回傳空陣列', () => {
-    const output = buildSelectionOverlay(testData, 'test-uuid-unknown', '');
+    const output = buildSelectionOverlay(testShapes, 'test-uuid-unknown', '');
 
     expect(output).toEqual([]);
   });
 
   it('一般圖形：回傳選取框 + 8 個控制點', () => {
-    const output = buildSelectionOverlay(testData, 'test-uuid-terminal', '');
+    const output = buildSelectionOverlay(testShapes, 'test-uuid-terminal', '');
 
     expect(output).toHaveLength(9);
     // 取得選取框
     const selectionBox = output[0];
     expect(selectionBox.type).toBe('process');
-    expect(selectionBox.decorate).toMatchObject({ stroke: '#00a8ff', strokeDasharray: '3' });
+    expect(selectionBox.style).toMatchObject({ stroke: '#00a8ff', strokeDasharray: '3' });
     // 取得控制點，確認 id, cursor, x, y
     const handles = output.slice(1).map(({ id, cursor, x, y }) => ({ id, cursor, x, y }));
     expect(handles).toEqual([
@@ -156,7 +156,7 @@ describe('buildSelectionOverlay: 產生圖形選取框、控制點 (線沒有選
   });
 
   it('一般圖形拖左上控制點縮放中 (start 是右下的固定點): 顯示的控制點在滑鼠位置', () => {
-    const output = buildSelectionOverlay(testData, 'test-uuid-terminal-resizing', 'nw-resize');
+    const output = buildSelectionOverlay(testShapes, 'test-uuid-terminal-resizing', 'nw-resize');
 
     expect(output).toHaveLength(9);
 
@@ -166,18 +166,18 @@ describe('buildSelectionOverlay: 產生圖形選取框、控制點 (線沒有選
     expect(visible[0]).toMatchObject({ cursor: 'nw-resize', x: 10, y: 20 });
   });
 
-  it('不會改到傳進去的 data', () => {
+  it('不會改到傳進去的 shapes', () => {
     // structuredClone 是瀏覽器和 Node 內建的深拷貝函式
-    const before = structuredClone(testData);
+    const before = structuredClone(testShapes);
 
-    buildSelectionOverlay(testData, 'test-uuid-terminal-resizing', 'nw-resize');
+    buildSelectionOverlay(testShapes, 'test-uuid-terminal-resizing', 'nw-resize');
 
-    // 不會改到傳進去的 data
-    expect(testData).toEqual(before);
+    // 不會改到傳進去的 shapes
+    expect(testShapes).toEqual(before);
   });
 
   it('flowline: 回傳起點、終點', () => {
-    const output = buildSelectionOverlay(testData, 'test-uuid-flowline', '');
+    const output = buildSelectionOverlay(testShapes, 'test-uuid-flowline', '');
 
     expect(output).toHaveLength(2);
     // 取得控制點，確認 id, cursor, x, y
@@ -193,7 +193,7 @@ describe('buildSelectionOverlay: 產生圖形選取框、控制點 (線沒有選
   });
 
   it('flowline 反向畫，座標不會被整理，控制點依線的方向繪製', () => {
-    const output = buildSelectionOverlay(testData, 'test-uuid-flowline-reverse', '');
+    const output = buildSelectionOverlay(testShapes, 'test-uuid-flowline-reverse', '');
 
     expect(output).toHaveLength(2);
     // 取得控制點，確認 id, cursor, x, y
@@ -205,7 +205,7 @@ describe('buildSelectionOverlay: 產生圖形選取框、控制點 (線沒有選
   });
 
   it('flowline 拖曳起點：只顯示起點', () => {
-    const output = buildSelectionOverlay(testData, 'test-uuid-flowline', 'start-resize');
+    const output = buildSelectionOverlay(testShapes, 'test-uuid-flowline', 'start-resize');
 
     expect(output).toHaveLength(2);
     // 只有 start-resize 的控制點為顯示，另一個控制點不顯示

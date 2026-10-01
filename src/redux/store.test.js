@@ -4,7 +4,7 @@ import { chartActions } from './chartSlice';
 import { ActionCreators } from 'redux-undo';
 
 const initialState = {
-  data: [],
+  shapes: [],
   selectedId: null,
   activeHandle: '',
 };
@@ -14,23 +14,23 @@ beforeEach(() => {
   store = makeStore(); // 每個測試開始前都拿到全新的 store
 });
 const getChart = () => store.getState().chart;
-// 回傳「最後一筆被改過」的新 data 陣列
+// 回傳「最後一筆被改過」的新 shapes 陣列
 const updateLastShape = (changes) => {
-  const data = getChart().present.data;
-  return [...data.slice(0, -1), { ...data[data.length - 1], ...changes }];
+  const shapes = getChart().present.shapes;
+  return [...shapes.slice(0, -1), { ...shapes[shapes.length - 1], ...changes }];
 };
 // 完整畫一個圖形 startDraw -> draw -> endDraw
 const drawShape = (x, y, drawType) => {
   store.dispatch(chartActions.startDraw(x, y, drawType));
-  store.dispatch(chartActions.draw({ data: updateLastShape({ endX: x + 1, endY: y + 1 }) }));
-  store.dispatch(chartActions.endDraw({ data: updateLastShape({ endX: x + 4, endY: y + 4 }) }));
+  store.dispatch(chartActions.draw({ shapes: updateLastShape({ endX: x + 1, endY: y + 1 }) }));
+  store.dispatch(chartActions.endDraw({ shapes: updateLastShape({ endX: x + 4, endY: y + 4 }) }));
 };
 
 describe('整合測試', () => {
   it('初始狀態', () => {
     // past: [], present: S0, future: []
     expect(getChart().present).toEqual(initialState);
-    expect(getChart().present.data).toHaveLength(0);
+    expect(getChart().present.shapes).toHaveLength(0);
     expect(getChart().past).toHaveLength(0);
     expect(getChart().future).toHaveLength(0);
   });
@@ -38,38 +38,38 @@ describe('整合測試', () => {
   describe('init 與畫圖', () => {
     it('init', () => {
       const payload = [{ id: 'init-id' }];
-      store.dispatch(chartActions.init({ data: payload }));
+      store.dispatch(chartActions.init({ shapes: payload }));
 
       // past: [S0], present: S1, future: []
-      expect(getChart().present.data).toHaveLength(1);
-      expect(getChart().present.data).toEqual(payload);
+      expect(getChart().present.shapes).toHaveLength(1);
+      expect(getChart().present.shapes).toEqual(payload);
       expect(getChart().past).toHaveLength(1);
       expect(getChart().future).toHaveLength(0);
     });
 
     it('畫第一張圖形', () => {
-      store.dispatch(chartActions.init({ data: [{ id: 'init-id' }] }));
+      store.dispatch(chartActions.init({ shapes: [{ id: 'init-id' }] }));
       drawShape(10, 20, 'process');
 
       // past: [S0, S1], present: S2, future: []
       expect(getChart().past).toHaveLength(2);
-      expect(getChart().past[0].data).toHaveLength(0);
-      expect(getChart().past[1].data).toHaveLength(1);
-      expect(getChart().present.data).toHaveLength(2);
+      expect(getChart().past[0].shapes).toHaveLength(0);
+      expect(getChart().past[1].shapes).toHaveLength(1);
+      expect(getChart().present.shapes).toHaveLength(2);
       expect(getChart().future).toHaveLength(0);
     });
 
     it('畫兩個圖形', () => {
-      store.dispatch(chartActions.init({ data: [{ id: 'init-id' }] }));
+      store.dispatch(chartActions.init({ shapes: [{ id: 'init-id' }] }));
       drawShape(10, 20, 'process');
       drawShape(30, 40, 'terminal');
 
       // past: [S0, S1, S2], present: S3, future: []
       expect(getChart().past).toHaveLength(3);
-      expect(getChart().past[0].data).toHaveLength(0);
-      expect(getChart().past[1].data).toHaveLength(1);
-      expect(getChart().past[2].data).toHaveLength(2);
-      expect(getChart().present.data).toHaveLength(3);
+      expect(getChart().past[0].shapes).toHaveLength(0);
+      expect(getChart().past[1].shapes).toHaveLength(1);
+      expect(getChart().past[2].shapes).toHaveLength(2);
+      expect(getChart().present.shapes).toHaveLength(3);
       expect(getChart().future).toHaveLength(0);
     });
 
@@ -78,10 +78,10 @@ describe('整合測試', () => {
 
       expect(getChart().past).toHaveLength(0);
       expect(getChart().present).toBe(s0);
-      expect(getChart().present.data).toHaveLength(0);
+      expect(getChart().present.shapes).toHaveLength(0);
       expect(getChart().future).toHaveLength(0);
 
-      store.dispatch(chartActions.init({ data: [{ id: 'init-id' }] }));
+      store.dispatch(chartActions.init({ shapes: [{ id: 'init-id' }] }));
       const s1 = getChart().present;
 
       expect(getChart().past).toEqual([s0]);
@@ -91,21 +91,21 @@ describe('整合測試', () => {
       store.dispatch(chartActions.startDraw(10, 20, 'inputOutput'));
 
       expect(getChart().past).toEqual([s0]);
-      expect(getChart().present.data).toHaveLength(2);
+      expect(getChart().present.shapes).toHaveLength(2);
       expect(getChart().future).toHaveLength(0);
 
-      const drawData = getChart().present.data;
-      const drawLast = drawData[drawData.length - 1];
-      store.dispatch(chartActions.draw({ data: [...drawData.slice(0, -1), { ...drawLast, endX: 11, endY: 21 }] }));
+      const drawShapes = getChart().present.shapes;
+      const drawLast = drawShapes[drawShapes.length - 1];
+      store.dispatch(chartActions.draw({ shapes: [...drawShapes.slice(0, -1), { ...drawLast, endX: 11, endY: 21 }] }));
 
       expect(getChart().past).toEqual([s0]);
-      expect(getChart().present.data).toHaveLength(2);
+      expect(getChart().present.shapes).toHaveLength(2);
       expect(getChart().future).toHaveLength(0);
 
-      const endDrawData = getChart().present.data;
-      const endDrawLast = endDrawData[endDrawData.length - 1];
+      const endDrawShapes = getChart().present.shapes;
+      const endDrawLast = endDrawShapes[endDrawShapes.length - 1];
       store.dispatch(
-        chartActions.endDraw({ data: [...endDrawData.slice(0, -1), { ...endDrawLast, endX: 15, endY: 25 }] })
+        chartActions.endDraw({ shapes: [...endDrawShapes.slice(0, -1), { ...endDrawLast, endX: 15, endY: 25 }] })
       );
       const s2 = getChart().present;
 
@@ -132,7 +132,7 @@ describe('整合測試', () => {
       const s0 = getChart().present;
 
       const payloadInit = [{ id: 'init-id' }];
-      store.dispatch(chartActions.init({ data: payloadInit }));
+      store.dispatch(chartActions.init({ shapes: payloadInit }));
       const s1 = getChart().present; // [init]
 
       drawShape(10, 20, 'process');
@@ -177,7 +177,7 @@ describe('整合測試', () => {
       const s0 = getChart().present;
 
       const payloadInit = [{ id: 'init-id' }];
-      store.dispatch(chartActions.init({ data: payloadInit }));
+      store.dispatch(chartActions.init({ shapes: payloadInit }));
       const s1 = getChart().present; // [init]
 
       drawShape(10, 20, 'process');

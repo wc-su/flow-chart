@@ -11,7 +11,7 @@ export const makeStore = () =>
       chart: undoable(chartReducer, {
         limit: 50, // 最多存 50 步，超過丟掉最舊的
         // 只記錄「一次操作完成」的 action
-        filter: includeAction(['chart/init', 'chart/deleteData', 'chart/endDraw']),
+        filter: includeAction(['chart/init', 'chart/deleteShape', 'chart/endDraw']),
       }),
     },
   });
