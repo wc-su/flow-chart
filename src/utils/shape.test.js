@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createShape, buildSelectionOverlay } from './index';
+import { createShape, buildSelectionOverlay } from './shape';
 
 const testShapes = [
   // 開新檔 init 時放入的佔位資料，只有 id

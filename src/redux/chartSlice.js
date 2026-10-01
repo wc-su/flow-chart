@@ -1,5 +1,5 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
-import { createShape, buildSelectionOverlay } from '../drawFunction';
+import { createShape, buildSelectionOverlay } from '../utils/shape';
 import { v4 as uuidv4 } from 'uuid';
 
 const initialState = {
