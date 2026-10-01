@@ -1,5 +1,5 @@
 /**
- * 一個圖形的資料（存在 Redux 的 data 陣列、也存進 Firestore）
+ * 一個圖形的資料（存在 Redux 的 shapes 陣列、也存進 Firestore）
  * @typedef {Object} Shape
  * @property {string} id 圖形 id（uuid）
  * @property {string} type terminal、process、inputOutput、decision、flowline
@@ -49,7 +49,7 @@ function createShape({ id, x, y, drawType }) {
     width: 0,
     height: 0,
     type: drawType,
-    decorate: {
+    style: {
       fill: '#FFFFFF',
       fillOpacity: '0',
       stroke: '#000000',
@@ -64,16 +64,16 @@ function createShape({ id, x, y, drawType }) {
 }
 
 /**
- * 產生選取中圖形的選取框和控制點，疊在原本的圖形上顯示。不會修改傳入的 data。
- * @param {Shape[]} data 全部圖形
+ * 產生選取中圖形的選取框和控制點，疊在原本的圖形上顯示。不會修改傳入的 shapes。
+ * @param {Shape[]} shapes 全部圖形
  * @param {string|null} selectedId 被選取圖形的 id（uuid），沒選取時是 null
  * @param {string} activeHandle 正在拖曳的控制點 cursor（例如 'se-resize'），沒有時是 ''
  * @returns {Array} 一般圖形：[選取框, 8 個控制點]；flowline：[起點, 終點]；沒選取：[]
  */
-function buildSelectionOverlay(data, selectedId, activeHandle) {
-  const selected = data.find((item) => item.id === selectedId);
+function buildSelectionOverlay(shapes, selectedId, activeHandle) {
+  const selected = shapes.find((item) => item.id === selectedId);
   if (selected) {
-    // 深拷貝被選取的圖形：data 來自 Redux state，已被 Immer 凍結，直接修改會報錯
+    // 深拷貝被選取的圖形：shapes 來自 Redux state，已被 Immer 凍結，直接修改會報錯
     const box = JSON.parse(JSON.stringify(selected));
     // 整理座標：由右下往左上畫時 start 會比 end 大，統一成 start 在左上、end 在右下，後面才能從左上角算控制點位置。
     // flowline 有方向（箭頭），不能整理
@@ -96,8 +96,8 @@ function buildSelectionOverlay(data, selectedId, activeHandle) {
     // 非「線」，改成長方形選取框、藍色虛線，pointerEvents: 'none' 讓滑鼠穿過選取框，點到下面的圖形。
     if (box.type !== 'flowline') {
       box.type = 'process';
-      box.decorate.stroke = '#00a8ff';
-      box.decorate.strokeDasharray = '3';
+      box.style.stroke = '#00a8ff';
+      box.style.strokeDasharray = '3';
       box.pointerEvents = 'none';
     }
 
@@ -113,8 +113,8 @@ function buildSelectionOverlay(data, selectedId, activeHandle) {
     // 先記下圖形寬高（下面會被改成控制點的大小），再把樣板改成藍色實心圓，半徑 4（Ellipse 以 x, y 為圓心）
     const boxWidth = handleBase.width;
     const boxHeight = handleBase.height;
-    handleBase.decorate.fill = '#00a8ff';
-    handleBase.decorate.stroke = 'none';
+    handleBase.style.fill = '#00a8ff';
+    handleBase.style.stroke = 'none';
     handleBase.type = 'ellipse';
     handleBase.width = 4;
     handleBase.height = 4;

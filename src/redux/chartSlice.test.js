@@ -6,12 +6,12 @@ vi.mock('uuid', () => ({
 }));
 
 const initialState = {
-  data: [],
+  shapes: [],
   selectedId: null,
   activeHandle: '',
 };
 
-const generateData = (replace) => {
+const generateShape = (replace) => {
   return {
     id: 'test-uuid',
     startX: 0,
@@ -23,7 +23,7 @@ const generateData = (replace) => {
     width: 0,
     height: 0,
     type: 'terminal',
-    decorate: {
+    style: {
       fill: '#FFFFFF',
       fillOpacity: '0',
       stroke: '#000000',
@@ -47,28 +47,28 @@ describe('chartReducer', () => {
 
   describe('init', () => {
     it('帶入資料作為第一筆資料', () => {
-      const prev = { data: [], selectedId: 'test-3', activeHandle: 'nw-resize' };
-      const newData = [generateData()];
-      const state = chartReducer(prev, chartActions.init({ data: newData }));
+      const prev = { shapes: [], selectedId: 'test-3', activeHandle: 'nw-resize' };
+      const newShapes = [generateShape()];
+      const state = chartReducer(prev, chartActions.init({ shapes: newShapes }));
 
-      expect(state.data).toBe(newData);
+      expect(state.shapes).toBe(newShapes);
       expect(state.selectedId).toBeNull();
       expect(state.activeHandle).toBe('');
     });
   });
 
-  describe('deleteData', () => {
-    it('刪除 data，並清除選取狀態', () => {
-      const keep = generateData({ id: 'keep' });
-      const remove = generateData({ id: 'remove' });
+  describe('deleteShape', () => {
+    it('刪除 shape，並清除選取狀態', () => {
+      const keep = generateShape({ id: 'keep' });
+      const remove = generateShape({ id: 'remove' });
       const prev = {
-        data: [keep, remove],
+        shapes: [keep, remove],
         selectedId: 'test-1',
         activeHandle: 'w-resize',
       };
-      const state = chartReducer(prev, chartActions.deleteData({ data: [keep] }));
+      const state = chartReducer(prev, chartActions.deleteShape({ shapes: [keep] }));
 
-      expect(state.data).toEqual([keep]);
+      expect(state.shapes).toEqual([keep]);
       expect(state.selectedId).toBeNull();
       expect(state.activeHandle).toBe('');
     });
@@ -82,28 +82,28 @@ describe('chartReducer', () => {
     });
 
     it('畫出新圖形的第一步', () => {
-      const prev = { data: [], selectedId: 'test-1', activeHandle: 'se-resize' };
+      const prev = { shapes: [], selectedId: 'test-1', activeHandle: 'se-resize' };
       const state = chartReducer(prev, chartActions.startDraw(10, 20, 'process'));
 
-      expect(state.data[0]).toEqual(
-        generateData({ startX: 10, startY: 20, endX: 10, endY: 20, x: 10, y: 20, type: 'process' })
+      expect(state.shapes[0]).toEqual(
+        generateShape({ startX: 10, startY: 20, endX: 10, endY: 20, x: 10, y: 20, type: 'process' })
       );
-      expect(state.data).toHaveLength(1);
+      expect(state.shapes).toHaveLength(1);
       expect(state.selectedId).toBe(prev.selectedId);
       expect(state.activeHandle).toBe(prev.activeHandle);
     });
 
     it('已有舊資料，畫出新圖形的第一步', () => {
-      const prev = { data: [generateData()], selectedId: 'test-2', activeHandle: 'n-resize' };
+      const prev = { shapes: [generateShape()], selectedId: 'test-2', activeHandle: 'n-resize' };
       const state = chartReducer(prev, chartActions.startDraw(10, 30, 'decision'));
 
-      expect(state.data[0]).toBe(prev.data[0]);
+      expect(state.shapes[0]).toBe(prev.shapes[0]);
       expect(state.selectedId).toBe(prev.selectedId);
       expect(state.activeHandle).toBe(prev.activeHandle);
-      expect(state.data[1]).toEqual(
-        generateData({ startX: 10, startY: 30, endX: 10, endY: 30, x: 10, y: 30, type: 'decision' })
+      expect(state.shapes[1]).toEqual(
+        generateShape({ startX: 10, startY: 30, endX: 10, endY: 30, x: 10, y: 30, type: 'decision' })
       );
-      expect(state.data).toHaveLength(2);
+      expect(state.shapes).toHaveLength(2);
     });
   });
 
@@ -111,13 +111,13 @@ describe('chartReducer', () => {
     it.each([
       ['endDraw', chartActions.endDraw],
       ['draw', chartActions.draw],
-      ['changeData', chartActions.changeData],
+      ['changeShape', chartActions.changeShape],
     ])('%s', (_name, action) => {
-      const prev = { data: [generateData()], selectedId: 'test-1', activeHandle: 'sw-resize' };
-      const payloadData = [generateData({ x: 20, y: 30 })];
-      const state = chartReducer(prev, action({ data: payloadData }));
+      const prev = { shapes: [generateShape()], selectedId: 'test-1', activeHandle: 'sw-resize' };
+      const payloadShapes = [generateShape({ x: 20, y: 30 })];
+      const state = chartReducer(prev, action({ shapes: payloadShapes }));
 
-      expect(state.data).toBe(payloadData);
+      expect(state.shapes).toBe(payloadShapes);
       expect(state.selectedId).toBe('test-1');
       expect(state.activeHandle).toBe('sw-resize');
     });
@@ -130,16 +130,16 @@ describe('chartReducer', () => {
         chartActions.setSelection({ selectedId: 'test-1', activeHandle: 'sw-resize' })
       );
 
-      expect(state.data).toBe(initialState.data);
+      expect(state.shapes).toBe(initialState.shapes);
       expect(state.selectedId).toBe('test-1');
       expect(state.activeHandle).toBe('sw-resize');
     });
 
     it('清除選取圖形', () => {
-      const prev = { data: [generateData()], selectedId: 'test-1', activeHandle: 'sw-resize' };
+      const prev = { shapes: [generateShape()], selectedId: 'test-1', activeHandle: 'sw-resize' };
       const state = chartReducer(prev, chartActions.clearSelection());
 
-      expect(state.data).toBe(prev.data);
+      expect(state.shapes).toBe(prev.shapes);
       expect(state.selectedId).toBeNull();
       expect(state.activeHandle).toBe('');
     });
@@ -147,7 +147,7 @@ describe('chartReducer', () => {
 
   describe('clear', () => {
     it('清除回初始狀態', () => {
-      const prev = { data: [generateData({ x: 10, y: 20 })], selectedId: 'test-2', activeHandle: 's-resize' };
+      const prev = { shapes: [generateShape({ x: 10, y: 20 })], selectedId: 'test-2', activeHandle: 's-resize' };
       const state = chartReducer(prev, chartActions.clear());
 
       expect(state).toEqual(initialState);
