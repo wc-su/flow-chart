@@ -1,8 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
 import undoable, { includeAction } from 'redux-undo';
 
-import userReducer from './userReducer';
-import chartReducer from './chartReducer';
+import userReducer from './userSlice';
+import chartReducer from './chartSlice';
 
 export const makeStore = () =>
   configureStore({

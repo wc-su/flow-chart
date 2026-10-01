@@ -59,9 +59,9 @@ const chartSlice = createSlice({
 
 export const chartActions = chartSlice.actions;
 
-export const selectData = (s) => s.chart.present.data;
-export const selectSelectedId = (s) => s.chart.present.selectedId;
-export const selectActiveHandle = (s) => s.chart.present.activeHandle;
+export const selectData = (state) => state.chart.present.data;
+export const selectSelectedId = (state) => state.chart.present.selectedId;
+export const selectActiveHandle = (state) => state.chart.present.activeHandle;
 
 export const selectSelectionOverlay = createSelector(
   [selectData, selectSelectedId, selectActiveHandle],

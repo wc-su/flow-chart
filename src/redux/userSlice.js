@@ -6,17 +6,17 @@ export const USER_STATUS = Object.freeze({
   LOGGED_OUT: 'loggedOut',
 });
 
-const initialState = { userStatus: USER_STATUS.IDLE };
+const initialState = { status: USER_STATUS.IDLE };
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
     login(state) {
-      state.userStatus = USER_STATUS.LOGGED_IN;
+      state.status = USER_STATUS.LOGGED_IN;
     },
     logout(state) {
-      state.userStatus = USER_STATUS.LOGGED_OUT;
+      state.status = USER_STATUS.LOGGED_OUT;
     },
   },
 });

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import chartReducer, { chartActions } from './chartReducer';
+import chartReducer, { chartActions } from './chartSlice';
 
 vi.mock('uuid', () => ({
   v4: () => 'test-uuid',

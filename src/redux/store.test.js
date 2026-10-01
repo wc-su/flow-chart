@@ -1,6 +1,6 @@
 import { describe, it, beforeEach, expect } from 'vitest';
 import { makeStore } from './store';
-import { chartActions } from './chartReducer';
+import { chartActions } from './chartSlice';
 import { ActionCreators } from 'redux-undo';
 
 const initialState = {
