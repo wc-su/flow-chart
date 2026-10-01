@@ -19,10 +19,10 @@ const updateLastShape = (changes) => {
   const data = getChart().present.data;
   return [...data.slice(0, -1), { ...data[data.length - 1], ...changes }];
 };
-// 完整畫一個圖形 startDraw -> drawing -> endDraw
+// 完整畫一個圖形 startDraw -> draw -> endDraw
 const drawShape = (x, y, drawType) => {
   store.dispatch(chartActions.startDraw(x, y, drawType));
-  store.dispatch(chartActions.drawing({ data: updateLastShape({ endX: x + 1, endY: y + 1 }) }));
+  store.dispatch(chartActions.draw({ data: updateLastShape({ endX: x + 1, endY: y + 1 }) }));
   store.dispatch(chartActions.endDraw({ data: updateLastShape({ endX: x + 4, endY: y + 4 }) }));
 };
 
@@ -94,11 +94,9 @@ describe('整合測試', () => {
       expect(getChart().present.data).toHaveLength(2);
       expect(getChart().future).toHaveLength(0);
 
-      const drawingData = getChart().present.data;
-      const drawingLast = drawingData[drawingData.length - 1];
-      store.dispatch(
-        chartActions.drawing({ data: [...drawingData.slice(0, -1), { ...drawingLast, endX: 11, endY: 21 }] })
-      );
+      const drawData = getChart().present.data;
+      const drawLast = drawData[drawData.length - 1];
+      store.dispatch(chartActions.draw({ data: [...drawData.slice(0, -1), { ...drawLast, endX: 11, endY: 21 }] }));
 
       expect(getChart().past).toEqual([s0]);
       expect(getChart().present.data).toHaveLength(2);

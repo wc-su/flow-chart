@@ -29,7 +29,7 @@ const handleConfig = [
 const lineHandleConfig = [{ cursor: 'start-resize' }, { cursor: 'end-resize' }];
 
 /**
- * 建立一個剛開始畫的新圖形：起點和終點都在滑鼠位置，寬高是 0，之後由 drawing 更新終點。
+ * 建立一個剛開始畫的新圖形：起點和終點都在滑鼠位置，寬高是 0，之後由 draw 更新終點。
  * @param {Object} payload 由 startDraw 的 prepare 產生
  * @param {string} payload.id uuid，存成圖形的 id
  * @param {number} payload.x 滑鼠在畫布上的 x
