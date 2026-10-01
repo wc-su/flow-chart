@@ -22,8 +22,8 @@ const chartSlice = createSlice({
       state.selectedId = null;
       state.activeHandle = '';
     },
+    // 新增圖形初始資料
     startDraw: {
-      // add new data item
       reducer(state, action) {
         state.data.push(createShape(action.payload));
       },
@@ -31,12 +31,15 @@ const chartSlice = createSlice({
         return { payload: { id: uuidv4(), x, y, drawType } };
       },
     },
+    // 畫圖中，滑鼠移動時更新終點和寬高
+    draw: (state, action) => {
+      state.data = action.payload.data;
+    },
+    // 畫圖、移動、縮放結束時使用
     endDraw: (state, action) => {
       state.data = action.payload.data;
     },
-    drawing: (state, action) => {
-      state.data = action.payload.data;
-    },
+    // 移動、縮放中，滑鼠移動時更新
     changeData: (state, action) => {
       state.data = action.payload.data;
     },
@@ -49,7 +52,6 @@ const chartSlice = createSlice({
       state.activeHandle = '';
     },
     clear(state) {
-      // reset state
       state.data = [];
       state.selectedId = null;
       state.activeHandle = '';
@@ -59,9 +61,9 @@ const chartSlice = createSlice({
 
 export const chartActions = chartSlice.actions;
 
-export const selectData = (s) => s.chart.present.data;
-export const selectSelectedId = (s) => s.chart.present.selectedId;
-export const selectActiveHandle = (s) => s.chart.present.activeHandle;
+export const selectData = (state) => state.chart.present.data;
+export const selectSelectedId = (state) => state.chart.present.selectedId;
+export const selectActiveHandle = (state) => state.chart.present.activeHandle;
 
 export const selectSelectionOverlay = createSelector(
   [selectData, selectSelectedId, selectActiveHandle],

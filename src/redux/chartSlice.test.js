@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import chartReducer, { chartActions } from './chartReducer';
+import chartReducer, { chartActions } from './chartSlice';
 
 vi.mock('uuid', () => ({
   v4: () => 'test-uuid',
@@ -110,7 +110,7 @@ describe('chartReducer', () => {
   describe('繪畫', () => {
     it.each([
       ['endDraw', chartActions.endDraw],
-      ['drawing', chartActions.drawing],
+      ['draw', chartActions.draw],
       ['changeData', chartActions.changeData],
     ])('%s', (_name, action) => {
       const prev = { data: [generateData()], selectedId: 'test-1', activeHandle: 'sw-resize' };

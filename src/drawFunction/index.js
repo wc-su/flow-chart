@@ -29,7 +29,7 @@ const handleConfig = [
 const lineHandleConfig = [{ cursor: 'start-resize' }, { cursor: 'end-resize' }];
 
 /**
- * 建立一個剛開始畫的新圖形：起點和終點都在滑鼠位置，寬高是 0，之後由 drawing 更新終點。
+ * 建立一個剛開始畫的新圖形：起點和終點都在滑鼠位置，寬高是 0，之後由 draw 更新終點。
  * @param {Object} payload 由 startDraw 的 prepare 產生
  * @param {string} payload.id uuid，存成圖形的 id
  * @param {number} payload.x 滑鼠在畫布上的 x
@@ -71,43 +71,43 @@ function createShape({ id, x, y, drawType }) {
  * @returns {Array} 一般圖形：[選取框, 8 個控制點]；flowline：[起點, 終點]；沒選取：[]
  */
 function buildSelectionOverlay(data, selectedId, activeHandle) {
-  const originItem = data.find((item) => item.id === selectedId);
-  if (originItem) {
+  const selected = data.find((item) => item.id === selectedId);
+  if (selected) {
     // 深拷貝被選取的圖形：data 來自 Redux state，已被 Immer 凍結，直接修改會報錯
-    const originData = JSON.parse(JSON.stringify(originItem));
+    const box = JSON.parse(JSON.stringify(selected));
     // 整理座標：由右下往左上畫時 start 會比 end 大，統一成 start 在左上、end 在右下，後面才能從左上角算控制點位置。
     // flowline 有方向（箭頭），不能整理
-    if (originData.type !== 'flowline') {
-      const newStartX = Math.min(originData.startX, originData.endX);
-      const newStartY = Math.min(originData.startY, originData.endY);
-      const newEndX = Math.max(originData.startX, originData.endX);
-      const newEndY = Math.max(originData.startY, originData.endY);
-      originData.startX = newStartX;
-      originData.startY = newStartY;
-      originData.x = newStartX;
-      originData.y = newStartY;
-      originData.endX = newEndX;
-      originData.endY = newEndY;
+    if (box.type !== 'flowline') {
+      const newStartX = Math.min(box.startX, box.endX);
+      const newStartY = Math.min(box.startY, box.endY);
+      const newEndX = Math.max(box.startX, box.endX);
+      const newEndY = Math.max(box.startY, box.endY);
+      box.startX = newStartX;
+      box.startY = newStartY;
+      box.x = newStartX;
+      box.y = newStartY;
+      box.endX = newEndX;
+      box.endY = newEndY;
     }
 
     // 控制點的樣板：必須在下面改成選取框之前複製，否則會繼承 pointerEvents: 'none'，控制點會點不到
-    const handleBase = JSON.parse(JSON.stringify(originData));
+    const handleBase = JSON.parse(JSON.stringify(box));
 
     // 非「線」，改成長方形選取框、藍色虛線，pointerEvents: 'none' 讓滑鼠穿過選取框，點到下面的圖形。
-    if (originData.type !== 'flowline') {
-      originData.type = 'process';
-      originData.decorate.stroke = '#00a8ff';
-      originData.decorate.strokeDasharray = '3';
-      originData.pointerEvents = 'none';
+    if (box.type !== 'flowline') {
+      box.type = 'process';
+      box.decorate.stroke = '#00a8ff';
+      box.decorate.strokeDasharray = '3';
+      box.pointerEvents = 'none';
     }
 
-    const newData = [];
+    const overlay = [];
     // 一般圖形才有選取框；縮放中時隱藏
-    if (originData.type !== 'flowline') {
+    if (box.type !== 'flowline') {
       if (activeHandle !== '') {
-        originData.display = 'none';
+        box.display = 'none';
       }
-      newData.push(originData);
+      overlay.push(box);
     }
 
     // 先記下圖形寬高（下面會被改成控制點的大小），再把樣板改成藍色實心圓，半徑 4（Ellipse 以 x, y 為圓心）
@@ -119,50 +119,50 @@ function buildSelectionOverlay(data, selectedId, activeHandle) {
     handleBase.width = 4;
     handleBase.height = 4;
 
-    if (originData.type === 'flowline') {
+    if (box.type === 'flowline') {
       // 兩個端點直接用線的 start、end
-      newData.push({ ...handleBase });
-      newData[0].id = `${originData.id}:${lineHandleConfig[0].cursor}`;
-      newData[0].cursor = lineHandleConfig[0].cursor;
-      newData[0].x = newData[0].startX;
-      newData[0].y = newData[0].startY;
-      newData[0].endX = newData[0].startX;
-      newData[0].endY = newData[0].startY;
+      overlay.push({ ...handleBase });
+      overlay[0].id = `${box.id}:${lineHandleConfig[0].cursor}`;
+      overlay[0].cursor = lineHandleConfig[0].cursor;
+      overlay[0].x = overlay[0].startX;
+      overlay[0].y = overlay[0].startY;
+      overlay[0].endX = overlay[0].startX;
+      overlay[0].endY = overlay[0].startY;
       // 縮放中只顯示正在拖的那個控制點
       if (activeHandle && activeHandle !== lineHandleConfig[0].cursor) {
-        newData[0].display = 'none';
+        overlay[0].display = 'none';
       }
-      newData.push({ ...handleBase });
-      newData[1].id = `${originData.id}:${lineHandleConfig[1].cursor}`;
-      newData[1].cursor = lineHandleConfig[1].cursor;
-      newData[1].startX = newData[1].endX;
-      newData[1].startY = newData[1].endY;
-      newData[1].x = newData[1].endX;
-      newData[1].y = newData[1].endY;
+      overlay.push({ ...handleBase });
+      overlay[1].id = `${box.id}:${lineHandleConfig[1].cursor}`;
+      overlay[1].cursor = lineHandleConfig[1].cursor;
+      overlay[1].startX = overlay[1].endX;
+      overlay[1].startY = overlay[1].endY;
+      overlay[1].x = overlay[1].endX;
+      overlay[1].y = overlay[1].endY;
       // 縮放中只顯示正在拖的那個控制點
       if (activeHandle && activeHandle !== lineHandleConfig[1].cursor) {
-        newData[1].display = 'none';
+        overlay[1].display = 'none';
       }
     } else {
       // 依 config 算出每個控制點的位置
       for (let i = 1; i <= handleConfig.length; i++) {
-        newData.push({ ...handleBase });
-        newData[i].id = `${originData.id}:${handleConfig[i - 1].cursor}`;
-        newData[i].cursor = handleConfig[i - 1].cursor;
+        overlay.push({ ...handleBase });
+        overlay[i].id = `${box.id}:${handleConfig[i - 1].cursor}`;
+        overlay[i].cursor = handleConfig[i - 1].cursor;
         // 位置 = 左上角 + 寬高 × 比例（0 左／上、0.5 中間、1 右／下）
-        newData[i].startX += boxWidth * handleConfig[i - 1].x;
-        newData[i].startY += boxHeight * handleConfig[i - 1].y;
-        newData[i].x = newData[i].startX;
-        newData[i].y = newData[i].startY;
-        newData[i].endX = newData[i].startX;
-        newData[i].endY = newData[i].startY;
+        overlay[i].startX += boxWidth * handleConfig[i - 1].x;
+        overlay[i].startY += boxHeight * handleConfig[i - 1].y;
+        overlay[i].x = overlay[i].startX;
+        overlay[i].y = overlay[i].startY;
+        overlay[i].endX = overlay[i].startX;
+        overlay[i].endY = overlay[i].startY;
         // 縮放中只顯示正在拖的那個控制點
         if (activeHandle) {
-          newData[i].display = handleConfig[i - 1].cursor === activeHandle ? 'block' : 'none';
+          overlay[i].display = handleConfig[i - 1].cursor === activeHandle ? 'block' : 'none';
         }
       }
     }
-    return newData;
+    return overlay;
   } else {
     return [];
   }
