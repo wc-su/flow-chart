@@ -1,0 +1,30 @@
+body,
+h1,
+p {
+  margin: 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+input[type='submit'],
+input[type='reset'],
+input[type='button'],
+input[type='text'] {
+  appearance: none;
+}

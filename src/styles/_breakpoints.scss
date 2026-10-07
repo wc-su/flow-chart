@@ -1,0 +1,20 @@
+@use 'sass:map';
+
+$breakpoints: (
+  md: 768px,
+  sm: 576px,
+);
+
+@mixin breakpoint-down($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    // 依帶入參數產生對應的 media query
+    @media (max-width: map.get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  }
+  // 沒有對應的內容
+  @else {
+    @warn "Unfortunately, no value could be retrieved from `#{$breakpoint}`. "
+          + "Available breakpoints are: #{map.keys($breakpoints)}.";
+  }
+}
