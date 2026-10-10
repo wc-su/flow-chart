@@ -1,0 +1,54 @@
+@use '../../styles/breakpoints' as bp;
+
+.authModal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(#000000, 0.2);
+  z-index: 50;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.authModal__container {
+  width: 390px;
+  margin: 100px auto;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 50px 40px 40px 40px;
+  position: relative;
+  @include bp.breakpoint-down(sm) {
+    width: 330px;
+    padding: 50px 30px 40px 30px;
+  }
+}
+.authModal__closeBtn {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  &:hover {
+    background: #ededed;
+    border-radius: 5px;
+  }
+  &::before,
+  &::after {
+    content: '';
+    width: 20px;
+    border: 1px solid #000;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+  }
+  &::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+  &::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+}
+
+.authModal__errMsg {
+  color: #ff0000;
+  text-align: center;
+  margin-bottom: 20px;
+}

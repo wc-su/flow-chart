@@ -1,0 +1,112 @@
+@use '../../styles/breakpoints' as bp;
+
+@mixin header-icon {
+  width: 30px;
+  padding: 5px;
+  &:hover {
+    background: #e7e6e6;
+    border-radius: 5px;
+  }
+}
+
+.header {
+  background-color: #f4f1de;
+}
+
+.header__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 20px 2px 20px;
+  @include bp.breakpoint-down(md) {
+    padding-top: 10px;
+    padding-bottom: 8px;
+  }
+}
+
+.header-logo__letter {
+  font-size: 30px;
+  font-weight: bold;
+  display: inline-block;
+  color: #81b29a;
+}
+.header-logo__letter--dark {
+  color: #3d405b;
+}
+// 沒要求減少時才加動畫
+@media (prefers-reduced-motion: no-preference) {
+  .header-logo--animated:is(:hover, :focus-visible) .header-logo__letter {
+    animation: header-logo-flash 2.4s;
+    animation-delay: calc(var(--i) * 0.08s);
+  }
+}
+@keyframes header-logo-flash {
+  5% {
+    opacity: 0.3;
+  }
+}
+
+.header__menuBtn {
+  display: none;
+  @include bp.breakpoint-down(md) {
+    display: block;
+  }
+}
+.header__menuIcon {
+  @include header-icon;
+}
+
+.header-menu {
+  @include bp.breakpoint-down(md) {
+    position: fixed;
+    inset: 0 0 0 150%; // 移到畫面右側隱藏
+    visibility: hidden;
+    background-color: #f4f1de;
+    z-index: 10;
+    transition:
+      inset 0.3s,
+      visibility 0.3s;
+  }
+}
+.header-menu--open {
+  @include bp.breakpoint-down(md) {
+    inset: 0;
+    visibility: visible;
+  }
+}
+.header-menu__closeBtn {
+  display: none;
+  @include bp.breakpoint-down(md) {
+    display: block;
+    margin-left: auto;
+    padding: 16px 20px 4px 15px;
+  }
+}
+.header-menu__closeIcon {
+  @include header-icon;
+}
+.header-menu__list {
+  display: flex;
+  gap: 10px;
+  @include bp.breakpoint-down(md) {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 100px;
+  }
+}
+.header-menu__item {
+  padding: 10px 5px;
+}
+.header-menu__itemBtn {
+  color: #3d405b;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 2px 10px;
+  border-bottom: 3px solid transparent;
+  transition: border-bottom-color 0.08s;
+  &:hover {
+    border-bottom-color: #e07a5f;
+  }
+}
