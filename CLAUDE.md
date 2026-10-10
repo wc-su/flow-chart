@@ -18,6 +18,11 @@ React 19 · Vite · Redux Toolkit + redux-undo · React Router v7 · Firebase ·
 - AI 協作方式：以說明、建議、code review 為主，程式碼由我撰寫；除非明確說「幫我修改」或「幫我新增」，否則不直接改動或新增檔案，一律先詢問
 - commit 訊息用中文，格式 `type: 描述` (feat / chore / style …)
 - 分支命名 `feat/xxx`
+- CSS 用標準 BEM (`block__element--modifier`)，另外決定：
+  - 小寫開頭，名字有多個單字時用 camelCase (`home-hero__imgWrap`)
+  - 元件本身的區塊直接用元件名稱 (`Header.jsx` → `header`)；頁面專用的區塊、元件裡拆出來的區塊，加上所屬的頁面或元件名稱當前綴，用 `-` 連接 (`home-hero`、`header-menu`)
+  - `-` 只用在前綴和區塊之間
+  - `@keyframes` 名稱也是全域的，用區塊名稱開頭 (`header-logo`)
 - 程式碼註解、測試名稱的標點：括號固定用半形 `()`；冒號前面是中文用全形 `：`，
   前面不是中文 (英文、`)` 等) 用半形 `:`；中英文之間加空格
 
