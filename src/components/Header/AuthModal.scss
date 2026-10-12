@@ -1,12 +1,15 @@
 @use '../../styles/breakpoints' as bp;
 
+body:has(.authModal) {
+  overflow: hidden;
+}
+
 .authModal {
   position: fixed;
   inset: 0;
   background-color: rgba(#000000, 0.2);
   z-index: 50;
   overflow-y: auto;
-  overscroll-behavior: contain;
 }
 .authModal__container {
   width: 390px;
