@@ -142,12 +142,12 @@ const Home = () => {
       <footer className="home-footer">
         <div className="home-footer__container">
           <Link to="/" className="home-footer__logo">
-            <img className="home-footer__logoImg" src="/favicon.svg" alt="logo" />
+            <img className="home-footer__logoImg" src="/favicon.svg" alt="" />
             <span className="home-footer__logoText">FlowChart</span>
           </Link>
           <small className="home-footer__copyright">© 2022–2026 Eric Su</small>
-          <a className="home-footer__socialLink" href={GITHUB_URL} target="_blank">
-            <img className="home-footer__socialLinkIcon" src={githubIcon} alt="github icon" />
+          <a className="home-footer__socialLink" href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
+            <img className="home-footer__socialLinkIcon" src={githubIcon} alt="GitHub（另開新分頁）" />
           </a>
         </div>
       </footer>
