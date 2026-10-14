@@ -5,7 +5,8 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'node', // 純 redux 夠用
-    // globals: true,         // 可直接用 describe/it/expect
+    environment: 'node', // 預設 node；要畫元件的測試檔在第一行加 @vitest-environment jsdom
+    // globals: true,       // 可直接用 describe/it/expect
+    setupFiles: ['./src/setupTests.js'],
   },
 });
