@@ -1,5 +1,14 @@
+import { useParams } from 'react-router';
+
 const Chart = () => {
-  return <h1>Chart</h1>;
+  const { chartId } = useParams();
+
+  return (
+    <>
+      <h1>Chart</h1>
+      <p>{chartId}</p>
+    </>
+  );
 };
 
 export default Chart;
