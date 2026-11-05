@@ -31,6 +31,7 @@ describe('路由', () => {
   it('/chart 顯示 Chart (沒有 id)', async () => {
     renderRoute('/chart');
     expect(await screen.findByRole('main')).toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toBeInTheDocument(); // 桌機有工具列的標題輸入框
   });
 
   it('/chart/:chartId 顯示 Chart', async () => {
