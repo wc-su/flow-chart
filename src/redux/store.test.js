@@ -1,6 +1,6 @@
 import { describe, it, beforeEach, expect } from 'vitest';
 import { makeStore } from './store';
-import { chartActions } from './chartSlice';
+import { chartActions, selectCanUndo, selectCanRedo } from './chartSlice';
 import { ActionCreators } from 'redux-undo';
 
 const initialState = {
@@ -199,6 +199,25 @@ describe('整合測試', () => {
       expect(getChart().present).toBe(s2);
       expect(getChart().future).toEqual([s3b]);
       expect(getChart().future).not.toContain(s3a);
+    });
+
+    it('selectCanUndo、selectCanRedo 跟著 past、future 改變', () => {
+      // 初始狀態，兩個都是 false
+      expect(selectCanUndo(store.getState())).toBe(false);
+      expect(selectCanRedo(store.getState())).toBe(false);
+
+      const payloadInit = [{ id: 'init-id' }];
+      store.dispatch(chartActions.init({ shapes: payloadInit }));
+
+      // 新增 init 之後，可以 undo，不能執行 redo
+      expect(selectCanUndo(store.getState())).toBe(true);
+      expect(selectCanRedo(store.getState())).toBe(false);
+
+      // 執行 undo
+      store.dispatch(ActionCreators.undo());
+      // 可以 redo，不能執行 undo
+      expect(selectCanUndo(store.getState())).toBe(false);
+      expect(selectCanRedo(store.getState())).toBe(true);
     });
   });
 });

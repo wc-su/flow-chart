@@ -7,18 +7,42 @@ import ToolProvider from './components/Tool/ToolProvider';
 
 import './Chart.scss';
 
-const Chart = () => {
-  const [toolBarPop, setToolBarPop] = useState('');
+const MIN_ZOOM = 50;
+const MAX_ZOOM = 500;
+const ZOOM_STEP = 10;
 
-  function handleMainClick() {
-    setToolBarPop('');
+const Chart = () => {
+  const [zoom, setZoom] = useState(100);
+  const [title, setTitle] = useState('');
+
+  function handleUpload() {}
+
+  function handleExport() {
+    // 之後調整，記得帶入參數 format: handleExport(format)
+  }
+
+  function handleZoomIn() {
+    setZoom((prev) => Math.min(prev + ZOOM_STEP, MAX_ZOOM));
+  }
+  function handleZoomOut() {
+    setZoom((prev) => Math.max(prev - ZOOM_STEP, MIN_ZOOM));
   }
 
   return (
     <main className="chart">
       <ToolProvider>
-        <CanvasToolBar toolBarPop={toolBarPop} setToolBarPop={setToolBarPop} />
-        <div className="chart__main" onClick={handleMainClick}>
+        <CanvasToolBar
+          zoom={zoom}
+          canZoomIn={zoom < MAX_ZOOM}
+          canZoomOut={zoom > MIN_ZOOM}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          title={title}
+          onTitleChange={setTitle}
+          onUpload={handleUpload}
+          onExport={handleExport}
+        />
+        <div className="chart__main">
           <Canvas />
         </div>
         <MobileView className="chart-prompt">
