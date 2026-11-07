@@ -1,0 +1,55 @@
+.chart {
+  display: grid;
+  grid-template-rows: auto 1fr; // 工具列照內容高度，畫布區填滿剩下的
+  overflow: hidden;
+}
+.chart__main {
+  overflow: hidden;
+  background-color: #e6e5e5;
+}
+
+.chart-prompt {
+  grid-row: 1 / -1;
+  background-color: #3d405b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.chart-prompt__container {
+  width: 80%;
+  max-width: 400px;
+  background-color: #fdf0d5;
+  border-radius: 10px;
+  padding: 40px 40px 50px 40px;
+}
+.chart-prompt__title {
+  font-size: 30px;
+  font-weight: bold;
+  position: relative;
+  color: #ff0000;
+}
+.chart-prompt__title::before {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+  border-bottom: 2px solid lightgray;
+}
+.chart-prompt__message {
+  margin-top: 35px;
+  color: #3d405b;
+  line-height: 2;
+}
+.chart-prompt__link {
+  display: block;
+  text-decoration: none;
+  width: 150px;
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+  background-color: #fb8500;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 16px auto 0; // 左右 auto 會水平置中
+}

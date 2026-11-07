@@ -1,7 +1,7 @@
 import RootLayout from '../layouts/RootLayout';
 import Home from '../pages/Home/Home';
 import Files from '../pages/Files';
-import Chart from '../pages/Chart';
+import Chart from '../pages/Chart/Chart';
 import NotFound from '../pages/NotFound';
 import RootErrorBoundary from '../components/RootErrorBoundary';
 

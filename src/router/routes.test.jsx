@@ -30,15 +30,16 @@ describe('路由', () => {
 
   it('/chart 顯示 Chart (沒有 id)', async () => {
     renderRoute('/chart');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Chart' })).toBeInTheDocument();
+    expect(await screen.findByRole('main')).toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toBeInTheDocument(); // 桌機有工具列的標題輸入框
   });
 
-  it('/chart/:chartId 顯示 Chart，拿得到 chartId', async () => {
+  it('/chart/:chartId 顯示 Chart', async () => {
     renderRoute('/chart/b85b459a-c983-d2ee-796c-22f570089bf9');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Chart' })).toBeInTheDocument();
-    // 測試 chartId 的值
-    expect(screen.getByText('b85b459a-c983-d2ee-796c-22f570089bf9')).toBeInTheDocument();
+    expect(await screen.findByRole('main')).toBeInTheDocument();
   });
+
+  it.todo('/chart/:chartId 讀到檔案的資料 (接 Firebase 後)');
 
   it('不存在的網址顯示 404 而且有 Header', async () => {
     renderRoute('/123');

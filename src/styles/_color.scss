@@ -1,0 +1,5 @@
+@use 'sass:color';
+
+$toolBar-text: #fff;
+$toolBar-primary: #3d405b;
+$toolBar-hover: color.adjust($toolBar-primary, $lightness: 20%);

@@ -1,0 +1,71 @@
+@use '../../../styles/color' as colors;
+
+.toolDropdown {
+  display: flex;
+  position: relative;
+}
+.toolDropdown__main {
+  margin-right: 0;
+  padding-right: 2px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.toolDropdown__toggle {
+  margin-left: 0;
+  padding-left: 2px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.toolDropdown__arrow {
+  max-width: none;
+  width: 15px;
+  height: 15px;
+  margin: auto 0;
+}
+.toolDropdown__menu {
+  position: absolute;
+  background-color: colors.$toolBar-primary;
+  top: calc(100% + 18px); // 工具列下方 padding 10px 加上三角形的 8px
+  left: 5px;
+  border-radius: 10px;
+  color: colors.$toolBar-text;
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  padding: 4px;
+  &::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 20px;
+    width: 10px;
+    height: 20px;
+    transform: rotate(45deg);
+    background-color: colors.$toolBar-primary;
+    z-index: -1;
+  }
+}
+.toolDropdown__option {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: 8px;
+  padding: 8px 12px;
+}
+.toolDropdown__option:first-child {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+.toolDropdown__option:last-child {
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+.toolDropdown__option:hover {
+  background-color: colors.$toolBar-hover;
+}
+.toolDropdown__optionImg {
+  max-width: none;
+  object-fit: contain;
+  width: 25px;
+  height: 25px;
+}

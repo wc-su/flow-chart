@@ -64,6 +64,8 @@ export const chartActions = chartSlice.actions;
 export const selectShapes = (state) => state.chart.present.shapes;
 export const selectSelectedId = (state) => state.chart.present.selectedId;
 export const selectActiveHandle = (state) => state.chart.present.activeHandle;
+export const selectCanUndo = (state) => state.chart.past.length >= 1;
+export const selectCanRedo = (state) => state.chart.future.length >= 1;
 
 export const selectSelectionOverlay = createSelector(
   [selectShapes, selectSelectedId, selectActiveHandle],
