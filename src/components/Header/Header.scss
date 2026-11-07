@@ -1,16 +1,17 @@
+@use '../../styles/color' as colors;
 @use '../../styles/breakpoints' as bp;
 
 @mixin header-icon {
   width: 30px;
   padding: 5px;
   &:hover {
-    background: #e7e6e6;
+    background: colors.$gray-200;
     border-radius: 5px;
   }
 }
 
 .header {
-  background-color: #f4f1de;
+  background-color: colors.$header-bg;
 }
 
 .header__container {
@@ -30,10 +31,10 @@
   font-size: 30px;
   font-weight: bold;
   display: inline-block;
-  color: #81b29a;
+  color: colors.$accent;
 }
 .header-logo__letter--dark {
-  color: #3d405b;
+  color: colors.$primary;
 }
 // 沒要求減少時才加動畫
 @media (prefers-reduced-motion: no-preference) {
@@ -63,7 +64,7 @@
     position: fixed;
     inset: 0 0 0 150%; // 移到畫面右側隱藏
     visibility: hidden;
-    background-color: #f4f1de;
+    background-color: colors.$header-bg;
     z-index: 10;
     transition:
       inset 0.3s,
@@ -100,13 +101,13 @@
   padding: 10px 5px;
 }
 .header-menu__itemBtn {
-  color: #3d405b;
+  color: colors.$primary;
   font-size: 18px;
   font-weight: bold;
   padding: 2px 10px;
   border-bottom: 3px solid transparent;
   transition: border-bottom-color 0.08s;
   &:hover {
-    border-bottom-color: #e07a5f;
+    border-bottom-color: colors.$header-menu-hover;
   }
 }
