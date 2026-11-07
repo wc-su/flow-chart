@@ -1,3 +1,5 @@
+@use '../../styles/color' as colors;
+
 .authForm {
   display: flex;
   flex-direction: column;
@@ -8,38 +10,38 @@
 .authForm__input {
   width: 100%;
   font-size: 16px;
-  border: 1px solid #3d405b;
+  border: 1px solid colors.$primary;
   border-radius: 8px;
   padding: 19px 20px;
 }
 .authForm__input--google {
-  background-color: #fff;
+  background-color: colors.$white;
   cursor: pointer;
   &:hover {
-    color: #fff;
-    background-color: #3d405b;
+    color: colors.$white;
+    background-color: colors.$primary;
   }
 }
 .authForm__input--submit {
-  background-color: #3d405b;
-  color: #fff;
+  background-color: colors.$primary;
+  color: colors.$white;
   cursor: pointer;
   &:hover {
-    color: #3d405b;
-    background-color: #fb8500;
-    border-color: #fb8500;
+    color: colors.$primary;
+    background-color: colors.$secondary;
+    border-color: colors.$secondary;
   }
 }
 
 .authForm__info {
-  color: #9c9c9c;
+  color: colors.$gray-500;
   user-select: none;
 }
 
 .authForm__textBtn {
   display: inline-block;
   text-align: center;
-  color: #7088db;
+  color: colors.$authForm-link;
   &:hover {
     text-decoration: underline;
   }

@@ -1,5 +1,28 @@
 @use 'sass:color';
 
-$toolBar-text: #fff;
-$toolBar-primary: #3d405b;
+// 全站共用：依用途命名
+$primary: #3d405b;
+$secondary: #fb8500;
+$accent: #81b29a;
+$surface: #fdf0d5;
+$text-muted: #6e6c7a;
+$danger: #ff0000;
+$white: #fff;
+$black: #000;
+$mask: rgba($black, 0.2);
+
+// 灰色：依深淺編號，數字越小越淺
+$gray-100: #ededed;
+$gray-200: #e6e5e5;
+$gray-300: #d3d3d3;
+$gray-500: #9c9c9c;
+
+// 只屬於一個元件：元件名稱當前綴
+$header-bg: #f4f1de;
+$header-menu-hover: #e07a5f;
+$home-cta-border: #fcbf49;
+$loading-dot: #4b9cdb;
+$authForm-link: #7088db;
+$toolBar-text: $white;
+$toolBar-primary: $primary;
 $toolBar-hover: color.adjust($toolBar-primary, $lightness: 20%);

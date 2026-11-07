@@ -1,3 +1,4 @@
+@use '../../styles/color' as colors;
 @use '../../styles/breakpoints' as bp;
 
 body:has(.authModal) {
@@ -7,14 +8,14 @@ body:has(.authModal) {
 .authModal {
   position: fixed;
   inset: 0;
-  background-color: rgba(#000000, 0.2);
+  background-color: colors.$mask;
   z-index: 50;
   overflow-y: auto;
 }
 .authModal__container {
   width: 390px;
   margin: 100px auto;
-  background-color: #fff;
+  background-color: colors.$white;
   border-radius: 10px;
   padding: 50px 40px 40px 40px;
   position: relative;
@@ -30,14 +31,14 @@ body:has(.authModal) {
   top: 10px;
   right: 10px;
   &:hover {
-    background: #ededed;
+    background: colors.$gray-100;
     border-radius: 5px;
   }
   &::before,
   &::after {
     content: '';
     width: 20px;
-    border: 1px solid #000;
+    border: 1px solid colors.$black;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -51,7 +52,7 @@ body:has(.authModal) {
 }
 
 .authModal__errMsg {
-  color: #ff0000;
+  color: colors.$danger;
   text-align: center;
   margin-bottom: 20px;
 }

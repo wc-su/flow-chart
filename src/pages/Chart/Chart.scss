@@ -1,3 +1,5 @@
+@use '../../styles/color' as colors;
+
 .chart {
   display: grid;
   grid-template-rows: auto 1fr; // 工具列照內容高度，畫布區填滿剩下的
@@ -5,12 +7,12 @@
 }
 .chart__main {
   overflow: hidden;
-  background-color: #e6e5e5;
+  background-color: colors.$gray-200;
 }
 
 .chart-prompt {
   grid-row: 1 / -1;
-  background-color: #3d405b;
+  background-color: colors.$primary;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,7 +20,7 @@
 .chart-prompt__container {
   width: 80%;
   max-width: 400px;
-  background-color: #fdf0d5;
+  background-color: colors.$surface;
   border-radius: 10px;
   padding: 40px 40px 50px 40px;
 }
@@ -26,7 +28,7 @@
   font-size: 30px;
   font-weight: bold;
   position: relative;
-  color: #ff0000;
+  color: colors.$danger;
 }
 .chart-prompt__title::before {
   content: '';
@@ -34,21 +36,21 @@
   bottom: -10px;
   left: 0;
   width: 100%;
-  border-bottom: 2px solid lightgray;
+  border-bottom: 2px solid colors.$gray-300;
 }
 .chart-prompt__message {
   margin-top: 35px;
-  color: #3d405b;
+  color: colors.$primary;
   line-height: 2;
 }
 .chart-prompt__link {
   display: block;
   text-decoration: none;
   width: 150px;
-  color: #fff;
+  color: colors.$white;
   font-size: 18px;
   text-align: center;
-  background-color: #fb8500;
+  background-color: colors.$secondary;
   border-radius: 8px;
   padding: 10px;
   margin: 16px auto 0; // 左右 auto 會水平置中
