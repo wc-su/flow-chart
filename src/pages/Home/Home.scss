@@ -309,6 +309,9 @@
   border: 1px solid colors.$text-muted;
   border-radius: 10px;
   transition: opacity 0.5s;
+  .home-footer__logo:is(:hover, :focus-visible) & {
+    opacity: 0.8;
+  }
 }
 .home-footer__logoText {
   text-decoration: none;
@@ -316,12 +319,7 @@
   font-size: 18px;
   font-weight: bold;
   transition: color 0.3s;
-}
-.home-footer__logo:is(:hover, :focus-visible) {
-  .home-footer__logoImg {
-    opacity: 0.8;
-  }
-  .home-footer__logoText {
+  .home-footer__logo:is(:hover, :focus-visible) & {
     color: colors.$secondary;
   }
 }

@@ -29,14 +29,14 @@
   font-weight: bold;
   position: relative;
   color: colors.$danger;
-}
-.chart-prompt__title::before {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 0;
-  width: 100%;
-  border-bottom: 2px solid colors.$gray-300;
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    border-bottom: 2px solid colors.$gray-300;
+  }
 }
 .chart-prompt__message {
   margin-top: 35px;

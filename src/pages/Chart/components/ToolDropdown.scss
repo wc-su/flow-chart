@@ -51,17 +51,17 @@
   white-space: nowrap;
   gap: 8px;
   padding: 8px 12px;
-}
-.toolDropdown__option:first-child {
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-}
-.toolDropdown__option:last-child {
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
-}
-.toolDropdown__option:hover {
-  background-color: colors.$toolBar-hover;
+  &:first-child {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+  &:last-child {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+  &:hover {
+    background-color: colors.$toolBar-hover;
+  }
 }
 .toolDropdown__optionImg {
   max-width: none;
