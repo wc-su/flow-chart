@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 import ToolButton from './ToolButton';
 
@@ -7,7 +7,31 @@ import './ToolDropdown.scss';
 import selectIcon from '../images/down.png';
 
 const ToolDropdown = ({ options, active, disabled, onSelect, isOpen, onClose, onToggle }) => {
+  const rootRef = useRef(null);
+
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    if (!isOpen) return; // 關著的時候不監聽
+
+    function handlePointerDown(e) {
+      // contains: e.target (被點到的元素) 是不是在 rootRef 這個 div 裡面
+      if (!rootRef.current.contains(e.target)) {
+        onClose();
+      }
+    }
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') onClose();
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      // cleanup: 選單關閉或元件消失時移除，不然監聽會一直留著
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   function changeIndex(index) {
     setSelectedIndex(index);
@@ -16,7 +40,7 @@ const ToolDropdown = ({ options, active, disabled, onSelect, isOpen, onClose, on
   }
 
   return (
-    <div className="toolDropdown">
+    <div className="toolDropdown" ref={rootRef}>
       <ToolButton
         className="toolDropdown__main"
         icon={options[selectedIndex].icon}

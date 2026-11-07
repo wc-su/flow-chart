@@ -63,7 +63,11 @@ const CanvasToolBar = ({
 
   const { tool, setTool } = useTool();
 
-  const [openDropdown, setOpenDropdown] = useState(null);
+  const [openDropdown, setOpenDropdown] = useState(null); // null | 'draw' | 'save'
+
+  function handleToggleDropdown(type) {
+    setOpenDropdown((prev) => (prev === type ? null : type));
+  }
 
   return (
     <div className="canvasToolBar">
@@ -89,7 +93,7 @@ const CanvasToolBar = ({
           onSelect={(option) => setTool(option.value)}
           isOpen={openDropdown === 'draw'}
           onClose={() => setOpenDropdown(null)}
-          onToggle={() => setOpenDropdown((prev) => (prev === 'draw' ? null : 'draw'))}
+          onToggle={() => handleToggleDropdown('draw')}
         />
         <ToolButton
           icon={undoIcon}
@@ -129,7 +133,7 @@ const CanvasToolBar = ({
           onSelect={(option) => onExport(option.value)}
           isOpen={openDropdown === 'save'}
           onClose={() => setOpenDropdown(null)}
-          onToggle={() => setOpenDropdown((prev) => (prev === 'save' ? null : 'save'))}
+          onToggle={() => handleToggleDropdown('save')}
         />
         <ToolButton icon={zoomInIcon} label="zoomIn" disabled={isMobile || !canZoomIn} onClick={onZoomIn} />
         <ToolButton icon={zoomOutIcon} label="zoomOut" disabled={isMobile || !canZoomOut} onClick={onZoomOut} />
