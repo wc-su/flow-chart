@@ -1,0 +1,7 @@
+@use '@/styles/color' as colors;
+
+.canvas {
+  position: relative;
+  box-shadow: 0 0 5px colors.$canvas-shadow;
+  background-color: colors.$white;
+}
