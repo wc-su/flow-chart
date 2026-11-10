@@ -23,6 +23,7 @@ React 19 · Vite · Redux Toolkit + redux-undo · React Router v7 · Firebase ·
   - 元件本身的區塊直接用元件名稱 (`Header.jsx` → `header`)；頁面專用的區塊、元件裡拆出來的區塊，加上所屬的頁面或元件名稱當前綴，用 `-` 連接 (`home-hero`、`header-menu`)
   - `-` 只用在前綴和區塊之間
   - `@keyframes` 名稱也是全域的，用區塊名稱開頭 (`header-logo`)
+- 資料夾命名：代表某個元件、頁面或功能的用大寫開頭，和主檔案同名 (`Header/Header.jsx`)；分類用的資料夾用小寫 (`components`、`shapes`、`images`)
 - 程式碼註解、測試名稱的標點：括號固定用半形 `()`；冒號前面是中文用全形 `：`，
   前面不是中文 (英文、`)` 等) 用半形 `:`；中英文之間加空格
 
