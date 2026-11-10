@@ -4,7 +4,7 @@ import ToolButton from './ToolButton';
 
 import './ToolDropdown.scss';
 
-import selectIcon from '../images/down.png';
+import selectIcon from './images/down.png';
 
 const ToolDropdown = ({ options, active, disabled, onSelect, isOpen, onClose, onToggle }) => {
   const rootRef = useRef(null);

@@ -4,30 +4,30 @@ import { ActionCreators } from 'redux-undo';
 import { isMobile } from 'react-device-detect';
 import { useNavigate } from 'react-router';
 
-import ToolButton from './ToolButton';
-import ToolDropdown from './ToolDropdown';
 import { USER_STATUS } from '@/redux/userSlice';
 import { selectCanUndo, selectCanRedo, selectSelectedId } from '@/redux/chartSlice';
-import { useTool } from './Tool/ToolContext';
-import { TOOL } from './Tool/tool';
+import { useTool } from '../Tool/ToolContext';
+import { TOOL } from '../Tool/tool';
+import ToolButton from './ToolButton';
+import ToolDropdown from './ToolDropdown';
 
 import './CanvasToolBar.scss';
 
-import terminalIcon from '../images/terminal.png';
-import processIcon from '../images/process.png';
-import inputOutputIcon from '../images/inputOutput.png';
-import decisionIcon from '../images/decision.png';
-import flowlineIcon from '../images/flowline.png';
-import saveAsJPGIcon from '../images/save-as-jpg.png';
-import saveAsPNGIcon from '../images/save-as-png.png';
-import backIcon from '../images/back-files.png';
-import moveIcon from '../images/canvas-move.png';
-import undoIcon from '../images/back-step.png';
-import redoIcon from '../images/next-step.png';
-import deleteIcon from '../images/delete.png';
-import uploadIcon from '../images/upload.png';
-import zoomInIcon from '../images/zoom-in.png';
-import zoomOutIcon from '../images/zoom-out.png';
+import terminalIcon from './images/terminal.png';
+import processIcon from './images/process.png';
+import inputOutputIcon from './images/inputOutput.png';
+import decisionIcon from './images/decision.png';
+import flowlineIcon from './images/flowline.png';
+import saveAsJPGIcon from './images/save-as-jpg.png';
+import saveAsPNGIcon from './images/save-as-png.png';
+import backIcon from './images/back-files.png';
+import moveIcon from './images/canvas-move.png';
+import undoIcon from './images/back-step.png';
+import redoIcon from './images/next-step.png';
+import deleteIcon from './images/delete.png';
+import uploadIcon from './images/upload.png';
+import zoomInIcon from './images/zoom-in.png';
+import zoomOutIcon from './images/zoom-out.png';
 
 const DRAW_OPTIONS = Object.freeze([
   { value: TOOL.TERMINAL, icon: terminalIcon, label: 'Terminal' },

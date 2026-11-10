@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import { isMobile } from 'react-device-detect';
 
-import CanvasToolBar from './components/CanvasToolBar';
+import CanvasToolBar from './components/CanvasToolBar/CanvasToolBar';
 import Canvas from './components/Canvas';
 import ToolProvider from './components/Tool/ToolProvider';
 import { USER_STATUS } from '@/redux/userSlice';
