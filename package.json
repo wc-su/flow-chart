@@ -13,7 +13,11 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "*.{js,jsx,css,scss,json,md}": "prettier --write"
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,scss,json,md}": "prettier --write"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.12.0",
