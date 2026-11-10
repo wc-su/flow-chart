@@ -9,4 +9,7 @@ export default defineConfig({
     // globals: true,       // 可直接用 describe/it/expect
     setupFiles: ['./src/setupTests.js'],
   },
+  server: {
+    open: true,
+  },
 });
