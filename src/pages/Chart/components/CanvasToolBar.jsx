@@ -6,8 +6,8 @@ import { useNavigate } from 'react-router';
 
 import ToolButton from './ToolButton';
 import ToolDropdown from './ToolDropdown';
-import { USER_STATUS } from '../../../redux/userSlice';
-import { selectCanUndo, selectCanRedo, selectSelectedId } from '../../../redux/chartSlice';
+import { USER_STATUS } from '@/redux/userSlice';
+import { selectCanUndo, selectCanRedo, selectSelectedId } from '@/redux/chartSlice';
 import { useTool } from './Tool/ToolContext';
 import { TOOL } from './Tool/tool';
 

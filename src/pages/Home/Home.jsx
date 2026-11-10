@@ -2,7 +2,7 @@ import { Link } from 'react-router';
 import { useSelector } from 'react-redux';
 
 import './Home.scss';
-import { USER_STATUS } from '../../redux/userSlice';
+import { USER_STATUS } from '@/redux/userSlice';
 
 // images
 import heroImg from './images/hero.svg';
