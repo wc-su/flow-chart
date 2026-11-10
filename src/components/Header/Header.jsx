@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
 import { useState } from 'react';
 
-import { USER_STATUS, userActions } from '../../redux/userSlice';
+import { USER_STATUS, userActions } from '@/redux/userSlice';
 import AuthModal from './AuthModal';
 import { AUTH_VIEWS } from './authViews';
 

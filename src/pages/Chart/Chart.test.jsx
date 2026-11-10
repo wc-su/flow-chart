@@ -3,10 +3,10 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { createMemoryRouter, RouterProvider } from 'react-router';
-import { userActions } from '../../redux/userSlice';
 
-import routes from '../../router/routes';
-import { makeStore } from '../../redux/store';
+import routes from '@/router/routes';
+import { makeStore } from '@/redux/store';
+import { userActions } from '@/redux/userSlice';
 
 vi.mock('react-device-detect', () => ({ isMobile: true }));
 

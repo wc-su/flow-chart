@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 
 import routes from './routes';
-import { makeStore } from '../redux/store';
+import { makeStore } from '@/redux/store';
 
 // 用指定的網址畫出整個 App
 const renderRoute = (url) => {

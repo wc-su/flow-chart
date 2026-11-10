@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { AUTH_VIEWS } from './authViews';
-import { userActions } from '../../redux/userSlice';
+import { userActions } from '@/redux/userSlice';
 
 import './AuthForm.scss';
 
