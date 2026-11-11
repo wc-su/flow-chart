@@ -25,8 +25,11 @@ const handleConfig = [
   { cursor: 's-resize', x: 0.5, y: 1 },
   { cursor: 'se-resize', x: 1, y: 1 },
 ];
-// flowline 的兩個端點，位置直接用線的 start、end，只用到 cursor
-const lineHandleConfig = [{ cursor: 'start-resize' }, { cursor: 'end-resize' }];
+// flowline 的兩個端點：比例 0 是起點、1 是終點
+const lineHandleConfig = [
+  { cursor: 'start-resize', x: 0, y: 0 },
+  { cursor: 'end-resize', x: 1, y: 1 },
+];
 
 const MIN_SHAPE_SIZE = 24;
 
@@ -113,58 +116,33 @@ export function buildSelectionOverlay(shapes, selectedId, activeHandle) {
       overlay.push(box);
     }
 
-    // 先記下圖形寬高（下面會被改成控制點的大小），再把樣板改成藍色實心圓，半徑 4（Ellipse 以 x, y 為圓心）
-    const boxWidth = handleBase.width;
-    const boxHeight = handleBase.height;
+    // 把樣板改成藍色實心圓，半徑 4（Ellipse 以 x, y 為圓心）
     handleBase.style.fill = '#00a8ff';
     handleBase.style.stroke = 'none';
     handleBase.type = 'ellipse';
     handleBase.width = 4;
     handleBase.height = 4;
 
-    if (box.type === SHAPE_TYPE.FLOWLINE) {
-      // 兩個端點直接用線的 start、end
-      overlay.push({ ...handleBase });
-      overlay[0].id = `${box.id}:${lineHandleConfig[0].cursor}`;
-      overlay[0].cursor = lineHandleConfig[0].cursor;
-      overlay[0].x = overlay[0].startX;
-      overlay[0].y = overlay[0].startY;
-      overlay[0].endX = overlay[0].startX;
-      overlay[0].endY = overlay[0].startY;
+    const config = box.type === SHAPE_TYPE.FLOWLINE ? lineHandleConfig : handleConfig;
+    for (const handleItem of config) {
+      const handle = { ...handleBase };
+      handle.id = `${box.id}:${handleItem.cursor}`;
+      handle.cursor = handleItem.cursor;
+      // 位置 = start + (end − start) × 比例：比例 0 是起點、1 是終點，
+      // 一般圖形的 start、end 已整理成左上、右下，flowline 保留畫的方向，兩種都適用
+      handle.startX += (handle.endX - handle.startX) * handleItem.x;
+      handle.startY += (handle.endY - handle.startY) * handleItem.y;
+      handle.endX = handle.startX;
+      handle.endY = handle.startY;
+      handle.x = handle.startX;
+      handle.y = handle.startY;
       // 縮放中只顯示正在拖的那個控制點
-      if (activeHandle && activeHandle !== lineHandleConfig[0].cursor) {
-        overlay[0].display = 'none';
+      if (activeHandle) {
+        handle.display = handleItem.cursor === activeHandle ? 'block' : 'none';
       }
-      overlay.push({ ...handleBase });
-      overlay[1].id = `${box.id}:${lineHandleConfig[1].cursor}`;
-      overlay[1].cursor = lineHandleConfig[1].cursor;
-      overlay[1].startX = overlay[1].endX;
-      overlay[1].startY = overlay[1].endY;
-      overlay[1].x = overlay[1].endX;
-      overlay[1].y = overlay[1].endY;
-      // 縮放中只顯示正在拖的那個控制點
-      if (activeHandle && activeHandle !== lineHandleConfig[1].cursor) {
-        overlay[1].display = 'none';
-      }
-    } else {
-      // 依 config 算出每個控制點的位置
-      for (let i = 1; i <= handleConfig.length; i++) {
-        overlay.push({ ...handleBase });
-        overlay[i].id = `${box.id}:${handleConfig[i - 1].cursor}`;
-        overlay[i].cursor = handleConfig[i - 1].cursor;
-        // 位置 = 左上角 + 寬高 × 比例（0 左／上、0.5 中間、1 右／下）
-        overlay[i].startX += boxWidth * handleConfig[i - 1].x;
-        overlay[i].startY += boxHeight * handleConfig[i - 1].y;
-        overlay[i].x = overlay[i].startX;
-        overlay[i].y = overlay[i].startY;
-        overlay[i].endX = overlay[i].startX;
-        overlay[i].endY = overlay[i].startY;
-        // 縮放中只顯示正在拖的那個控制點
-        if (activeHandle) {
-          overlay[i].display = handleConfig[i - 1].cursor === activeHandle ? 'block' : 'none';
-        }
-      }
+      overlay.push(handle);
     }
+
     return overlay;
   } else {
     return [];
