@@ -28,6 +28,16 @@ const handleConfig = [
 // flowline 的兩個端點，位置直接用線的 start、end，只用到 cursor
 const lineHandleConfig = [{ cursor: 'start-resize' }, { cursor: 'end-resize' }];
 
+const MIN_SHAPE_SIZE = 24;
+
+export const SHAPE_TYPE = Object.freeze({
+  TERMINAL: 'terminal',
+  PROCESS: 'process',
+  INPUTOUTPUT: 'inputOutput',
+  DECISION: 'decision',
+  FLOWLINE: 'flowline',
+});
+
 /**
  * 建立一個剛開始畫的新圖形：起點和終點都在滑鼠位置，寬高是 0，之後由 draw 更新終點。
  * @param {Object} payload 由 startDraw 的 prepare 產生
@@ -37,7 +47,7 @@ const lineHandleConfig = [{ cursor: 'start-resize' }, { cursor: 'end-resize' }];
  * @param {string} payload.drawType 圖形種類（terminal、process、inputOutput、decision、flowline）
  * @returns {Shape} 新圖形的資料
  */
-function createShape({ id, x, y, drawType }) {
+export function createShape({ id, x, y, drawType }) {
   return {
     id: id,
     startX: x,
@@ -70,31 +80,24 @@ function createShape({ id, x, y, drawType }) {
  * @param {string} activeHandle 正在拖曳的控制點 cursor（例如 'se-resize'），沒有時是 ''
  * @returns {Array} 一般圖形：[選取框, 8 個控制點]；flowline：[起點, 終點]；沒選取：[]
  */
-function buildSelectionOverlay(shapes, selectedId, activeHandle) {
+export function buildSelectionOverlay(shapes, selectedId, activeHandle) {
   const selected = shapes.find((item) => item.id === selectedId);
   if (selected) {
     // 深拷貝被選取的圖形：shapes 來自 Redux state，已被 Immer 凍結，直接修改會報錯
     const box = JSON.parse(JSON.stringify(selected));
     // 整理座標：由右下往左上畫時 start 會比 end 大，統一成 start 在左上、end 在右下，後面才能從左上角算控制點位置。
     // flowline 有方向（箭頭），不能整理
-    if (box.type !== 'flowline') {
-      const newStartX = Math.min(box.startX, box.endX);
-      const newStartY = Math.min(box.startY, box.endY);
-      const newEndX = Math.max(box.startX, box.endX);
-      const newEndY = Math.max(box.startY, box.endY);
-      box.startX = newStartX;
-      box.startY = newStartY;
-      box.x = newStartX;
-      box.y = newStartY;
-      box.endX = newEndX;
-      box.endY = newEndY;
+    if (box.type !== SHAPE_TYPE.FLOWLINE) {
+      Object.assign(box, normalizeBox(box));
+      box.x = box.startX;
+      box.y = box.startY;
     }
 
     // 控制點的樣板：必須在下面改成選取框之前複製，否則會繼承 pointerEvents: 'none'，控制點會點不到
     const handleBase = JSON.parse(JSON.stringify(box));
 
     // 非「線」，改成長方形選取框、藍色虛線，pointerEvents: 'none' 讓滑鼠穿過選取框，點到下面的圖形。
-    if (box.type !== 'flowline') {
+    if (box.type !== SHAPE_TYPE.FLOWLINE) {
       box.type = 'process';
       box.style.stroke = '#00a8ff';
       box.style.strokeDasharray = '3';
@@ -103,7 +106,7 @@ function buildSelectionOverlay(shapes, selectedId, activeHandle) {
 
     const overlay = [];
     // 一般圖形才有選取框；縮放中時隱藏
-    if (box.type !== 'flowline') {
+    if (box.type !== SHAPE_TYPE.FLOWLINE) {
       if (activeHandle !== '') {
         box.display = 'none';
       }
@@ -119,7 +122,7 @@ function buildSelectionOverlay(shapes, selectedId, activeHandle) {
     handleBase.width = 4;
     handleBase.height = 4;
 
-    if (box.type === 'flowline') {
+    if (box.type === SHAPE_TYPE.FLOWLINE) {
       // 兩個端點直接用線的 start、end
       overlay.push({ ...handleBase });
       overlay[0].id = `${box.id}:${lineHandleConfig[0].cursor}`;
@@ -168,4 +171,69 @@ function buildSelectionOverlay(shapes, selectedId, activeHandle) {
   }
 }
 
-export { createShape, buildSelectionOverlay };
+/**
+ * 整理座標，把 start、end 整理成 start 在左上、end 在右下
+ * @param {Object} params
+ * @param {number} params.startX 起點 X
+ * @param {number} params.startY 起點 Y
+ * @param {number} params.endX 終點 X
+ * @param {number} params.endY 終點 Y
+ * @returns {Object} 整理後的 startX、startY、endX、endY
+ */
+export function normalizeBox({ startX, startY, endX, endY }) {
+  return {
+    startX: Math.min(startX, endX),
+    startY: Math.min(startY, endY),
+    endX: Math.max(startX, endX),
+    endY: Math.max(startY, endY),
+  };
+}
+
+/**
+ * 滑鼠座標轉換成在畫布上的座標
+ * @param {Object} params
+ * @param {number} params.clientX 滑鼠 X 座標
+ * @param {number} params.clientY 滑鼠 Y 座標
+ * @param {DOMRect} params.rect 畫布的 getBoundingClientRect()
+ * @param {number} params.rate 畫布比例
+ * @returns {Object} 畫布上的座標 x, y
+ */
+export function toCanvasPoint({ clientX, clientY, rect, rate }) {
+  const x = (clientX - rect.left) / rate;
+  const y = (clientY - rect.top) / rate;
+  return { x, y };
+}
+
+/**
+ * 依圖形、滑鼠位置計算 x, y 和寬高
+ * @param {number} shapeStartX 圖形起點 startX
+ * @param {number} shapeStartY 圖形起點 startY
+ * @param {number} pointerX 滑鼠在畫布位置 X
+ * @param {number} pointerY 滑鼠在畫布位置 Y
+ * @returns {Object} 計算的終點、x, y 和寬高
+ */
+export function getDrawingBox(shapeStartX, shapeStartY, pointerX, pointerY) {
+  return {
+    endX: pointerX,
+    endY: pointerY,
+    x: Math.min(shapeStartX, pointerX),
+    y: Math.min(shapeStartY, pointerY),
+    width: Math.abs(pointerX - shapeStartX),
+    height: Math.abs(pointerY - shapeStartY),
+  };
+}
+
+/**
+ * 是不是太小、不該保留的圖形
+ * @param {string} type 圖形種類
+ * @param {number} width 寬度
+ * @param {number} height 高度
+ * @returns {boolean} true 表示太小 (一般圖形寬或高小於 24，flowline 長度小於 24)
+ */
+export function isEmptyShape(type, width, height) {
+  if (type === SHAPE_TYPE.FLOWLINE) {
+    return Math.hypot(width, height) < MIN_SHAPE_SIZE;
+  } else {
+    return width < MIN_SHAPE_SIZE || height < MIN_SHAPE_SIZE;
+  }
+}

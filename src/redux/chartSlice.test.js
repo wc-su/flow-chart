@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import chartReducer, { chartActions } from './chartSlice';
+import { SHAPE_TYPE } from '@/utils/shape';
 
 vi.mock('uuid', () => ({
   v4: () => 'test-uuid',
@@ -22,7 +23,7 @@ const generateShape = (replace) => {
     y: 0,
     width: 0,
     height: 0,
-    type: 'terminal',
+    type: SHAPE_TYPE.TERMINAL,
     style: {
       fill: '#FFFFFF',
       fillOpacity: '0',
@@ -108,14 +109,310 @@ describe('chartReducer', () => {
   });
 
   describe('繪畫', () => {
-    it.each([
-      ['endDraw', chartActions.endDraw],
-      ['draw', chartActions.draw],
-      ['changeShape', chartActions.changeShape],
-    ])('%s', (_name, action) => {
+    it('畫圖中，滑鼠往右下 -> 結束畫圖', () => {
+      // 起始畫布位置 10, 20
+      const prevPosition = { startX: 10, startY: 20, x: 10, y: 20 };
+      const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
+      // 滑鼠移到畫布位置 100, 200
+      const input = { x: 100, y: 200 };
+      const state = chartReducer(prev, chartActions.draw(input));
+
+      const shape = state.shapes[0];
+      expect(shape.startX).toBe(10);
+      expect(shape.startY).toBe(20);
+      expect(shape.endX).toBe(100);
+      expect(shape.endY).toBe(200);
+      expect(shape.x).toBe(10);
+      expect(shape.y).toBe(20);
+      expect(shape.width).toBe(90);
+      expect(shape.height).toBe(180);
+
+      const endState = chartReducer(state, chartActions.endDraw());
+      const endShape = endState.shapes[0];
+      expect(endShape.startX).toBe(10);
+      expect(endShape.startY).toBe(20);
+      expect(endShape.endX).toBe(100);
+      expect(endShape.endY).toBe(200);
+      expect(endShape.x).toBe(10);
+      expect(endShape.y).toBe(20);
+      expect(endShape.width).toBe(90);
+      expect(endShape.height).toBe(180);
+    });
+
+    it('畫圖中，滑鼠往右上 -> 結束畫圖', () => {
+      // 起始畫布位置 10, 500
+      const prevPosition = { startX: 10, startY: 500, x: 10, y: 500 };
+      const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
+      // 滑鼠移到畫布位置 100, 200
+      const input = { x: 100, y: 200 };
+      const state = chartReducer(prev, chartActions.draw(input));
+
+      const shape = state.shapes[0];
+      expect(shape.startX).toBe(10);
+      expect(shape.startY).toBe(500);
+      expect(shape.endX).toBe(100);
+      expect(shape.endY).toBe(200);
+      expect(shape.x).toBe(10);
+      expect(shape.y).toBe(200);
+      expect(shape.width).toBe(90);
+      expect(shape.height).toBe(300);
+
+      const endState = chartReducer(state, chartActions.endDraw());
+      const endShape = endState.shapes[0];
+      expect(endShape.startX).toBe(10);
+      expect(endShape.startY).toBe(200);
+      expect(endShape.endX).toBe(100);
+      expect(endShape.endY).toBe(500);
+      expect(endShape.x).toBe(10);
+      expect(endShape.y).toBe(200);
+      expect(endShape.width).toBe(90);
+      expect(endShape.height).toBe(300);
+    });
+
+    it('畫圖中，滑鼠往左上 -> 結束畫圖', () => {
+      // 起始畫布位置 400, 500
+      const prevPosition = { startX: 400, startY: 500, x: 400, y: 500 };
+      const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
+      // 滑鼠移到畫布位置 100, 200
+      const input = { x: 100, y: 200 };
+      const state = chartReducer(prev, chartActions.draw(input));
+
+      const shape = state.shapes[0];
+      expect(shape.startX).toBe(400);
+      expect(shape.startY).toBe(500);
+      expect(shape.endX).toBe(100);
+      expect(shape.endY).toBe(200);
+      expect(shape.x).toBe(100);
+      expect(shape.y).toBe(200);
+      expect(shape.width).toBe(300);
+      expect(shape.height).toBe(300);
+
+      const endState = chartReducer(state, chartActions.endDraw());
+      const endShape = endState.shapes[0];
+      expect(endShape.startX).toBe(100);
+      expect(endShape.startY).toBe(200);
+      expect(endShape.endX).toBe(400);
+      expect(endShape.endY).toBe(500);
+      expect(endShape.x).toBe(100);
+      expect(endShape.y).toBe(200);
+      expect(endShape.width).toBe(300);
+      expect(endShape.height).toBe(300);
+    });
+
+    it('畫圖中，滑鼠往左下 -> 結束畫圖', () => {
+      // 起始畫布位置 400, 100
+      const prevPosition = { startX: 400, startY: 100, x: 400, y: 100 };
+      const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
+      // 滑鼠移到畫布位置 100, 500
+      const input = { x: 100, y: 500 };
+      const state = chartReducer(prev, chartActions.draw(input));
+
+      const shape = state.shapes[0];
+      expect(shape.startX).toBe(400);
+      expect(shape.startY).toBe(100);
+      expect(shape.endX).toBe(100);
+      expect(shape.endY).toBe(500);
+      expect(shape.x).toBe(100);
+      expect(shape.y).toBe(100);
+      expect(shape.width).toBe(300);
+      expect(shape.height).toBe(400);
+
+      const endState = chartReducer(state, chartActions.endDraw());
+      const endShape = endState.shapes[0];
+      expect(endShape.startX).toBe(100);
+      expect(endShape.startY).toBe(100);
+      expect(endShape.endX).toBe(400);
+      expect(endShape.endY).toBe(500);
+      expect(endShape.x).toBe(100);
+      expect(endShape.y).toBe(100);
+      expect(endShape.width).toBe(300);
+      expect(endShape.height).toBe(400);
+    });
+
+    it('畫線中，滑鼠往右下 -> 結束畫線', () => {
+      // 起始畫布位置 10, 20
+      const prevPosition = { startX: 10, startY: 20, x: 10, y: 20, type: SHAPE_TYPE.FLOWLINE };
+      const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
+      // 滑鼠移到畫布位置 100, 200
+      const input = { x: 100, y: 200 };
+      const state = chartReducer(prev, chartActions.draw(input));
+
+      const shape = state.shapes[0];
+      expect(shape.startX).toBe(10);
+      expect(shape.startY).toBe(20);
+      expect(shape.endX).toBe(100);
+      expect(shape.endY).toBe(200);
+      expect(shape.x).toBe(10);
+      expect(shape.y).toBe(20);
+      expect(shape.width).toBe(90);
+      expect(shape.height).toBe(180);
+
+      const endState = chartReducer(state, chartActions.endDraw());
+      const endShape = endState.shapes[0];
+      expect(endShape.startX).toBe(10);
+      expect(endShape.startY).toBe(20);
+      expect(endShape.endX).toBe(100);
+      expect(endShape.endY).toBe(200);
+      expect(endShape.x).toBe(10);
+      expect(endShape.y).toBe(20);
+      expect(endShape.width).toBe(90);
+      expect(endShape.height).toBe(180);
+    });
+
+    it('畫線中，滑鼠往右上 -> 結束畫線', () => {
+      // 起始畫布位置 10, 500
+      const prevPosition = { startX: 10, startY: 500, x: 10, y: 500, type: SHAPE_TYPE.FLOWLINE };
+      const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
+      // 滑鼠移到畫布位置 100, 200
+      const input = { x: 100, y: 200 };
+      const state = chartReducer(prev, chartActions.draw(input));
+
+      const shape = state.shapes[0];
+      expect(shape.startX).toBe(10);
+      expect(shape.startY).toBe(500);
+      expect(shape.endX).toBe(100);
+      expect(shape.endY).toBe(200);
+      expect(shape.x).toBe(10);
+      expect(shape.y).toBe(200);
+      expect(shape.width).toBe(90);
+      expect(shape.height).toBe(300);
+
+      const endState = chartReducer(state, chartActions.endDraw());
+      const endShape = endState.shapes[0];
+      expect(endShape.startX).toBe(10);
+      expect(endShape.startY).toBe(500);
+      expect(endShape.endX).toBe(100);
+      expect(endShape.endY).toBe(200);
+      expect(endShape.x).toBe(10);
+      expect(endShape.y).toBe(200);
+      expect(endShape.width).toBe(90);
+      expect(endShape.height).toBe(300);
+    });
+
+    it('畫線中，滑鼠往左上 -> 結束畫線', () => {
+      // 起始畫布位置 400, 500
+      const prevPosition = { startX: 400, startY: 500, x: 400, y: 500, type: SHAPE_TYPE.FLOWLINE };
+      const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
+      // 滑鼠移到畫布位置 100, 200
+      const input = { x: 100, y: 200 };
+      const state = chartReducer(prev, chartActions.draw(input));
+
+      const shape = state.shapes[0];
+      expect(shape.startX).toBe(400);
+      expect(shape.startY).toBe(500);
+      expect(shape.endX).toBe(100);
+      expect(shape.endY).toBe(200);
+      expect(shape.x).toBe(100);
+      expect(shape.y).toBe(200);
+      expect(shape.width).toBe(300);
+      expect(shape.height).toBe(300);
+
+      const endState = chartReducer(state, chartActions.endDraw());
+      const endShape = endState.shapes[0];
+      expect(endShape.startX).toBe(400);
+      expect(endShape.startY).toBe(500);
+      expect(endShape.endX).toBe(100);
+      expect(endShape.endY).toBe(200);
+      expect(endShape.x).toBe(100);
+      expect(endShape.y).toBe(200);
+      expect(endShape.width).toBe(300);
+      expect(endShape.height).toBe(300);
+    });
+
+    it('畫線中，滑鼠往左下 -> 結束畫線', () => {
+      // 起始畫布位置 400, 100
+      const prevPosition = { startX: 400, startY: 100, x: 400, y: 100, type: SHAPE_TYPE.FLOWLINE };
+      const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
+      // 滑鼠移到畫布位置 100, 500
+      const input = { x: 100, y: 500 };
+      const state = chartReducer(prev, chartActions.draw(input));
+
+      const shape = state.shapes[0];
+      expect(shape.startX).toBe(400);
+      expect(shape.startY).toBe(100);
+      expect(shape.endX).toBe(100);
+      expect(shape.endY).toBe(500);
+      expect(shape.x).toBe(100);
+      expect(shape.y).toBe(100);
+      expect(shape.width).toBe(300);
+      expect(shape.height).toBe(400);
+
+      const endState = chartReducer(state, chartActions.endDraw());
+      const endShape = endState.shapes[0];
+      expect(endShape.startX).toBe(400);
+      expect(endShape.startY).toBe(100);
+      expect(endShape.endX).toBe(100);
+      expect(endShape.endY).toBe(500);
+      expect(endShape.x).toBe(100);
+      expect(endShape.y).toBe(100);
+      expect(endShape.width).toBe(300);
+      expect(endShape.height).toBe(400);
+    });
+
+    it('畫線中，滑鼠水平往左 -> 結束畫線', () => {
+      // 起始畫布位置 400, 100
+      const prevPosition = { startX: 400, startY: 100, x: 400, y: 100, type: SHAPE_TYPE.FLOWLINE };
+      const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
+      // 滑鼠移到畫布位置 100, 100
+      const input = { x: 100, y: 100 };
+      const state = chartReducer(prev, chartActions.draw(input));
+
+      const shape = state.shapes[0];
+      expect(shape.startX).toBe(400);
+      expect(shape.startY).toBe(100);
+      expect(shape.endX).toBe(100);
+      expect(shape.endY).toBe(100);
+      expect(shape.x).toBe(100);
+      expect(shape.y).toBe(100);
+      expect(shape.width).toBe(300);
+      expect(shape.height).toBe(0);
+
+      const endState = chartReducer(state, chartActions.endDraw());
+      const endShape = endState.shapes[0];
+      expect(endShape.startX).toBe(400);
+      expect(endShape.startY).toBe(100);
+      expect(endShape.endX).toBe(100);
+      expect(endShape.endY).toBe(100);
+      expect(endShape.x).toBe(100);
+      expect(endShape.y).toBe(100);
+      expect(endShape.width).toBe(300);
+      expect(endShape.height).toBe(0);
+    });
+
+    it('畫線中，滑鼠垂直往下 -> 結束畫線', () => {
+      // 起始畫布位置 400, 100
+      const prevPosition = { startX: 400, startY: 100, x: 400, y: 100, type: SHAPE_TYPE.FLOWLINE };
+      const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
+      // 滑鼠移到畫布位置 400, 600
+      const input = { x: 400, y: 600 };
+      const state = chartReducer(prev, chartActions.draw(input));
+
+      const shape = state.shapes[0];
+      expect(shape.startX).toBe(400);
+      expect(shape.startY).toBe(100);
+      expect(shape.endX).toBe(400);
+      expect(shape.endY).toBe(600);
+      expect(shape.x).toBe(400);
+      expect(shape.y).toBe(100);
+      expect(shape.width).toBe(0);
+      expect(shape.height).toBe(500);
+
+      const endState = chartReducer(state, chartActions.endDraw());
+      const endShape = endState.shapes[0];
+      expect(endShape.startX).toBe(400);
+      expect(endShape.startY).toBe(100);
+      expect(endShape.endX).toBe(400);
+      expect(endShape.endY).toBe(600);
+      expect(endShape.x).toBe(400);
+      expect(endShape.y).toBe(100);
+      expect(endShape.width).toBe(0);
+      expect(endShape.height).toBe(500);
+    });
+
+    it('移動、縮放中', () => {
       const prev = { shapes: [generateShape()], selectedId: 'test-1', activeHandle: 'sw-resize' };
       const payloadShapes = [generateShape({ x: 20, y: 30 })];
-      const state = chartReducer(prev, action({ shapes: payloadShapes }));
+      const state = chartReducer(prev, chartActions.changeShape({ shapes: payloadShapes }));
 
       expect(state.shapes).toBe(payloadShapes);
       expect(state.selectedId).toBe('test-1');

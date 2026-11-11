@@ -2,6 +2,7 @@ import { describe, it, beforeEach, expect } from 'vitest';
 import { makeStore } from './store';
 import { chartActions, selectCanUndo, selectCanRedo } from './chartSlice';
 import { ActionCreators } from 'redux-undo';
+import { SHAPE_TYPE } from '@/utils/shape';
 
 const initialState = {
   shapes: [],
@@ -14,16 +15,11 @@ beforeEach(() => {
   store = makeStore(); // 每個測試開始前都拿到全新的 store
 });
 const getChart = () => store.getState().chart;
-// 回傳「最後一筆被改過」的新 shapes 陣列
-const updateLastShape = (changes) => {
-  const shapes = getChart().present.shapes;
-  return [...shapes.slice(0, -1), { ...shapes[shapes.length - 1], ...changes }];
-};
 // 完整畫一個圖形 startDraw -> draw -> endDraw
-const drawShape = (x, y, drawType) => {
-  store.dispatch(chartActions.startDraw(x, y, drawType));
-  store.dispatch(chartActions.draw({ shapes: updateLastShape({ endX: x + 1, endY: y + 1 }) }));
-  store.dispatch(chartActions.endDraw({ shapes: updateLastShape({ endX: x + 4, endY: y + 4 }) }));
+const drawShape = (startX, startY, drawType, endX, endY) => {
+  store.dispatch(chartActions.startDraw(startX, startY, drawType));
+  store.dispatch(chartActions.draw({ x: endX, y: endY }));
+  store.dispatch(chartActions.endDraw());
 };
 
 describe('整合測試', () => {
@@ -49,20 +45,29 @@ describe('整合測試', () => {
 
     it('畫第一張圖形', () => {
       store.dispatch(chartActions.init({ shapes: [{ id: 'init-id' }] }));
-      drawShape(10, 20, 'process');
+      drawShape(10, 20, SHAPE_TYPE.TERMINAL, 100, 200);
 
       // past: [S0, S1], present: S2, future: []
       expect(getChart().past).toHaveLength(2);
       expect(getChart().past[0].shapes).toHaveLength(0);
       expect(getChart().past[1].shapes).toHaveLength(1);
       expect(getChart().present.shapes).toHaveLength(2);
+      const shapes = getChart().present.shapes;
+      expect(shapes[1].startX).toBe(10);
+      expect(shapes[1].startY).toBe(20);
+      expect(shapes[1].x).toBe(10);
+      expect(shapes[1].y).toBe(20);
+      expect(shapes[1].endX).toBe(100);
+      expect(shapes[1].endY).toBe(200);
+      expect(shapes[1].width).toBe(90);
+      expect(shapes[1].height).toBe(180);
       expect(getChart().future).toHaveLength(0);
     });
 
     it('畫兩個圖形', () => {
       store.dispatch(chartActions.init({ shapes: [{ id: 'init-id' }] }));
-      drawShape(10, 20, 'process');
-      drawShape(30, 40, 'terminal');
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 300);
+      drawShape(30, 40, SHAPE_TYPE.TERMINAL, 100, 600);
 
       // past: [S0, S1, S2], present: S3, future: []
       expect(getChart().past).toHaveLength(3);
@@ -94,19 +99,13 @@ describe('整合測試', () => {
       expect(getChart().present.shapes).toHaveLength(2);
       expect(getChart().future).toHaveLength(0);
 
-      const drawShapes = getChart().present.shapes;
-      const drawLast = drawShapes[drawShapes.length - 1];
-      store.dispatch(chartActions.draw({ shapes: [...drawShapes.slice(0, -1), { ...drawLast, endX: 11, endY: 21 }] }));
+      store.dispatch(chartActions.draw({ x: 11, y: 21 }));
 
       expect(getChart().past).toEqual([s0]);
       expect(getChart().present.shapes).toHaveLength(2);
       expect(getChart().future).toHaveLength(0);
 
-      const endDrawShapes = getChart().present.shapes;
-      const endDrawLast = endDrawShapes[endDrawShapes.length - 1];
-      store.dispatch(
-        chartActions.endDraw({ shapes: [...endDrawShapes.slice(0, -1), { ...endDrawLast, endX: 15, endY: 25 }] })
-      );
+      store.dispatch(chartActions.endDraw());
       const s2 = getChart().present;
 
       expect(getChart().past).toEqual([s0, s1]);
@@ -135,10 +134,10 @@ describe('整合測試', () => {
       store.dispatch(chartActions.init({ shapes: payloadInit }));
       const s1 = getChart().present; // [init]
 
-      drawShape(10, 20, 'process');
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 300);
       const s2 = getChart().present; // [init, A]
 
-      drawShape(30, 40, 'terminal');
+      drawShape(30, 40, SHAPE_TYPE.TERMINAL, 180, 150);
       const s3 = getChart().present; // [init, A, B]
 
       store.dispatch(ActionCreators.undo());
@@ -180,15 +179,15 @@ describe('整合測試', () => {
       store.dispatch(chartActions.init({ shapes: payloadInit }));
       const s1 = getChart().present; // [init]
 
-      drawShape(10, 20, 'process');
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 100);
       const s2 = getChart().present; // [init, A]
 
-      drawShape(30, 40, 'terminal');
+      drawShape(30, 40, SHAPE_TYPE.TERMINAL, 400, 150);
       const s3a = getChart().present; // [init, A, B]
 
       store.dispatch(ActionCreators.undo());
 
-      drawShape(50, 60, 'inputOutput');
+      drawShape(50, 60, SHAPE_TYPE.INPUTOUTPUT, 250, 360);
       const s3b = getChart().present; // [init, A, C]
 
       expect(getChart().future).toHaveLength(0);
