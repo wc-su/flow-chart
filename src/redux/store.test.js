@@ -112,6 +112,21 @@ describe('整合測試', () => {
       expect(getChart().present).toBe(s2);
       expect(getChart().future).toHaveLength(0);
     });
+
+    it('太小的圖形不進歷史', () => {
+      store.dispatch(chartActions.init({ shapes: [{ id: 'init-id' }] }));
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 300);
+
+      const prevState = getChart();
+
+      // 高度不滿 24，取消畫圖
+      store.dispatch(chartActions.startDraw(500, 600, SHAPE_TYPE.INPUTOUTPUT));
+      store.dispatch(chartActions.draw({ x: 400, y: 623 }));
+      store.dispatch(chartActions.cancelDraw());
+
+      expect(getChart().past).toEqual(prevState.past);
+      expect(getChart().present).toEqual(prevState.present);
+    });
   });
 
   describe('測試 undo/redo', () => {
@@ -217,6 +232,42 @@ describe('整合測試', () => {
       // 可以 redo，不能執行 undo
       expect(selectCanUndo(store.getState())).toBe(false);
       expect(selectCanRedo(store.getState())).toBe(true);
+    });
+
+    it('畫完圖後 undo 會取消選取', () => {
+      const payloadInit = [{ id: 'init-id' }];
+      store.dispatch(chartActions.init({ shapes: payloadInit }));
+
+      // 畫圖
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 100);
+      const s2Id = getChart().present.shapes[1].id;
+
+      expect(getChart().present.selectedId).toBe(s2Id);
+
+      // undo
+      store.dispatch(ActionCreators.undo());
+
+      expect(getChart().present.selectedId).toBe(null);
+      expect(getChart().present.shapes).toHaveLength(1);
+    });
+
+    it('取消之後再畫一個，undo 一次', () => {
+      const payloadInit = [{ id: 'init-id' }];
+      store.dispatch(chartActions.init({ shapes: payloadInit }));
+      const s1 = getChart().present;
+
+      // 寬度太小，執行 cancelDraw
+      store.dispatch(chartActions.startDraw(100, 200, SHAPE_TYPE.TERMINAL));
+      store.dispatch(chartActions.draw({ x: 123, y: 400 }));
+      store.dispatch(chartActions.cancelDraw());
+
+      // 正常畫圖
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 100);
+
+      // undo
+      store.dispatch(ActionCreators.undo());
+
+      expect(getChart().present).toBe(s1);
     });
   });
 });

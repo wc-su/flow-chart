@@ -77,17 +77,17 @@ describe('chartReducer', () => {
 
   describe('startDraw', () => {
     it('prepare 產生的 payload', () => {
-      const action = chartActions.startDraw(10, 20, 'process');
+      const action = chartActions.startDraw(10, 20, SHAPE_TYPE.PROCESS);
 
-      expect(action.payload).toEqual({ id: 'test-uuid', x: 10, y: 20, drawType: 'process' });
+      expect(action.payload).toEqual({ id: 'test-uuid', x: 10, y: 20, drawType: SHAPE_TYPE.PROCESS });
     });
 
     it('畫出新圖形的第一步', () => {
       const prev = { shapes: [], selectedId: 'test-1', activeHandle: 'se-resize' };
-      const state = chartReducer(prev, chartActions.startDraw(10, 20, 'process'));
+      const state = chartReducer(prev, chartActions.startDraw(10, 20, SHAPE_TYPE.PROCESS));
 
       expect(state.shapes[0]).toEqual(
-        generateShape({ startX: 10, startY: 20, endX: 10, endY: 20, x: 10, y: 20, type: 'process' })
+        generateShape({ startX: 10, startY: 20, endX: 10, endY: 20, x: 10, y: 20, type: SHAPE_TYPE.PROCESS })
       );
       expect(state.shapes).toHaveLength(1);
       expect(state.selectedId).toBe(prev.selectedId);
@@ -407,6 +407,50 @@ describe('chartReducer', () => {
       expect(endShape.y).toBe(100);
       expect(endShape.width).toBe(0);
       expect(endShape.height).toBe(500);
+    });
+
+    it('endDraw 會選取剛畫的圖形', () => {
+      const prev = {
+        shapes: [
+          generateShape({ id: 'init-id' }),
+          generateShape({ id: 'test-1', startX: 10, startY: 20, endX: 100, endY: 200, x: 10, y: 20 }),
+        ],
+        selectedId: '',
+        activeHandle: '',
+      };
+      const state = chartReducer(prev, chartActions.endDraw());
+
+      expect(state.selectedId).toBe('test-1');
+    });
+
+    it('endDraw 只動最後一個圖形', () => {
+      const prev = {
+        shapes: [
+          generateShape({ id: 'init-id' }),
+          generateShape({ id: 'test-1', startX: 10, startY: 20, endX: 100, endY: 200, x: 10, y: 20 }),
+        ],
+        selectedId: '',
+        activeHandle: '',
+      };
+      const state = chartReducer(prev, chartActions.endDraw());
+
+      expect(state.shapes[0]).toBe(prev.shapes[0]);
+    });
+
+    it('cancelDraw 移除最後一筆', () => {
+      const prev = {
+        shapes: [
+          generateShape({ id: 'init-id' }),
+          generateShape({ id: 'test-1', startX: 10, startY: 20, endX: 100, endY: 200, x: 10, y: 20 }),
+          generateShape({ id: 'test-2', startX: 500, startY: 400, endX: 100, endY: 200, x: 100, y: 200 }),
+        ],
+        selectedId: 'test-1',
+        activeHandle: '',
+      };
+      const state = chartReducer(prev, chartActions.cancelDraw());
+
+      expect(state.shapes.map((shape) => shape.id)).toEqual(['init-id', 'test-1']);
+      expect(state.selectedId).toBe(prev.selectedId);
     });
 
     it('移動、縮放中', () => {

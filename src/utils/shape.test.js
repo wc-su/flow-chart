@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createShape, buildSelectionOverlay } from './shape';
+import { SHAPE_TYPE, createShape, buildSelectionOverlay, isEmptyShape, normalizeBox, toCanvasPoint } from './shape';
 
 const testShapes = [
   // 開新檔 init 時放入的佔位資料，只有 id
@@ -100,7 +100,7 @@ const testShapes = [
 
 describe('createShape: 繪製新圖形的第一步', () => {
   it('畫圖 terminal', () => {
-    const input = { id: 'test-uuid', x: 0, y: 1, drawType: 'terminal' };
+    const input = { id: 'test-uuid', x: 0, y: 1, drawType: SHAPE_TYPE.TERMINAL };
     const obj = createShape(input);
 
     expect(obj.id).toBe(input.id);
@@ -211,5 +211,98 @@ describe('buildSelectionOverlay: 產生圖形選取框、控制點 (線沒有選
     // 只有 start-resize 的控制點為顯示，另一個控制點不顯示
     const visible = output.filter((item) => item.display === 'block').map((item) => item.cursor);
     expect(visible).toEqual(['start-resize']);
+  });
+});
+
+describe('isEmptyShape: 檢驗是否為無效圖形', () => {
+  it.each([
+    ['一般圖形寬高皆大於等於 24，要保留', SHAPE_TYPE.PROCESS, 24, 24, false],
+    ['一般圖形寬小於 24，不保留', SHAPE_TYPE.INPUTOUTPUT, 23, 100, true],
+    ['一般圖形高小於 24，不保留', SHAPE_TYPE.DECISION, 100, 23, true],
+    ['只點一下，不保留', SHAPE_TYPE.DECISION, 0, 0, true],
+    ['水平線長度超過 24 要保留', SHAPE_TYPE.FLOWLINE, 300, 0, false],
+    ['垂直線長度大於等於 24，要保留', SHAPE_TYPE.FLOWLINE, 0, 24, false],
+    ['垂直線長度小於 24，不保留', SHAPE_TYPE.FLOWLINE, 0, 23, true],
+    ['斜線長度大於等於 24，要保留', SHAPE_TYPE.FLOWLINE, 15, 20, false],
+    ['斜線長度小於 24，不保留', SHAPE_TYPE.FLOWLINE, 12, 16, true],
+  ])('%s', (_, type, width, height, expected) => {
+    const res = isEmptyShape(type, width, height);
+
+    expect(res).toBe(expected);
+  });
+});
+
+describe('normalizeBox: 把 start、end 整理成 start 在左上、end 在右下', () => {
+  it('start、end 本來就是左上到右下', () => {
+    const res = normalizeBox({ startX: 10, startY: 20, endX: 100, endY: 200 });
+
+    expect(res.startX).toBe(10);
+    expect(res.startY).toBe(20);
+    expect(res.endX).toBe(100);
+    expect(res.endY).toBe(200);
+  });
+
+  it('start 是右下、end 是左上，兩個位置交換', () => {
+    const res = normalizeBox({ startX: 400, startY: 500, endX: 100, endY: 200 });
+
+    expect(res.startX).toBe(100);
+    expect(res.startY).toBe(200);
+    expect(res.endX).toBe(400);
+    expect(res.endY).toBe(500);
+  });
+
+  it('start 是左下、end 是右上，只有 y 會交換', () => {
+    const res = normalizeBox({ startX: 10, startY: 500, endX: 100, endY: 200 });
+
+    expect(res.startX).toBe(10);
+    expect(res.startY).toBe(200);
+    expect(res.endX).toBe(100);
+    expect(res.endY).toBe(500);
+  });
+
+  it('直接傳整個物件也是可以的', () => {
+    const shape = {
+      id: 'test-uuid',
+      startX: 10,
+      startY: 500,
+      endX: 100,
+      endY: 200,
+      x: 10,
+      y: 200,
+      width: 90,
+      height: 300,
+      type: SHAPE_TYPE.TERMINAL,
+      style: {
+        fill: '#FFFFFF',
+        fillOpacity: '0',
+        stroke: '#000000',
+        strokeWidth: '1.3',
+        strokeMiterlimit: 10,
+        strokeDasharray: '0',
+      },
+      cursor: 'move',
+      pointerEvents: 'all',
+      display: 'block',
+    };
+    const res = normalizeBox(shape);
+
+    expect(res).toEqual({ startX: 10, startY: 200, endX: 100, endY: 500 });
+  });
+});
+
+describe('toCanvasPoint: 滑鼠座標轉換成在畫布上的座標', () => {
+  const rect = { left: 100, top: 50 };
+  it('基本換算', () => {
+    const res = toCanvasPoint({ clientX: 150, clientY: 80, rect, rate: 1 });
+
+    expect(res.x).toBe(50);
+    expect(res.y).toBe(30);
+  });
+
+  it('放大 200% 時除以倍率', () => {
+    const res = toCanvasPoint({ clientX: 150, clientY: 80, rect, rate: 2 });
+
+    expect(res.x).toBe(25);
+    expect(res.y).toBe(15);
   });
 });
