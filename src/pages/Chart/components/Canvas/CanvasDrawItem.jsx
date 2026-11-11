@@ -5,7 +5,7 @@ import Decision from './shapes/Decision';
 import Flowline from './shapes/Flowline';
 import Ellipse from './shapes/Ellipse';
 
-const CanvasDrawItem = ({ shape, newRate }) => {
+const CanvasDrawItem = ({ shape, newRate, onPointerDown }) => {
   let drawShape;
   switch (shape.type) {
     case 'terminal':
@@ -34,6 +34,7 @@ const CanvasDrawItem = ({ shape, newRate }) => {
         cursor: ['start-resize', 'end-resize'].includes(shape.cursor) ? 'pointer' : shape.cursor,
         display: shape.display,
       }}
+      onPointerDown={onPointerDown}
     >
       {drawShape}
     </g>

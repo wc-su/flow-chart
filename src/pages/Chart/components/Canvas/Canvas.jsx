@@ -37,6 +37,12 @@ const Canvas = () => {
   function handlePointerDown(e) {
     if (e.button !== 0) return;
 
+    // 沒選擇工具時點選空白處，取消選取 (點圖形的事件已在 handleShapePointerDown 擋下)
+    if (!tool) {
+      dispatch(chartActions.clearSelection());
+      return;
+    }
+    // 選了繪圖工具時，開始畫新圖形
     if (isDrawTool) {
       drawStatus.current = DRAW_STATUS.DRAWING;
       const position = toCanvasPoint({
@@ -80,6 +86,16 @@ const Canvas = () => {
     }
   }
 
+  function handleShapePointerDown(e, shape) {
+    if (e.button !== 0) return;
+
+    // 擋下事件，不讓它冒泡到畫布的 handlePointerDown 又取消選取
+    e.stopPropagation();
+    if (shape.type !== 'ellipse') {
+      dispatch(chartActions.setSelection({ selectedId: shape.id, activeHandle: '' }));
+    }
+  }
+
   return (
     <div
       className={clsx('canvas', isMoveTool && 'canvas--moving', isDrawTool && 'canvas--drawing')}
@@ -102,11 +118,21 @@ const Canvas = () => {
       >
         {/* 畫圖 */}
         {shapes.map((shape) => (
-          <CanvasDrawItem key={shape.id} shape={shape} newRate={newRate} />
+          <CanvasDrawItem
+            key={shape.id}
+            shape={shape}
+            newRate={newRate}
+            onPointerDown={(e) => handleShapePointerDown(e, shape)}
+          />
         ))}
         {/* 畫圖的外圍 */}
         {selectionOverlay.map((shape) => (
-          <CanvasDrawItem key={shape.id} shape={shape} newRate={newRate} />
+          <CanvasDrawItem
+            key={shape.id}
+            shape={shape}
+            newRate={newRate}
+            onPointerDown={(e) => handleShapePointerDown(e, shape)}
+          />
         ))}
       </svg>
     </div>
