@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { useSelector, useDispatch, useStore } from 'react-redux';
+import clsx from 'clsx';
 
 import { chartActions, selectShapes, selectSelectionOverlay } from '@/redux/chartSlice';
 import { isEmptyShape, toCanvasPoint } from '@/utils/shape';
@@ -30,11 +31,13 @@ const Canvas = () => {
   const selectionOverlay = useSelector(selectSelectionOverlay);
 
   const newRate = 1;
+  const isMoveTool = tool === TOOL.MOVE;
+  const isDrawTool = !!tool && tool !== TOOL.MOVE;
 
   function handlePointerDown(e) {
     if (e.button !== 0) return;
 
-    if (tool && tool !== TOOL.MOVE) {
+    if (isDrawTool) {
       drawStatus.current = DRAW_STATUS.DRAWING;
       const position = toCanvasPoint({
         clientX: e.clientX,
@@ -79,7 +82,7 @@ const Canvas = () => {
 
   return (
     <div
-      className="canvas"
+      className={clsx('canvas', isMoveTool && 'canvas--moving', isDrawTool && 'canvas--drawing')}
       style={{
         top: 0,
         left: 0,
