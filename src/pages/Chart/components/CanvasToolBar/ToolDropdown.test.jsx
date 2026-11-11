@@ -62,4 +62,16 @@ describe('ToolDropdown', () => {
 
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  it('打開時點到會 stopPropagation 的元素，呼叫 onClose', () => {
+    const { onClose } = renderDropdown({ isOpen: true });
+
+    render(<div onPointerDown={(e) => e.stopPropagation()}>Pointer Target</div>);
+
+    const pointerDiv = screen.getByText('Pointer Target');
+
+    fireEvent.pointerDown(pointerDiv);
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 });

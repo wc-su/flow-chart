@@ -24,11 +24,14 @@ const ToolDropdown = ({ options, active, disabled, onSelect, isOpen, onClose, on
       if (e.key === 'Escape') onClose();
     }
 
-    document.addEventListener('pointerdown', handlePointerDown);
+    // 第三個參數 true: 改成在捕獲階段監聽，事件往內傳時 document 會先收到
+    // 用冒泡階段的話，點到圖形時 Canvas 的 stopPropagation 會擋住事件，這邊選單不會關閉
+    document.addEventListener('pointerdown', handlePointerDown, true);
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       // cleanup: 選單關閉或元件消失時移除，不然監聽會一直留著
-      document.removeEventListener('pointerdown', handlePointerDown);
+      // 移除時也要傳 true，和加的時候一致才可以移除
+      document.removeEventListener('pointerdown', handlePointerDown, true);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, onClose]);
