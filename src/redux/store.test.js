@@ -18,8 +18,10 @@ const getChart = () => store.getState().chart;
 // 完整畫一個圖形 startDraw -> draw -> endDraw
 const drawShape = (startX, startY, drawType, endX, endY) => {
   store.dispatch(chartActions.startDraw(startX, startY, drawType));
+  const shapes = getChart().present.shapes;
+  const id = shapes[shapes.length - 1].id;
   store.dispatch(chartActions.draw({ x: endX, y: endY }));
-  store.dispatch(chartActions.endDraw());
+  store.dispatch(chartActions.endDraw({ id }));
 };
 
 describe('整合測試', () => {
@@ -94,6 +96,8 @@ describe('整合測試', () => {
       expect(getChart().future).toHaveLength(0);
 
       store.dispatch(chartActions.startDraw(10, 20, 'inputOutput'));
+      const shapes = getChart().present.shapes;
+      const id = shapes[shapes.length - 1].id;
 
       expect(getChart().past).toEqual([s0]);
       expect(getChart().present.shapes).toHaveLength(2);
@@ -105,7 +109,7 @@ describe('整合測試', () => {
       expect(getChart().present.shapes).toHaveLength(2);
       expect(getChart().future).toHaveLength(0);
 
-      store.dispatch(chartActions.endDraw());
+      store.dispatch(chartActions.endDraw({ id }));
       const s2 = getChart().present;
 
       expect(getChart().past).toEqual([s0, s1]);

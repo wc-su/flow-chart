@@ -3,7 +3,7 @@ import { useSelector, useDispatch, useStore } from 'react-redux';
 import clsx from 'clsx';
 
 import { chartActions, selectShapes, selectSelectionOverlay } from '@/redux/chartSlice';
-import { isEmptyShape, toCanvasPoint } from '@/utils/shape';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, isEmptyShape, toCanvasPoint, isSameShape } from '@/utils/shape';
 import { TOOL } from '@/pages/Chart/components/Tool/tool';
 import { useTool } from '@/pages/Chart/components/Tool/ToolContext';
 
@@ -24,6 +24,7 @@ const Canvas = () => {
   const store = useStore();
 
   const drawStatus = useRef(DRAW_STATUS.IDLE);
+  const moveInitData = useRef({});
 
   const { tool, setTool } = useTool();
 
@@ -67,22 +68,44 @@ const Canvas = () => {
           })
         )
       );
+    } else if (drawStatus.current === DRAW_STATUS.DRAGGING) {
+      const distanceX = (e.clientX - moveInitData.current.clientX) / newRate;
+      const distanceY = (e.clientY - moveInitData.current.clientY) / newRate;
+      dispatch(
+        chartActions.moveShape({
+          initShape: moveInitData.current.shape,
+          distanceX,
+          distanceY,
+        })
+      );
     }
   }
 
   function handlePointerUp() {
     if (drawStatus.current === DRAW_STATUS.DRAWING) {
       const latest = selectShapes(store.getState());
-      const { type, width, height } = latest[latest.length - 1];
+      const { id, type, width, height } = latest[latest.length - 1];
       if (isEmptyShape(type, width, height)) {
         // 移除畫的那筆
         // TODO: 需要有提示訊息嗎？
         dispatch(chartActions.cancelDraw());
       } else {
-        dispatch(chartActions.endDraw());
+        dispatch(chartActions.endDraw({ id }));
       }
       drawStatus.current = DRAW_STATUS.IDLE;
       setTool(null);
+    } else if (drawStatus.current === DRAW_STATUS.DRAGGING) {
+      const latest = selectShapes(store.getState());
+      const { id } = moveInitData.current.shape;
+      if (
+        !isSameShape(
+          moveInitData.current.shape,
+          latest.find((shape) => shape.id === id)
+        )
+      ) {
+        dispatch(chartActions.endDraw({ id }));
+      }
+      drawStatus.current = DRAW_STATUS.IDLE;
     }
   }
 
@@ -93,6 +116,13 @@ const Canvas = () => {
     e.stopPropagation();
     if (shape.type !== 'ellipse') {
       dispatch(chartActions.setSelection({ selectedId: shape.id, activeHandle: '' }));
+      // 記住點選圖形的資訊以及滑鼠的座標位置
+      drawStatus.current = DRAW_STATUS.DRAGGING;
+      moveInitData.current = {
+        shape: shape,
+        clientX: e.clientX,
+        clientY: e.clientY,
+      };
     }
   }
 
@@ -102,8 +132,8 @@ const Canvas = () => {
       style={{
         top: 0,
         left: 0,
-        width: 600 * newRate,
-        height: 800 * newRate,
+        width: CANVAS_WIDTH * newRate,
+        height: CANVAS_HEIGHT * newRate,
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -111,9 +141,9 @@ const Canvas = () => {
       onPointerLeave={handlePointerUp}
     >
       <svg
-        width={600 * newRate}
-        height={800 * newRate}
-        viewBox={`0 0 ${600 * newRate} ${800 * newRate}`}
+        width={CANVAS_WIDTH * newRate}
+        height={CANVAS_HEIGHT * newRate}
+        viewBox={`0 0 ${CANVAS_WIDTH * newRate} ${CANVAS_HEIGHT * newRate}`}
         xmlns="http://www.w3.org/2000/svg"
       >
         {/* 畫圖 */}

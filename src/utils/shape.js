@@ -31,6 +31,8 @@ const lineHandleConfig = [
   { cursor: 'end-resize', x: 1, y: 1 },
 ];
 
+export const CANVAS_WIDTH = 600;
+export const CANVAS_HEIGHT = 800;
 const MIN_SHAPE_SIZE = 24;
 
 export const SHAPE_TYPE = Object.freeze({
@@ -214,4 +216,38 @@ export function isEmptyShape(type, width, height) {
   } else {
     return width < MIN_SHAPE_SIZE || height < MIN_SHAPE_SIZE;
   }
+}
+
+/**
+ * 依傳入的距離差更新初始狀態
+ * @param {Object} params
+ * @param {Object} params.initShape 點下的初始狀態
+ * @param {number} params.distanceX x 的距離差
+ * @param {number} params.distanceY y 的距離差
+ * @returns {Object} 更新後的座標 { x, y, startX, startY, endX, endY }
+ */
+export function getMovedShape({ initShape, distanceX, distanceY }) {
+  const { x, y, startX, startY, endX, endY, width, height } = initShape;
+  const actualX = Math.min(Math.max(x + distanceX, 0), CANVAS_WIDTH - width);
+  const actualY = Math.min(Math.max(y + distanceY, 0), CANVAS_HEIGHT - height);
+  const actualDistanceX = actualX - x;
+  const actualDistanceY = actualY - y;
+  return {
+    x: actualX,
+    y: actualY,
+    startX: startX + actualDistanceX,
+    startY: startY + actualDistanceY,
+    endX: endX + actualDistanceX,
+    endY: endY + actualDistanceY,
+  };
+}
+
+/**
+ * 比對新舊座標，看圖形是否相同
+ * @param {Object} oldShape 舊的圖形
+ * @param {Object} newShape 新的圖形
+ * @returns {boolean} true 表示相同
+ */
+export function isSameShape(oldShape, newShape) {
+  return oldShape.x === newShape.x && oldShape.y === newShape.y;
 }

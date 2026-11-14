@@ -1,5 +1,38 @@
 import { describe, expect, it } from 'vitest';
-import { SHAPE_TYPE, createShape, buildSelectionOverlay, isEmptyShape, normalizeBox, toCanvasPoint } from './shape';
+import {
+  SHAPE_TYPE,
+  createShape,
+  buildSelectionOverlay,
+  isEmptyShape,
+  normalizeBox,
+  toCanvasPoint,
+  getMovedShape,
+  isSameShape,
+} from './shape';
+
+const generateShape = ({ startX, startY, endX, endY, x, y, type }) => ({
+  id: 'test-uuid',
+  startX: startX,
+  startY: startY,
+  endX: endX,
+  endY: endY,
+  x: x,
+  y: y,
+  width: Math.abs(endX - startX),
+  height: Math.abs(endY - startY),
+  type: type,
+  style: {
+    fill: '#FFFFFF',
+    fillOpacity: '0',
+    stroke: '#000000',
+    strokeWidth: '1.3',
+    strokeMiterlimit: 10,
+    strokeDasharray: '0',
+  },
+  cursor: 'move',
+  pointerEvents: 'all',
+  display: 'block',
+});
 
 const testShapes = [
   // 開新檔 init 時放入的佔位資料，只有 id
@@ -304,5 +337,96 @@ describe('toCanvasPoint: 滑鼠座標轉換成在畫布上的座標', () => {
 
     expect(res.x).toBe(25);
     expect(res.y).toBe(15);
+  });
+});
+
+describe('getMovedShape: 拖曳圖形', () => {
+  it('往右下移動', () => {
+    const initShape = generateShape({
+      x: 100,
+      y: 200,
+      startX: 100,
+      startY: 200,
+      endX: 200,
+      endY: 300,
+      type: SHAPE_TYPE.TERMINAL,
+    });
+    const result = getMovedShape({ initShape, distanceX: 5, distanceY: 1 });
+
+    expect(result).toEqual({ x: 105, y: 201, startX: 105, startY: 201, endX: 205, endY: 301 });
+  });
+
+  it('往左上移動', () => {
+    const initShape = generateShape({
+      x: 102,
+      y: 107,
+      startX: 102,
+      startY: 107,
+      endX: 150,
+      endY: 200,
+      type: SHAPE_TYPE.TERMINAL,
+    });
+    const result = getMovedShape({ initShape, distanceX: -2, distanceY: -7 });
+
+    expect(result).toEqual({ x: 100, y: 100, startX: 100, startY: 100, endX: 148, endY: 193 });
+  });
+
+  it('線會保留方向', () => {
+    const initShape = generateShape({
+      x: 100,
+      y: 100,
+      startX: 300,
+      startY: 200,
+      endX: 100,
+      endY: 100,
+      type: SHAPE_TYPE.FLOWLINE,
+    });
+    const result = getMovedShape({ initShape, distanceX: 10, distanceY: 10 });
+
+    expect(result).toEqual({ x: 110, y: 110, startX: 310, startY: 210, endX: 110, endY: 110 });
+  });
+
+  it('往左拖到 x 會變成 −30', () => {
+    const initShape = generateShape({
+      x: 100,
+      y: 100,
+      startX: 100,
+      startY: 100,
+      endX: 300,
+      endY: 200,
+      type: SHAPE_TYPE.TERMINAL,
+    });
+
+    const result = getMovedShape({ initShape, distanceX: -130, distanceY: 50 });
+
+    expect(result).toEqual({ x: 0, y: 150, startX: 0, startY: 150, endX: 200, endY: 250 });
+  });
+
+  it('寬 100 的圖形往右拖到 x 會變成 550', () => {
+    const initShape = generateShape({
+      x: 100,
+      y: 150,
+      startX: 100,
+      startY: 150,
+      endX: 200,
+      endY: 350,
+      type: SHAPE_TYPE.TERMINAL,
+    });
+
+    const result = getMovedShape({ initShape, distanceX: 450, distanceY: 0 });
+
+    expect(result).toEqual({ x: 500, y: 150, startX: 500, startY: 150, endX: 600, endY: 350 });
+  });
+});
+
+describe('isSameShape: 拖曳圖形是否和原本一樣', () => {
+  it.each([
+    ['圖形位置沒變', { x: 100, y: 100 }, { x: 100, y: 100 }, true],
+    ['圖形位置改變', { x: 150, y: 200 }, { x: 300, y: 200 }, false],
+    ['只有 y 不同', { x: 150, y: 200 }, { x: 150, y: 300 }, false],
+  ])('%s', (_, oldShape, newShape, expected) => {
+    const result = isSameShape(oldShape, newShape);
+
+    expect(result).toBe(expected);
   });
 });

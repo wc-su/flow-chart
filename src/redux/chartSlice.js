@@ -1,5 +1,12 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
-import { createShape, buildSelectionOverlay, getDrawingBox, SHAPE_TYPE, normalizeBox } from '@/utils/shape';
+import {
+  createShape,
+  buildSelectionOverlay,
+  getDrawingBox,
+  SHAPE_TYPE,
+  normalizeBox,
+  getMovedShape,
+} from '@/utils/shape';
 import { v4 as uuidv4 } from 'uuid';
 
 const initialState = {
@@ -37,9 +44,16 @@ const chartSlice = createSlice({
       const shape = state.shapes[state.shapes.length - 1];
       Object.assign(shape, getDrawingBox(shape.startX, shape.startY, x, y));
     },
+    // 圖形拖曳中
+    moveShape: (state, action) => {
+      const { initShape, distanceX, distanceY } = action.payload;
+      const shape = state.shapes.find((shape) => shape.id === initShape.id);
+      Object.assign(shape, getMovedShape({ initShape, distanceX, distanceY }));
+    },
     // 畫圖結束時使用
-    endDraw: (state) => {
-      const shape = state.shapes[state.shapes.length - 1];
+    endDraw: (state, action) => {
+      const { id } = action.payload;
+      const shape = state.shapes.find((shape) => shape.id === id);
       if (shape.type !== SHAPE_TYPE.FLOWLINE) {
         Object.assign(shape, normalizeBox(shape));
       }
@@ -49,7 +63,7 @@ const chartSlice = createSlice({
     cancelDraw(state) {
       state.shapes.pop();
     },
-    // 移動、縮放中，滑鼠移動時更新
+    // 縮放中，滑鼠移動時更新
     changeShape: (state, action) => {
       state.shapes = action.payload.shapes;
     },

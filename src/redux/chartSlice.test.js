@@ -111,7 +111,7 @@ describe('chartReducer', () => {
   describe('繪畫', () => {
     it('畫圖中，滑鼠往右下 -> 結束畫圖', () => {
       // 起始畫布位置 10, 20
-      const prevPosition = { startX: 10, startY: 20, x: 10, y: 20 };
+      const prevPosition = { startX: 10, startY: 20, x: 10, y: 20, id: 'test-uuid-1' };
       const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
       // 滑鼠移到畫布位置 100, 200
       const input = { x: 100, y: 200 };
@@ -127,7 +127,7 @@ describe('chartReducer', () => {
       expect(shape.width).toBe(90);
       expect(shape.height).toBe(180);
 
-      const endState = chartReducer(state, chartActions.endDraw());
+      const endState = chartReducer(state, chartActions.endDraw({ id: 'test-uuid-1' }));
       const endShape = endState.shapes[0];
       expect(endShape.startX).toBe(10);
       expect(endShape.startY).toBe(20);
@@ -141,7 +141,7 @@ describe('chartReducer', () => {
 
     it('畫圖中，滑鼠往右上 -> 結束畫圖', () => {
       // 起始畫布位置 10, 500
-      const prevPosition = { startX: 10, startY: 500, x: 10, y: 500 };
+      const prevPosition = { startX: 10, startY: 500, x: 10, y: 500, id: 'test-uuid-1' };
       const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
       // 滑鼠移到畫布位置 100, 200
       const input = { x: 100, y: 200 };
@@ -157,7 +157,7 @@ describe('chartReducer', () => {
       expect(shape.width).toBe(90);
       expect(shape.height).toBe(300);
 
-      const endState = chartReducer(state, chartActions.endDraw());
+      const endState = chartReducer(state, chartActions.endDraw({ id: 'test-uuid-1' }));
       const endShape = endState.shapes[0];
       expect(endShape.startX).toBe(10);
       expect(endShape.startY).toBe(200);
@@ -171,7 +171,7 @@ describe('chartReducer', () => {
 
     it('畫圖中，滑鼠往左上 -> 結束畫圖', () => {
       // 起始畫布位置 400, 500
-      const prevPosition = { startX: 400, startY: 500, x: 400, y: 500 };
+      const prevPosition = { startX: 400, startY: 500, x: 400, y: 500, id: 'test-uuid-1' };
       const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
       // 滑鼠移到畫布位置 100, 200
       const input = { x: 100, y: 200 };
@@ -187,7 +187,7 @@ describe('chartReducer', () => {
       expect(shape.width).toBe(300);
       expect(shape.height).toBe(300);
 
-      const endState = chartReducer(state, chartActions.endDraw());
+      const endState = chartReducer(state, chartActions.endDraw({ id: 'test-uuid-1' }));
       const endShape = endState.shapes[0];
       expect(endShape.startX).toBe(100);
       expect(endShape.startY).toBe(200);
@@ -201,7 +201,7 @@ describe('chartReducer', () => {
 
     it('畫圖中，滑鼠往左下 -> 結束畫圖', () => {
       // 起始畫布位置 400, 100
-      const prevPosition = { startX: 400, startY: 100, x: 400, y: 100 };
+      const prevPosition = { startX: 400, startY: 100, x: 400, y: 100, id: 'test-uuid-1' };
       const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
       // 滑鼠移到畫布位置 100, 500
       const input = { x: 100, y: 500 };
@@ -217,7 +217,7 @@ describe('chartReducer', () => {
       expect(shape.width).toBe(300);
       expect(shape.height).toBe(400);
 
-      const endState = chartReducer(state, chartActions.endDraw());
+      const endState = chartReducer(state, chartActions.endDraw({ id: 'test-uuid-1' }));
       const endShape = endState.shapes[0];
       expect(endShape.startX).toBe(100);
       expect(endShape.startY).toBe(100);
@@ -231,7 +231,7 @@ describe('chartReducer', () => {
 
     it('畫線中，滑鼠往右下 -> 結束畫線', () => {
       // 起始畫布位置 10, 20
-      const prevPosition = { startX: 10, startY: 20, x: 10, y: 20, type: SHAPE_TYPE.FLOWLINE };
+      const prevPosition = { startX: 10, startY: 20, x: 10, y: 20, type: SHAPE_TYPE.FLOWLINE, id: 'test-uuid-1' };
       const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
       // 滑鼠移到畫布位置 100, 200
       const input = { x: 100, y: 200 };
@@ -247,7 +247,7 @@ describe('chartReducer', () => {
       expect(shape.width).toBe(90);
       expect(shape.height).toBe(180);
 
-      const endState = chartReducer(state, chartActions.endDraw());
+      const endState = chartReducer(state, chartActions.endDraw({ id: 'test-uuid-1' }));
       const endShape = endState.shapes[0];
       expect(endShape.startX).toBe(10);
       expect(endShape.startY).toBe(20);
@@ -261,7 +261,7 @@ describe('chartReducer', () => {
 
     it('畫線中，滑鼠往右上 -> 結束畫線', () => {
       // 起始畫布位置 10, 500
-      const prevPosition = { startX: 10, startY: 500, x: 10, y: 500, type: SHAPE_TYPE.FLOWLINE };
+      const prevPosition = { startX: 10, startY: 500, x: 10, y: 500, type: SHAPE_TYPE.FLOWLINE, id: 'test-uuid-1' };
       const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
       // 滑鼠移到畫布位置 100, 200
       const input = { x: 100, y: 200 };
@@ -277,7 +277,7 @@ describe('chartReducer', () => {
       expect(shape.width).toBe(90);
       expect(shape.height).toBe(300);
 
-      const endState = chartReducer(state, chartActions.endDraw());
+      const endState = chartReducer(state, chartActions.endDraw({ id: 'test-uuid-1' }));
       const endShape = endState.shapes[0];
       expect(endShape.startX).toBe(10);
       expect(endShape.startY).toBe(500);
@@ -291,7 +291,7 @@ describe('chartReducer', () => {
 
     it('畫線中，滑鼠往左上 -> 結束畫線', () => {
       // 起始畫布位置 400, 500
-      const prevPosition = { startX: 400, startY: 500, x: 400, y: 500, type: SHAPE_TYPE.FLOWLINE };
+      const prevPosition = { startX: 400, startY: 500, x: 400, y: 500, type: SHAPE_TYPE.FLOWLINE, id: 'test-uuid-1' };
       const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
       // 滑鼠移到畫布位置 100, 200
       const input = { x: 100, y: 200 };
@@ -307,7 +307,7 @@ describe('chartReducer', () => {
       expect(shape.width).toBe(300);
       expect(shape.height).toBe(300);
 
-      const endState = chartReducer(state, chartActions.endDraw());
+      const endState = chartReducer(state, chartActions.endDraw({ id: 'test-uuid-1' }));
       const endShape = endState.shapes[0];
       expect(endShape.startX).toBe(400);
       expect(endShape.startY).toBe(500);
@@ -321,7 +321,7 @@ describe('chartReducer', () => {
 
     it('畫線中，滑鼠往左下 -> 結束畫線', () => {
       // 起始畫布位置 400, 100
-      const prevPosition = { startX: 400, startY: 100, x: 400, y: 100, type: SHAPE_TYPE.FLOWLINE };
+      const prevPosition = { startX: 400, startY: 100, x: 400, y: 100, type: SHAPE_TYPE.FLOWLINE, id: 'test-uuid-1' };
       const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
       // 滑鼠移到畫布位置 100, 500
       const input = { x: 100, y: 500 };
@@ -337,7 +337,7 @@ describe('chartReducer', () => {
       expect(shape.width).toBe(300);
       expect(shape.height).toBe(400);
 
-      const endState = chartReducer(state, chartActions.endDraw());
+      const endState = chartReducer(state, chartActions.endDraw({ id: 'test-uuid-1' }));
       const endShape = endState.shapes[0];
       expect(endShape.startX).toBe(400);
       expect(endShape.startY).toBe(100);
@@ -351,7 +351,7 @@ describe('chartReducer', () => {
 
     it('畫線中，滑鼠水平往左 -> 結束畫線', () => {
       // 起始畫布位置 400, 100
-      const prevPosition = { startX: 400, startY: 100, x: 400, y: 100, type: SHAPE_TYPE.FLOWLINE };
+      const prevPosition = { startX: 400, startY: 100, x: 400, y: 100, type: SHAPE_TYPE.FLOWLINE, id: 'test-uuid-1' };
       const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
       // 滑鼠移到畫布位置 100, 100
       const input = { x: 100, y: 100 };
@@ -367,7 +367,7 @@ describe('chartReducer', () => {
       expect(shape.width).toBe(300);
       expect(shape.height).toBe(0);
 
-      const endState = chartReducer(state, chartActions.endDraw());
+      const endState = chartReducer(state, chartActions.endDraw({ id: 'test-uuid-1' }));
       const endShape = endState.shapes[0];
       expect(endShape.startX).toBe(400);
       expect(endShape.startY).toBe(100);
@@ -381,7 +381,7 @@ describe('chartReducer', () => {
 
     it('畫線中，滑鼠垂直往下 -> 結束畫線', () => {
       // 起始畫布位置 400, 100
-      const prevPosition = { startX: 400, startY: 100, x: 400, y: 100, type: SHAPE_TYPE.FLOWLINE };
+      const prevPosition = { startX: 400, startY: 100, x: 400, y: 100, type: SHAPE_TYPE.FLOWLINE, id: 'test-uuid-1' };
       const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
       // 滑鼠移到畫布位置 400, 600
       const input = { x: 400, y: 600 };
@@ -397,7 +397,7 @@ describe('chartReducer', () => {
       expect(shape.width).toBe(0);
       expect(shape.height).toBe(500);
 
-      const endState = chartReducer(state, chartActions.endDraw());
+      const endState = chartReducer(state, chartActions.endDraw({ id: 'test-uuid-1' }));
       const endShape = endState.shapes[0];
       expect(endShape.startX).toBe(400);
       expect(endShape.startY).toBe(100);
@@ -418,7 +418,7 @@ describe('chartReducer', () => {
         selectedId: '',
         activeHandle: '',
       };
-      const state = chartReducer(prev, chartActions.endDraw());
+      const state = chartReducer(prev, chartActions.endDraw({ id: 'test-1' }));
 
       expect(state.selectedId).toBe('test-1');
     });
@@ -432,7 +432,7 @@ describe('chartReducer', () => {
         selectedId: '',
         activeHandle: '',
       };
-      const state = chartReducer(prev, chartActions.endDraw());
+      const state = chartReducer(prev, chartActions.endDraw({ id: 'test-1' }));
 
       expect(state.shapes[0]).toBe(prev.shapes[0]);
     });
@@ -451,6 +451,58 @@ describe('chartReducer', () => {
 
       expect(state.shapes.map((shape) => shape.id)).toEqual(['init-id', 'test-1']);
       expect(state.selectedId).toBe(prev.selectedId);
+    });
+
+    it('拖曳圖形', () => {
+      const initShape = generateShape({
+        id: 'test-2',
+        x: 200,
+        y: 350,
+        startX: 200,
+        startY: 350,
+        endX: 400,
+        endY: 600,
+        width: 200,
+        height: 250,
+      });
+      const prev = {
+        shapes: [
+          generateShape({
+            id: 'test-1',
+            x: 10,
+            y: 20,
+            startX: 10,
+            startY: 20,
+            endX: 200,
+            endY: 250,
+            width: 190,
+            height: 230,
+          }),
+          initShape,
+        ],
+        selectedId: 'test-2',
+        activeHandle: '',
+      };
+      const moveState = chartReducer(prev, chartActions.moveShape({ initShape, distanceX: 100, distanceY: 150 }));
+
+      const compare = generateShape({
+        id: 'test-2',
+        x: 300,
+        y: 500,
+        startX: 300,
+        startY: 500,
+        endX: 500,
+        endY: 750,
+        width: 200,
+        height: 250,
+      });
+      expect(moveState.shapes[0]).toBe(prev.shapes[0]);
+      expect(moveState.shapes[1]).toEqual(compare);
+
+      const endState = chartReducer(moveState, chartActions.endDraw({ id: 'test-2' }));
+
+      expect(endState.shapes[1]).toEqual(compare);
+      expect(endState.selectedId).toBe('test-2');
     });
 
     it('移動、縮放中', () => {
