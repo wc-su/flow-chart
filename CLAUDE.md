@@ -24,8 +24,7 @@ React 19 · Vite · Redux Toolkit + redux-undo · React Router v7 · Firebase ·
   - `-` 只用在前綴和區塊之間
   - `@keyframes` 名稱也是全域的，用區塊名稱開頭 (`header-logo`)
 - 資料夾命名：代表某個元件、頁面或功能的用大寫開頭，和主檔案同名 (`Header/Header.jsx`)；分類用的資料夾用小寫 (`components`、`shapes`、`images`)
-- 程式碼註解、測試名稱的標點：括號固定用半形 `()`；冒號前面是中文用全形 `：`，
-  前面不是中文 (英文、`)` 等) 用半形 `:`；中英文之間加空格
+- 程式碼註解、測試名稱的標點：括號固定用半形 `()`；冒號前面是中文用全形 `：`，前面不是中文 (英文、`)` 等) 用半形 `:`；中英文之間加空格
 
 ## 測試
 
@@ -37,5 +36,4 @@ React 19 · Vite · Redux Toolkit + redux-undo · React Router v7 · Firebase ·
 - 座標：`x`、`y` 一律是 start、end 中比較小的 (左上角)，`width`、`height` 一律是正數。
 - 畫圖中、縮放中 start 可能比 end 大；放開滑鼠 (`endDraw`) 後，flowline 以外會整理成 start 左上、end 右下，flowline 保留畫的方向 (箭頭)
 - 放開滑鼠 (endDraw) 時，太小的圖形不存、不記進歷史：一般圖形是寬或高小於 24，flowline 是長度小於 24。完全水平或垂直的 flowline 要保留
-- redux-undo 的 filter 只收 `init`、`deleteShape`、`endDraw`；`draw`、`changeShape`
-  是過程中的即時更新、`clear` 放進去會讓清空可以被 undo，都不能放進 filter
+- redux-undo 的 filter 只收 `init`、`deleteShape`、`endDraw`；`draw`、`moveShape`、`changeShape` 是過程中的即時更新、`clear` 放進去會讓清空可以被 undo，都不能放進 filter
