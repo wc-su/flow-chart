@@ -131,6 +131,31 @@ describe('整合測試', () => {
       expect(getChart().past).toEqual(prevState.past);
       expect(getChart().present).toEqual(prevState.present);
     });
+
+    it('縮放圖形', () => {
+      store.dispatch(chartActions.init({ shapes: [{ id: 'init-id' }] }));
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 300);
+
+      const prevState = getChart();
+      const id = prevState.present.shapes[1].id;
+
+      // 選擇剛畫好的圖形
+      store.dispatch(chartActions.setSelection({ selectedId: id, activeHandle: '' }));
+
+      // 縮放選擇的圖形
+      store.dispatch(chartActions.startResize({ id, activeHandle: 'se-resize' }));
+      store.dispatch(chartActions.resizeShape({ x: 400, y: 600 }));
+      store.dispatch(chartActions.endDraw({ id }));
+
+      expect(getChart().present.shapes[1].endX).toBe(400);
+      expect(getChart().present.shapes[1].endY).toBe(600);
+      expect(getChart().present.selectedId).toBe(id);
+      expect(getChart().present.activeHandle).toBe('');
+
+      // undo
+      store.dispatch(ActionCreators.undo());
+      expect(getChart().present).toEqual(prevState.present);
+    });
   });
 
   describe('測試 undo/redo', () => {

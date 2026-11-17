@@ -6,6 +6,7 @@ import {
   SHAPE_TYPE,
   normalizeBox,
   getMovedShape,
+  getResizingBox,
 } from '@/utils/shape';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -38,6 +39,35 @@ const chartSlice = createSlice({
         return { payload: { id: uuidv4(), x, y, drawType } };
       },
     },
+    // 開始縮放圖形
+    startResize: (state, action) => {
+      const { id, activeHandle } = action.payload;
+      const shape = state.shapes.find((shape) => shape.id === id);
+      const { startX, startY, endX, endY } = shape;
+      switch (activeHandle) {
+        case 'nw-resize':
+          shape.startX = endX;
+          shape.startY = endY;
+          shape.endX = startX;
+          shape.endY = startY;
+          break;
+        case 'n-resize':
+        case 'ne-resize':
+          shape.startY = endY;
+          shape.endY = startY;
+          break;
+        case 'w-resize':
+        case 'sw-resize':
+          shape.startX = endX;
+          shape.endX = startX;
+          break;
+        case 'e-resize':
+        case 's-resize':
+        case 'se-resize':
+          break;
+      }
+      state.activeHandle = activeHandle;
+    },
     // 畫圖中，滑鼠移動時更新終點和寬高
     draw: (state, action) => {
       const { x, y } = action.payload;
@@ -50,7 +80,13 @@ const chartSlice = createSlice({
       const shape = state.shapes.find((shape) => shape.id === initShape.id);
       Object.assign(shape, getMovedShape({ initShape, distanceX, distanceY }));
     },
-    // 畫圖結束時使用
+    // 圖形縮放中
+    resizeShape: (state, action) => {
+      const { x, y } = action.payload;
+      const shape = state.shapes.find((shape) => shape.id === state.selectedId);
+      Object.assign(shape, getResizingBox(state.activeHandle, shape, x, y));
+    },
+    // 畫圖結束，會進歷史紀錄
     endDraw: (state, action) => {
       const { id } = action.payload;
       const shape = state.shapes.find((shape) => shape.id === id);
@@ -58,14 +94,28 @@ const chartSlice = createSlice({
         Object.assign(shape, normalizeBox(shape));
       }
       state.selectedId = shape.id;
+      state.activeHandle = '';
+    },
+    // 縮放結束，不會進歷史紀錄
+    normalizeShape: (state, action) => {
+      const { id } = action.payload;
+      const shape = state.shapes.find((shape) => shape.id === id);
+      if (shape.type !== SHAPE_TYPE.FLOWLINE) {
+        Object.assign(shape, normalizeBox(shape));
+      }
+      state.activeHandle = '';
+    },
+    // 縮放結束，還原為開始圖形，不會進歷史紀錄
+    resetShape: (state, action) => {
+      const { id, initShape } = action.payload;
+      const { x, y, startX, startY, endX, endY, width, height } = initShape;
+      const shape = state.shapes.find((shape) => shape.id === id);
+      Object.assign(shape, { x, y, startX, startY, endX, endY, width, height });
+      state.activeHandle = '';
     },
     // 移除最後一筆
     cancelDraw(state) {
       state.shapes.pop();
-    },
-    // 縮放中，滑鼠移動時更新
-    changeShape: (state, action) => {
-      state.shapes = action.payload.shapes;
     },
     setSelection: (state, action) => {
       state.selectedId = action.payload.selectedId;

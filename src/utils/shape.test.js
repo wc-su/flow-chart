@@ -8,9 +8,11 @@ import {
   toCanvasPoint,
   getMovedShape,
   isSameShape,
+  getResizingBox,
+  isEqualShape,
 } from './shape';
 
-const generateShape = ({ startX, startY, endX, endY, x, y, type }) => ({
+const generateShape = ({ startX, startY, endX, endY, x, y, type, ...rest }) => ({
   id: 'test-uuid',
   startX: startX,
   startY: startY,
@@ -32,6 +34,7 @@ const generateShape = ({ startX, startY, endX, endY, x, y, type }) => ({
   cursor: 'move',
   pointerEvents: 'all',
   display: 'block',
+  ...rest,
 });
 
 const testShapes = [
@@ -428,5 +431,319 @@ describe('isSameShape: 拖曳圖形是否和原本一樣', () => {
     const result = isSameShape(oldShape, newShape);
 
     expect(result).toBe(expected);
+  });
+});
+
+describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬高', () => {
+  it('nw，更換 endX/Y，x/y, width/height 重算', () => {
+    const shape = generateShape({
+      x: 100,
+      y: 100,
+      startX: 300,
+      startY: 300,
+      endX: 100,
+      endY: 100,
+      width: 200,
+      height: 200,
+      type: SHAPE_TYPE.TERMINAL,
+      cursor: 'nw-resize',
+    });
+    const result = getResizingBox(shape.cursor, shape, 150, 150);
+
+    expect(result).toEqual({ x: 150, y: 150, startX: 300, startY: 300, endX: 150, endY: 150, width: 150, height: 150 });
+  });
+
+  it('n，endX 不變，y, height 重算', () => {
+    const shape = generateShape({
+      x: 50,
+      y: 250,
+      startX: 50,
+      startY: 350,
+      endX: 350,
+      endY: 250,
+      width: 300,
+      height: 100,
+      type: SHAPE_TYPE.TERMINAL,
+      cursor: 'n-resize',
+    });
+    const result = getResizingBox(shape.cursor, shape, 10, 50);
+
+    expect(result).toEqual({ x: 50, y: 50, startX: 50, startY: 350, endX: 350, endY: 50, width: 300, height: 300 });
+  });
+
+  it('ne，更換 endX/Y，x/y, width/height 重算', () => {
+    const shape = generateShape({
+      x: 150,
+      y: 100,
+      startX: 150,
+      startY: 380,
+      endX: 400,
+      endY: 100,
+      width: 250,
+      height: 280,
+      type: SHAPE_TYPE.TERMINAL,
+      cursor: 'ne-resize',
+    });
+    const result = getResizingBox(shape.cursor, shape, 50, 50);
+
+    expect(result).toEqual({ x: 50, y: 50, startX: 150, startY: 380, endX: 50, endY: 50, width: 100, height: 330 });
+  });
+
+  it('w，endY 不變，x, width 重算', () => {
+    const shape = generateShape({
+      x: 180,
+      y: 50,
+      startX: 320,
+      startY: 50,
+      endX: 180,
+      endY: 120,
+      width: 140,
+      height: 70,
+      type: SHAPE_TYPE.TERMINAL,
+      cursor: 'w-resize',
+    });
+    const result = getResizingBox(shape.cursor, shape, 120, 100);
+
+    expect(result).toEqual({ x: 120, y: 50, startX: 320, startY: 50, endX: 120, endY: 120, width: 200, height: 70 });
+  });
+
+  it('e，endY 不變，x, width 重算', () => {
+    const shape = generateShape({
+      x: 120,
+      y: 100,
+      startX: 120,
+      startY: 100,
+      endX: 200,
+      endY: 350,
+      width: 80,
+      height: 250,
+      type: SHAPE_TYPE.TERMINAL,
+      cursor: 'e-resize',
+    });
+    const result = getResizingBox(shape.cursor, shape, 70, 50);
+
+    expect(result).toEqual({ x: 70, y: 100, startX: 120, startY: 100, endX: 70, endY: 350, width: 50, height: 250 });
+  });
+
+  it('sw，更換 end，x/y, width/height 重算', () => {
+    const shape = generateShape({
+      x: 120,
+      y: 180,
+      startX: 300,
+      startY: 180,
+      endX: 120,
+      endY: 300,
+      width: 180,
+      height: 120,
+      type: SHAPE_TYPE.TERMINAL,
+      cursor: 'sw-resize',
+    });
+    const result = getResizingBox(shape.cursor, shape, 100, 400);
+
+    expect(result).toEqual({ x: 100, y: 180, startX: 300, startY: 180, endX: 100, endY: 400, width: 200, height: 220 });
+  });
+
+  it('s，endX 不變，y, height 重算', () => {
+    const shape = generateShape({
+      x: 150,
+      y: 300,
+      startX: 150,
+      startY: 300,
+      endX: 450,
+      endY: 400,
+      width: 300,
+      height: 200,
+      type: SHAPE_TYPE.TERMINAL,
+      cursor: 's-resize',
+    });
+    const result = getResizingBox(shape.cursor, shape, 500, 800);
+
+    expect(result).toEqual({ x: 150, y: 300, startX: 150, startY: 300, endX: 450, endY: 800, width: 300, height: 500 });
+  });
+
+  it('se，更換 endX/Y，x/y, width/height 重算', () => {
+    const shape = generateShape({
+      x: 50,
+      y: 100,
+      startX: 50,
+      startY: 100,
+      endX: 300,
+      endY: 350,
+      width: 250,
+      height: 250,
+      type: SHAPE_TYPE.TERMINAL,
+      cursor: 'se-resize',
+    });
+    const result = getResizingBox(shape.cursor, shape, 350, 350);
+
+    expect(result).toEqual({ x: 50, y: 100, startX: 50, startY: 100, endX: 350, endY: 350, width: 300, height: 250 });
+  });
+
+  it('start，更換 startX/Y', () => {
+    const shape = generateShape({
+      x: 100,
+      y: 200,
+      startX: 100,
+      startY: 200,
+      endX: 200,
+      endY: 300,
+      width: 100,
+      height: 100,
+      type: SHAPE_TYPE.FLOWLINE,
+      cursor: 'start-resize',
+    });
+    const result = getResizingBox(shape.cursor, shape, 250, 100);
+
+    expect(result).toEqual({ x: 200, y: 100, startX: 250, startY: 100, endX: 200, endY: 300, width: 50, height: 200 });
+  });
+
+  it('end，更換 endX/Y', () => {
+    const shape = generateShape({
+      x: 50,
+      y: 60,
+      startX: 300,
+      startY: 400,
+      endX: 50,
+      endY: 60,
+      width: 250,
+      height: 340,
+      type: SHAPE_TYPE.FLOWLINE,
+      cursor: 'end-resize',
+    });
+    const result = getResizingBox(shape.cursor, shape, 150, 100);
+
+    expect(result).toEqual({ x: 150, y: 100, startX: 300, startY: 400, endX: 150, endY: 100, width: 150, height: 300 });
+  });
+
+  it('Y 方向拖過固定點', () => {
+    const shape = generateShape({
+      x: 100,
+      y: 100,
+      startX: 100,
+      startY: 100,
+      endX: 300,
+      endY: 200,
+      width: 200,
+      height: 100,
+      type: SHAPE_TYPE.PROCESS,
+      cursor: 'se-resize',
+    });
+    const result = getResizingBox(shape.cursor, shape, 200, 50);
+
+    expect(result).toEqual({ x: 100, y: 50, startX: 100, startY: 100, endX: 200, endY: 50, width: 100, height: 50 });
+  });
+});
+
+describe('isEqualShape: 比對新舊圖形起點、終點座標，看圖形是否相同', () => {
+  it('含縮放前大小相同', () => {
+    const oldShape = generateShape({
+      x: 100,
+      y: 200,
+      startX: 100,
+      startY: 200,
+      endX: 200,
+      endY: 300,
+      type: SHAPE_TYPE.INPUTOUTPUT,
+    });
+    const newShape = { ...oldShape, startX: 100, startY: 200, endX: 200, endY: 300 };
+    const result = isEqualShape(oldShape, newShape);
+
+    expect(result).toBe(true);
+  });
+
+  it('含縮放前大小不同', () => {
+    const oldShape = generateShape({
+      x: 100,
+      y: 300,
+      startX: 100,
+      startY: 300,
+      endX: 300,
+      endY: 500,
+      type: SHAPE_TYPE.INPUTOUTPUT,
+    });
+    const newShape = { ...oldShape, startX: 50, startY: 100, endX: 300, endY: 500 };
+    const result = isEqualShape(oldShape, newShape);
+
+    expect(result).toBe(false);
+  });
+
+  it('只有 startY 不同', () => {
+    const oldShape = generateShape({
+      x: 100,
+      y: 300,
+      startX: 100,
+      startY: 300,
+      endX: 300,
+      endY: 500,
+      type: SHAPE_TYPE.INPUTOUTPUT,
+    });
+    const newShape = { ...oldShape, startX: 100, startY: 100, endX: 300, endY: 500 };
+    const result = isEqualShape(oldShape, newShape);
+
+    expect(result).toBe(false);
+  });
+
+  it('只有 endX 不同', () => {
+    const oldShape = generateShape({
+      x: 100,
+      y: 300,
+      startX: 100,
+      startY: 300,
+      endX: 300,
+      endY: 500,
+      type: SHAPE_TYPE.INPUTOUTPUT,
+    });
+    const newShape = { ...oldShape, startX: 100, startY: 300, endX: 400, endY: 500 };
+    const result = isEqualShape(oldShape, newShape);
+
+    expect(result).toBe(false);
+  });
+
+  it('只有 endY 不同', () => {
+    const oldShape = generateShape({
+      x: 100,
+      y: 300,
+      startX: 100,
+      startY: 300,
+      endX: 300,
+      endY: 500,
+      type: SHAPE_TYPE.INPUTOUTPUT,
+    });
+    const newShape = { ...oldShape, startX: 100, startY: 300, endX: 300, endY: 600 };
+    const result = isEqualShape(oldShape, newShape);
+
+    expect(result).toBe(false);
+  });
+
+  it('只有 startX 不同', () => {
+    const oldShape = generateShape({
+      x: 100,
+      y: 300,
+      startX: 100,
+      startY: 300,
+      endX: 300,
+      endY: 500,
+      type: SHAPE_TYPE.INPUTOUTPUT,
+    });
+    const newShape = { ...oldShape, startX: 50, startY: 300, endX: 300, endY: 500 };
+    const result = isEqualShape(oldShape, newShape);
+
+    expect(result).toBe(false);
+  });
+
+  it('線的兩端對調，範圍相同但方向不同', () => {
+    const oldShape = generateShape({
+      x: 100,
+      y: 100,
+      startX: 100,
+      startY: 100,
+      endX: 300,
+      endY: 300,
+      type: SHAPE_TYPE.FLOWLINE,
+    });
+    const newShape = { ...oldShape, startX: 300, startY: 300, endX: 100, endY: 100 };
+    const result = isEqualShape(oldShape, newShape);
+
+    expect(result).toBe(false);
   });
 });

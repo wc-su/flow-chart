@@ -409,7 +409,7 @@ describe('chartReducer', () => {
       expect(endShape.height).toBe(500);
     });
 
-    it('endDraw 會選取剛畫的圖形', () => {
+    it('endDraw 會選取傳入指定 id 的圖形', () => {
       const prev = {
         shapes: [
           generateShape({ id: 'init-id' }),
@@ -423,11 +423,11 @@ describe('chartReducer', () => {
       expect(state.selectedId).toBe('test-1');
     });
 
-    it('endDraw 只動最後一個圖形', () => {
+    it('endDraw 只會異動傳入指定 id 的圖形：整理座標，start 在左上，end 在右下', () => {
       const prev = {
         shapes: [
           generateShape({ id: 'init-id' }),
-          generateShape({ id: 'test-1', startX: 10, startY: 20, endX: 100, endY: 200, x: 10, y: 20 }),
+          generateShape({ id: 'test-1', startX: 100, startY: 200, endX: 10, endY: 20, x: 10, y: 20 }),
         ],
         selectedId: '',
         activeHandle: '',
@@ -435,6 +435,47 @@ describe('chartReducer', () => {
       const state = chartReducer(prev, chartActions.endDraw({ id: 'test-1' }));
 
       expect(state.shapes[0]).toBe(prev.shapes[0]);
+      expect(state.shapes[1].startX).toBe(10);
+      expect(state.shapes[1].startY).toBe(20);
+      expect(state.shapes[1].endX).toBe(100);
+      expect(state.shapes[1].endY).toBe(200);
+    });
+
+    it('endDraw 指定 id 的線，不會整理座標', () => {
+      const prev = {
+        shapes: [
+          generateShape({ id: 'init-id' }),
+          generateShape({
+            id: 'test-1',
+            startX: 100,
+            startY: 200,
+            endX: 10,
+            endY: 20,
+            x: 10,
+            y: 20,
+            type: SHAPE_TYPE.FLOWLINE,
+          }),
+        ],
+        selectedId: '',
+        activeHandle: '',
+      };
+      const state = chartReducer(prev, chartActions.endDraw({ id: 'test-1' }));
+
+      expect(state.shapes).toBe(prev.shapes);
+    });
+
+    it('endDraw 會清除控制點', () => {
+      const prev = {
+        shapes: [
+          generateShape({ id: 'init-id' }),
+          generateShape({ id: 'test-1', startX: 10, startY: 20, endX: 101, endY: 200, x: 10, y: 20 }),
+        ],
+        selectedId: 'test-1',
+        activeHandle: 'se-resize',
+      };
+      const state = chartReducer(prev, chartActions.endDraw({ id: 'test-1' }));
+
+      expect(state.activeHandle).toBe('');
     });
 
     it('cancelDraw 移除最後一筆', () => {
@@ -504,15 +545,249 @@ describe('chartReducer', () => {
       expect(endState.shapes[1]).toEqual(compare);
       expect(endState.selectedId).toBe('test-2');
     });
+  });
 
-    it('移動、縮放中', () => {
-      const prev = { shapes: [generateShape()], selectedId: 'test-1', activeHandle: 'sw-resize' };
-      const payloadShapes = [generateShape({ x: 20, y: 30 })];
-      const state = chartReducer(prev, chartActions.changeShape({ shapes: payloadShapes }));
+  describe('startResize', () => {
+    it('nw，互換 x, y 位置，固定點為右下', () => {
+      const prev = {
+        shapes: [
+          generateShape({ id: 'test-1' }),
+          generateShape({ id: 'test-2', startX: 100, startY: 50, endX: 300, endY: 200 }),
+        ],
+        selectedId: 'test-2',
+        activeHandle: '',
+      };
+      const state = chartReducer(prev, chartActions.startResize({ id: 'test-2', activeHandle: 'nw-resize' }));
 
-      expect(state.shapes).toBe(payloadShapes);
-      expect(state.selectedId).toBe('test-1');
+      expect(state.shapes[0]).toBe(prev.shapes[0]);
+      expect(state.shapes[1]).toEqual(generateShape({ id: 'test-2', startX: 300, startY: 200, endX: 100, endY: 50 }));
+      expect(state.activeHandle).toBe('nw-resize');
+    });
+
+    it('n，互換 y 位置，固定點為左下', () => {
+      const prev = {
+        shapes: [generateShape({ id: 'test-1', startX: 50, startY: 250, endX: 350, endY: 350 })],
+        selectedId: 'test-1',
+        activeHandle: '',
+      };
+      const state = chartReducer(prev, chartActions.startResize({ id: 'test-1', activeHandle: 'n-resize' }));
+
+      expect(state.shapes[0]).toEqual(generateShape({ id: 'test-1', startX: 50, startY: 350, endX: 350, endY: 250 }));
+      expect(state.activeHandle).toBe('n-resize');
+    });
+
+    it('ne，互換 y 位置，固定點為左下', () => {
+      const prev = {
+        shapes: [generateShape({ id: 'test-1', startX: 150, startY: 100, endX: 400, endY: 380 })],
+        selectedId: 'test-1',
+        activeHandle: '',
+      };
+      const state = chartReducer(prev, chartActions.startResize({ id: 'test-1', activeHandle: 'ne-resize' }));
+
+      expect(state.shapes[0]).toEqual(generateShape({ id: 'test-1', startX: 150, startY: 380, endX: 400, endY: 100 }));
+      expect(state.activeHandle).toBe('ne-resize');
+    });
+
+    it('w，互換 x 位置，固定點為右上', () => {
+      const prev = {
+        shapes: [generateShape({ id: 'test-1', startX: 180, startY: 50, endX: 320, endY: 120 })],
+        selectedId: 'test-1',
+        activeHandle: '',
+      };
+      const state = chartReducer(prev, chartActions.startResize({ id: 'test-1', activeHandle: 'w-resize' }));
+
+      expect(state.shapes[0]).toEqual(generateShape({ id: 'test-1', startX: 320, startY: 50, endX: 180, endY: 120 }));
+      expect(state.activeHandle).toBe('w-resize');
+    });
+
+    it('sw，互換 x 位置，固定點為右上', () => {
+      const prev = {
+        shapes: [generateShape({ id: 'test-1', startX: 120, startY: 180, endX: 300, endY: 300 })],
+        selectedId: 'test-1',
+        activeHandle: '',
+      };
+      const state = chartReducer(prev, chartActions.startResize({ id: 'test-1', activeHandle: 'sw-resize' }));
+
+      expect(state.shapes[0]).toEqual(generateShape({ id: 'test-1', startX: 300, startY: 180, endX: 120, endY: 300 }));
       expect(state.activeHandle).toBe('sw-resize');
+    });
+
+    it.each([
+      ['e，不變', 'e-resize', 120, 100, 200, 350],
+      ['s，不變', 's-resize', 150, 300, 450, 400],
+      ['se，不變', 'se-resize', 50, 100, 300, 350],
+      ['start，不變', 'start-resize', 100, 100, 200, 300],
+      ['end，不變', 'end-resize', 300, 400, 50, 60],
+    ])('%s', (_, cursor, startX, startY, endX, endY) => {
+      const prev = {
+        shapes: [generateShape({ id: 'test-1', startX, startY, endX, endY })],
+        selectedId: 'test-1',
+        activeHandle: '',
+      };
+      const state = chartReducer(prev, chartActions.startResize({ id: 'test-1', activeHandle: cursor }));
+
+      expect(state.shapes[0]).toBe(prev.shapes[0]);
+      expect(state.activeHandle).toBe(cursor);
+    });
+  });
+
+  describe('resizeShape', () => {
+    it('圖形縮放中', () => {
+      const prev = {
+        shapes: [
+          generateShape({
+            id: 'test-1',
+            startX: 120,
+            startY: 180,
+            endX: 300,
+            endY: 350,
+            x: 120,
+            y: 180,
+            width: 180,
+            height: 170,
+          }),
+        ],
+        selectedId: 'test-1',
+        activeHandle: 'se-resize',
+      };
+      const state = chartReducer(prev, chartActions.resizeShape({ x: 400, y: 450 }));
+
+      expect(state.shapes[0].endX).toBe(400);
+      expect(state.shapes[0].endY).toBe(450);
+      expect(state.shapes[0].width).toBe(280);
+      expect(state.shapes[0].height).toBe(270);
+      // 不會異動 selectedId, activeHandle
+      expect(state.selectedId).toBe(prev.selectedId);
+      expect(state.activeHandle).toBe(prev.activeHandle);
+    });
+  });
+
+  describe('normalizeShape', () => {
+    it('圖形的控制點選擇右下，滑鼠移動位置和終點相同', () => {
+      const prev = {
+        shapes: [
+          generateShape({
+            id: 'test-1',
+            startX: 120,
+            startY: 180,
+            endX: 300,
+            endY: 350,
+            x: 120,
+            y: 180,
+            width: 180,
+            height: 170,
+          }),
+        ],
+        selectedId: 'test-1',
+        activeHandle: '',
+      };
+      const startState = chartReducer(prev, chartActions.startResize({ id: 'test-1', activeHandle: 'se-resize' }));
+      const resizeState = chartReducer(startState, chartActions.resizeShape({ x: 300, y: 350 }));
+      const normalizeState = chartReducer(resizeState, chartActions.normalizeShape({ id: 'test-1' }));
+
+      expect(normalizeState.shapes).toEqual(prev.shapes);
+      expect(normalizeState.selectedId).toBe(prev.selectedId);
+      expect(normalizeState.activeHandle).toBe('');
+    });
+
+    it('圖形控制點選擇左上，滑鼠移動位置和終點相同', () => {
+      const prev = {
+        shapes: [
+          generateShape({
+            id: 'test-1',
+            startX: 120,
+            startY: 180,
+            endX: 300,
+            endY: 350,
+            x: 120,
+            y: 180,
+            width: 180,
+            height: 170,
+          }),
+        ],
+        selectedId: 'test-1',
+        activeHandle: '',
+      };
+      // 控制點在 nw，start 和 end 位置互換
+      const startState = chartReducer(prev, chartActions.startResize({ id: 'test-1', activeHandle: 'nw-resize' }));
+      expect(startState.shapes[0].startX).toBe(300);
+      expect(startState.shapes[0].startY).toBe(350);
+      expect(startState.shapes[0].endX).toBe(120);
+      expect(startState.shapes[0].endY).toBe(180);
+
+      // 圖形最後位置和 endX/Y 相同
+      const resizeState = chartReducer(startState, chartActions.resizeShape({ x: 120, y: 180 }));
+
+      const normalizeState = chartReducer(resizeState, chartActions.normalizeShape({ id: 'test-1' }));
+      expect(normalizeState.shapes).toEqual(prev.shapes);
+      expect(normalizeState.selectedId).toBe(prev.selectedId);
+      expect(normalizeState.activeHandle).toBe('');
+    });
+
+    it('線的控制點選擇終點，滑鼠移動位置和終點相同', () => {
+      const prev = {
+        shapes: [
+          generateShape({
+            id: 'test-1',
+            startX: 300,
+            startY: 350,
+            endX: 120,
+            endY: 180,
+            x: 120,
+            y: 180,
+            width: 180,
+            height: 170,
+            type: SHAPE_TYPE.FLOWLINE,
+          }),
+        ],
+        selectedId: 'test-1',
+        activeHandle: '',
+      };
+      // 控制點在 end，線不會更改 start, end
+      const startState = chartReducer(prev, chartActions.startResize({ id: 'test-1', activeHandle: 'end-resize' }));
+      expect(startState.shapes).toBe(prev.shapes);
+
+      // 圖形最後位置和 endX/Y 相同
+      const resizeState = chartReducer(startState, chartActions.resizeShape({ x: 120, y: 180 }));
+
+      const normalizeState = chartReducer(resizeState, chartActions.normalizeShape({ id: 'test-1' }));
+      expect(normalizeState.shapes).toEqual(prev.shapes);
+      expect(normalizeState.selectedId).toBe(prev.selectedId);
+      expect(normalizeState.activeHandle).toBe('');
+    });
+  });
+
+  describe('resetShape', () => {
+    it('圖形最後寬度小於 24', () => {
+      const prev = {
+        shapes: [
+          generateShape({
+            id: 'test-1',
+            startX: 120,
+            startY: 180,
+            endX: 300,
+            endY: 350,
+            x: 120,
+            y: 180,
+            width: 180,
+            height: 170,
+          }),
+        ],
+        selectedId: 'test-1',
+        activeHandle: 'se-resize',
+      };
+      // 寬小於 24
+      const resizeState = chartReducer(prev, chartActions.resizeShape({ x: 143, y: 350 }));
+      expect(resizeState.shapes[0].width).toBe(23);
+
+      const resetState = chartReducer(
+        resizeState,
+        chartActions.resetShape({ id: 'test-1', initShape: prev.shapes[0] })
+      );
+
+      expect(resetState.shapes).toEqual(prev.shapes);
+      expect(resetState.selectedId).toBe(prev.selectedId);
+      expect(resetState.activeHandle).toBe('');
     });
   });
 

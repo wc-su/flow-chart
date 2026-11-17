@@ -3,7 +3,16 @@ import { useSelector, useDispatch, useStore } from 'react-redux';
 import clsx from 'clsx';
 
 import { chartActions, selectShapes, selectSelectionOverlay } from '@/redux/chartSlice';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, isEmptyShape, toCanvasPoint, isSameShape } from '@/utils/shape';
+import {
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  isEmptyShape,
+  toCanvasPoint,
+  isSameShape,
+  isEqualShape,
+  normalizeBox,
+  SHAPE_TYPE,
+} from '@/utils/shape';
 import { TOOL } from '@/pages/Chart/components/Tool/tool';
 import { useTool } from '@/pages/Chart/components/Tool/ToolContext';
 
@@ -78,6 +87,17 @@ const Canvas = () => {
           distanceY,
         })
       );
+    } else if (drawStatus.current === DRAW_STATUS.RESIZING) {
+      dispatch(
+        chartActions.resizeShape(
+          toCanvasPoint({
+            clientX: e.clientX,
+            clientY: e.clientY,
+            rect: e.currentTarget.getBoundingClientRect(),
+            rate: newRate,
+          })
+        )
+      );
     }
   }
 
@@ -106,23 +126,55 @@ const Canvas = () => {
         dispatch(chartActions.endDraw({ id }));
       }
       drawStatus.current = DRAW_STATUS.IDLE;
+    } else if (drawStatus.current === DRAW_STATUS.RESIZING) {
+      const latestShapes = selectShapes(store.getState());
+      const initShape = moveInitData.current.shape;
+      const { id } = initShape;
+      const latestShape = latestShapes.find((shape) => shape.id === id);
+      const { type, width, height } = latestShape;
+      if (isEmptyShape(type, width, height)) {
+        // 還原成 initShape
+        // TODO: 需要有提示訊息嗎？
+        dispatch(chartActions.resetShape({ id, initShape }));
+      } else {
+        const isFlowline = type === SHAPE_TYPE.FLOWLINE;
+        const isEqual = isEqualShape(initShape, isFlowline ? latestShape : normalizeBox(latestShape));
+        if (isEqual) {
+          dispatch(chartActions.normalizeShape({ id }));
+        } else {
+          dispatch(chartActions.endDraw({ id }));
+        }
+      }
+      drawStatus.current = DRAW_STATUS.IDLE;
     }
   }
 
   function handleShapePointerDown(e, shape) {
     if (e.button !== 0) return;
 
-    // 擋下事件，不讓它冒泡到畫布的 handlePointerDown 又取消選取
+    // 擋下事件，不讓它冒泡到畫布的 handlePointerDown 又被取消選取
     e.stopPropagation();
-    if (shape.type !== 'ellipse') {
-      dispatch(chartActions.setSelection({ selectedId: shape.id, activeHandle: '' }));
+    if (shape.type === 'ellipse') {
+      const latest = selectShapes(store.getState());
+      const { relationId, cursor } = shape;
       // 記住點選圖形的資訊以及滑鼠的座標位置
-      drawStatus.current = DRAW_STATUS.DRAGGING;
+      moveInitData.current = {
+        shape: latest.find((item) => item.id === relationId),
+        clientX: e.clientX,
+        clientY: e.clientY,
+      };
+      // 傳入 id 為要調整座標的圖形
+      dispatch(chartActions.startResize({ id: relationId, activeHandle: cursor }));
+      drawStatus.current = DRAW_STATUS.RESIZING;
+    } else {
+      // 記住點選圖形的資訊以及滑鼠的座標位置
       moveInitData.current = {
         shape: shape,
         clientX: e.clientX,
         clientY: e.clientY,
       };
+      dispatch(chartActions.setSelection({ selectedId: shape.id, activeHandle: '' }));
+      drawStatus.current = DRAW_STATUS.DRAGGING;
     }
   }
 

@@ -98,6 +98,9 @@ export function buildSelectionOverlay(shapes, selectedId, activeHandle) {
       box.y = box.startY;
     }
 
+    // 增加 relationId，對應被點選的圖形 id
+    box.relationId = box.id;
+
     // 控制點的樣板：必須在下面改成選取框之前複製，否則會繼承 pointerEvents: 'none'，控制點會點不到
     const handleBase = JSON.parse(JSON.stringify(box));
 
@@ -250,4 +253,63 @@ export function getMovedShape({ initShape, distanceX, distanceY }) {
  */
 export function isSameShape(oldShape, newShape) {
   return oldShape.x === newShape.x && oldShape.y === newShape.y;
+}
+
+/**
+ * 依控制點、圖形、滑鼠位置計算 x, y 和寬高
+ * @param {string} activeHandle 控制點
+ * @param {Object} shape 圖形
+ * @param {number} pointerX 滑鼠在畫布位置 X
+ * @param {number} pointerY 滑鼠在畫布位置 Y
+ * @returns {Object} 計算的起點、終點、x, y 和寬高
+ */
+export function getResizingBox(activeHandle, shape, pointerX, pointerY) {
+  const result = {
+    startX: shape.startX,
+    startY: shape.startY,
+    endX: shape.endX,
+    endY: shape.endY,
+    x: Math.min(shape.startX, shape.endX),
+    y: Math.min(shape.startY, shape.endY),
+    width: Math.abs(shape.endX - shape.startX),
+    height: Math.abs(shape.endY - shape.startY),
+  };
+
+  // n、s 控制點僅可動垂直方向 (Y)，不可異動 X，將其排除
+  const changeX = !['n-resize', 's-resize'].includes(activeHandle);
+  // w、e 控制點只能動水平方向 (X)，不可異動 Y，將其排除
+  const changeY = !['w-resize', 'e-resize'].includes(activeHandle);
+
+  if (activeHandle === 'start-resize') {
+    result.startX = pointerX;
+    result.startY = pointerY;
+  } else {
+    if (changeX) result.endX = pointerX;
+    if (changeY) result.endY = pointerY;
+  }
+  if (changeX) {
+    result.x = Math.min(result.startX, result.endX);
+    result.width = Math.abs(result.endX - result.startX);
+  }
+  if (changeY) {
+    result.y = Math.min(result.startY, result.endY);
+    result.height = Math.abs(result.endY - result.startY);
+  }
+
+  return result;
+}
+
+/**
+ * 比對新舊圖形起點、終點座標，看圖形是否相同
+ * @param {Object} oldShape 舊的圖形
+ * @param {Object} newShape 新的圖形
+ * @returns {boolean} true 表示相同
+ */
+export function isEqualShape(oldShape, newShape) {
+  return (
+    oldShape.startX === newShape.startX &&
+    oldShape.startY === newShape.startY &&
+    oldShape.endX === newShape.endX &&
+    oldShape.endY === newShape.endY
+  );
 }
