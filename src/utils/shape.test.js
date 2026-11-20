@@ -173,17 +173,17 @@ describe('buildSelectionOverlay: 產生圖形選取框、控制點 (線沒有選
     const selectionBox = output[0];
     expect(selectionBox.type).toBe('process');
     expect(selectionBox.style).toMatchObject({ stroke: '#00a8ff', strokeDasharray: '3' });
-    // 取得控制點，確認 id, cursor, x, y
-    const handles = output.slice(1).map(({ id, cursor, x, y }) => ({ id, cursor, x, y }));
+    // 取得控制點，確認 id, handle, cursor, x, y
+    const handles = output.slice(1).map(({ id, handle, cursor, x, y }) => ({ id, handle, cursor, x, y }));
     expect(handles).toEqual([
-      { id: 'test-uuid-terminal:nw-resize', cursor: 'nw-resize', x: 10, y: 20 },
-      { id: 'test-uuid-terminal:n-resize', cursor: 'n-resize', x: 60, y: 20 },
-      { id: 'test-uuid-terminal:ne-resize', cursor: 'ne-resize', x: 110, y: 20 },
-      { id: 'test-uuid-terminal:w-resize', cursor: 'w-resize', x: 10, y: 45 },
-      { id: 'test-uuid-terminal:e-resize', cursor: 'e-resize', x: 110, y: 45 },
-      { id: 'test-uuid-terminal:sw-resize', cursor: 'sw-resize', x: 10, y: 70 },
-      { id: 'test-uuid-terminal:s-resize', cursor: 's-resize', x: 60, y: 70 },
-      { id: 'test-uuid-terminal:se-resize', cursor: 'se-resize', x: 110, y: 70 },
+      { id: 'test-uuid-terminal:nw-resize', handle: 'nw-resize', cursor: 'nw-resize', x: 10, y: 20 },
+      { id: 'test-uuid-terminal:n-resize', handle: 'n-resize', cursor: 'n-resize', x: 60, y: 20 },
+      { id: 'test-uuid-terminal:ne-resize', handle: 'ne-resize', cursor: 'ne-resize', x: 110, y: 20 },
+      { id: 'test-uuid-terminal:w-resize', handle: 'w-resize', cursor: 'w-resize', x: 10, y: 45 },
+      { id: 'test-uuid-terminal:e-resize', handle: 'e-resize', cursor: 'e-resize', x: 110, y: 45 },
+      { id: 'test-uuid-terminal:sw-resize', handle: 'sw-resize', cursor: 'sw-resize', x: 10, y: 70 },
+      { id: 'test-uuid-terminal:s-resize', handle: 's-resize', cursor: 's-resize', x: 60, y: 70 },
+      { id: 'test-uuid-terminal:se-resize', handle: 'se-resize', cursor: 'se-resize', x: 110, y: 70 },
     ]);
     // 選取框不可選取，但控制點可選取
     expect(selectionBox.pointerEvents).toBe('none');
@@ -199,7 +199,7 @@ describe('buildSelectionOverlay: 產生圖形選取框、控制點 (線沒有選
     // 只有 nw-resize 的控制點為顯示，選取框以及其他控制點不顯示
     const visible = output.filter((item) => item.display === 'block');
     expect(visible).toHaveLength(1);
-    expect(visible[0]).toMatchObject({ cursor: 'nw-resize', x: 10, y: 20 });
+    expect(visible[0]).toMatchObject({ handle: 'nw-resize', cursor: 'nw-resize', x: 10, y: 20 });
   });
 
   it('不會改到傳進去的 shapes', () => {
@@ -216,11 +216,11 @@ describe('buildSelectionOverlay: 產生圖形選取框、控制點 (線沒有選
     const output = buildSelectionOverlay(testShapes, 'test-uuid-flowline', '');
 
     expect(output).toHaveLength(2);
-    // 取得控制點，確認 id, cursor, x, y
-    const handles = output.map(({ id, cursor, x, y }) => ({ id, cursor, x, y }));
+    // 取得控制點，確認 id, handle, cursor, x, y
+    const handles = output.map(({ id, handle, cursor, x, y }) => ({ id, handle, cursor, x, y }));
     expect(handles).toEqual([
-      { id: 'test-uuid-flowline:start-resize', cursor: 'start-resize', x: 50, y: 60 },
-      { id: 'test-uuid-flowline:end-resize', cursor: 'end-resize', x: 150, y: 100 },
+      { id: 'test-uuid-flowline:start-resize', handle: 'start-resize', cursor: 'pointer', x: 50, y: 60 },
+      { id: 'test-uuid-flowline:end-resize', handle: 'end-resize', cursor: 'pointer', x: 150, y: 100 },
     ]);
 
     // 皆可選取
@@ -232,11 +232,11 @@ describe('buildSelectionOverlay: 產生圖形選取框、控制點 (線沒有選
     const output = buildSelectionOverlay(testShapes, 'test-uuid-flowline-reverse', '');
 
     expect(output).toHaveLength(2);
-    // 取得控制點，確認 id, cursor, x, y
-    const handles = output.map(({ id, cursor, x, y }) => ({ id, cursor, x, y }));
+    // 取得控制點，確認 id, handle, cursor, x, y
+    const handles = output.map(({ id, handle, cursor, x, y }) => ({ id, handle, cursor, x, y }));
     expect(handles).toEqual([
-      { id: 'test-uuid-flowline-reverse:start-resize', cursor: 'start-resize', x: 150, y: 100 },
-      { id: 'test-uuid-flowline-reverse:end-resize', cursor: 'end-resize', x: 50, y: 60 },
+      { id: 'test-uuid-flowline-reverse:start-resize', handle: 'start-resize', cursor: 'pointer', x: 150, y: 100 },
+      { id: 'test-uuid-flowline-reverse:end-resize', handle: 'end-resize', cursor: 'pointer', x: 50, y: 60 },
     ]);
   });
 
@@ -245,7 +245,7 @@ describe('buildSelectionOverlay: 產生圖形選取框、控制點 (線沒有選
 
     expect(output).toHaveLength(2);
     // 只有 start-resize 的控制點為顯示，另一個控制點不顯示
-    const visible = output.filter((item) => item.display === 'block').map((item) => item.cursor);
+    const visible = output.filter((item) => item.display === 'block').map((item) => item.handle);
     expect(visible).toEqual(['start-resize']);
   });
 });
@@ -564,6 +564,7 @@ describe('isSameShape: 拖曳圖形是否和原本一樣', () => {
 
 describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬高', () => {
   it('nw，更換 endX/Y，x/y, width/height 重算', () => {
+    const handle = 'nw-resize';
     const shape = generateShape({
       x: 100,
       y: 100,
@@ -574,14 +575,14 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
       width: 200,
       height: 200,
       type: SHAPE_TYPE.TERMINAL,
-      cursor: 'nw-resize',
     });
-    const result = getResizingBox(shape.cursor, shape, 150, 150);
+    const result = getResizingBox(handle, shape, 150, 150);
 
     expect(result).toEqual({ x: 150, y: 150, startX: 300, startY: 300, endX: 150, endY: 150, width: 150, height: 150 });
   });
 
   it('n，endX 不變，y, height 重算', () => {
+    const handle = 'n-resize';
     const shape = generateShape({
       x: 50,
       y: 250,
@@ -592,14 +593,14 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
       width: 300,
       height: 100,
       type: SHAPE_TYPE.TERMINAL,
-      cursor: 'n-resize',
     });
-    const result = getResizingBox(shape.cursor, shape, 10, 50);
+    const result = getResizingBox(handle, shape, 10, 50);
 
     expect(result).toEqual({ x: 50, y: 50, startX: 50, startY: 350, endX: 350, endY: 50, width: 300, height: 300 });
   });
 
   it('ne，更換 endX/Y，x/y, width/height 重算', () => {
+    const handle = 'ne-resize';
     const shape = generateShape({
       x: 150,
       y: 100,
@@ -610,14 +611,14 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
       width: 250,
       height: 280,
       type: SHAPE_TYPE.TERMINAL,
-      cursor: 'ne-resize',
     });
-    const result = getResizingBox(shape.cursor, shape, 50, 50);
+    const result = getResizingBox(handle, shape, 50, 50);
 
     expect(result).toEqual({ x: 50, y: 50, startX: 150, startY: 380, endX: 50, endY: 50, width: 100, height: 330 });
   });
 
   it('w，endY 不變，x, width 重算', () => {
+    const handle = 'w-resize';
     const shape = generateShape({
       x: 180,
       y: 50,
@@ -628,14 +629,14 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
       width: 140,
       height: 70,
       type: SHAPE_TYPE.TERMINAL,
-      cursor: 'w-resize',
     });
-    const result = getResizingBox(shape.cursor, shape, 120, 100);
+    const result = getResizingBox(handle, shape, 120, 100);
 
     expect(result).toEqual({ x: 120, y: 50, startX: 320, startY: 50, endX: 120, endY: 120, width: 200, height: 70 });
   });
 
   it('e，endY 不變，x, width 重算', () => {
+    const handle = 'e-resize';
     const shape = generateShape({
       x: 120,
       y: 100,
@@ -646,14 +647,14 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
       width: 80,
       height: 250,
       type: SHAPE_TYPE.TERMINAL,
-      cursor: 'e-resize',
     });
-    const result = getResizingBox(shape.cursor, shape, 70, 50);
+    const result = getResizingBox(handle, shape, 70, 50);
 
     expect(result).toEqual({ x: 70, y: 100, startX: 120, startY: 100, endX: 70, endY: 350, width: 50, height: 250 });
   });
 
   it('sw，更換 end，x/y, width/height 重算', () => {
+    const handle = 'sw-resize';
     const shape = generateShape({
       x: 120,
       y: 180,
@@ -664,14 +665,14 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
       width: 180,
       height: 120,
       type: SHAPE_TYPE.TERMINAL,
-      cursor: 'sw-resize',
     });
-    const result = getResizingBox(shape.cursor, shape, 100, 400);
+    const result = getResizingBox(handle, shape, 100, 400);
 
     expect(result).toEqual({ x: 100, y: 180, startX: 300, startY: 180, endX: 100, endY: 400, width: 200, height: 220 });
   });
 
   it('s，endX 不變，y, height 重算', () => {
+    const handle = 's-resize';
     const shape = generateShape({
       x: 150,
       y: 300,
@@ -682,14 +683,14 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
       width: 300,
       height: 200,
       type: SHAPE_TYPE.TERMINAL,
-      cursor: 's-resize',
     });
-    const result = getResizingBox(shape.cursor, shape, 500, 800);
+    const result = getResizingBox(handle, shape, 500, 800);
 
     expect(result).toEqual({ x: 150, y: 300, startX: 150, startY: 300, endX: 450, endY: 800, width: 300, height: 500 });
   });
 
   it('se，更換 endX/Y，x/y, width/height 重算', () => {
+    const handle = 'se-resize';
     const shape = generateShape({
       x: 50,
       y: 100,
@@ -700,14 +701,14 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
       width: 250,
       height: 250,
       type: SHAPE_TYPE.TERMINAL,
-      cursor: 'se-resize',
     });
-    const result = getResizingBox(shape.cursor, shape, 350, 350);
+    const result = getResizingBox(handle, shape, 350, 350);
 
     expect(result).toEqual({ x: 50, y: 100, startX: 50, startY: 100, endX: 350, endY: 350, width: 300, height: 250 });
   });
 
   it('start，更換 startX/Y', () => {
+    const handle = 'start-resize';
     const shape = generateShape({
       x: 100,
       y: 200,
@@ -718,14 +719,14 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
       width: 100,
       height: 100,
       type: SHAPE_TYPE.FLOWLINE,
-      cursor: 'start-resize',
     });
-    const result = getResizingBox(shape.cursor, shape, 250, 100);
+    const result = getResizingBox(handle, shape, 250, 100);
 
     expect(result).toEqual({ x: 200, y: 100, startX: 250, startY: 100, endX: 200, endY: 300, width: 50, height: 200 });
   });
 
   it('end，更換 endX/Y', () => {
+    const handle = 'end-resize';
     const shape = generateShape({
       x: 50,
       y: 60,
@@ -736,14 +737,14 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
       width: 250,
       height: 340,
       type: SHAPE_TYPE.FLOWLINE,
-      cursor: 'end-resize',
     });
-    const result = getResizingBox(shape.cursor, shape, 150, 100);
+    const result = getResizingBox(handle, shape, 150, 100);
 
     expect(result).toEqual({ x: 150, y: 100, startX: 300, startY: 400, endX: 150, endY: 100, width: 150, height: 300 });
   });
 
   it('n: 滑鼠 Y 位置離固定點 Y 不滿 24，x 不變，y, height 重算', () => {
+    const handle = 'n-resize';
     const shape = generateShape({
       x: 100,
       y: 100,
@@ -754,14 +755,14 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
       width: 200,
       height: 200,
       type: SHAPE_TYPE.TERMINAL,
-      cursor: 'n-resize',
     });
-    const result = getResizingBox(shape.cursor, shape, 105, 290);
+    const result = getResizingBox(handle, shape, 105, 290);
 
     expect(result).toEqual({ x: 100, y: 276, startX: 100, startY: 300, endX: 300, endY: 276, width: 200, height: 24 });
   });
 
   it('Y 方向拖過固定點', () => {
+    const handle = 'se-resize';
     const shape = generateShape({
       x: 100,
       y: 100,
@@ -772,14 +773,14 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
       width: 200,
       height: 100,
       type: SHAPE_TYPE.PROCESS,
-      cursor: 'se-resize',
     });
-    const result = getResizingBox(shape.cursor, shape, 200, 50);
+    const result = getResizingBox(handle, shape, 200, 50);
 
     expect(result).toEqual({ x: 100, y: 50, startX: 100, startY: 100, endX: 200, endY: 50, width: 100, height: 50 });
   });
 
   it('線：靠下邊界，撐到 24 會出界 → 往上', () => {
+    const handle = 'start-resize';
     const shape = generateShape({
       x: 100,
       y: 740,
@@ -790,9 +791,8 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
       width: 0,
       height: 50,
       type: SHAPE_TYPE.FLOWLINE,
-      cursor: 'start-resize',
     });
-    const result = getResizingBox(shape.cursor, shape, 100, 800);
+    const result = getResizingBox(handle, shape, 100, 800);
 
     expect(result).toEqual({ x: 100, y: 766, startX: 100, startY: 766, endX: 100, endY: 790, width: 0, height: 24 });
   });

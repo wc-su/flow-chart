@@ -651,16 +651,16 @@ describe('chartReducer', () => {
       ['se，不變', 'se-resize', 50, 100, 300, 350],
       ['start，不變', 'start-resize', 100, 100, 200, 300],
       ['end，不變', 'end-resize', 300, 400, 50, 60],
-    ])('%s', (_, cursor, startX, startY, endX, endY) => {
+    ])('%s', (_, handle, startX, startY, endX, endY) => {
       const prev = {
         shapes: [generateShape({ id: 'test-1', startX, startY, endX, endY })],
         selectedId: 'test-1',
         activeHandle: '',
       };
-      const state = chartReducer(prev, chartActions.startResize({ id: 'test-1', activeHandle: cursor }));
+      const state = chartReducer(prev, chartActions.startResize({ id: 'test-1', activeHandle: handle }));
 
       expect(state.shapes[0]).toBe(prev.shapes[0]);
-      expect(state.activeHandle).toBe(cursor);
+      expect(state.activeHandle).toBe(handle);
     });
   });
 

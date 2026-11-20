@@ -29,13 +29,7 @@ const CanvasDrawItem = ({ shape, newRate, onPointerDown }) => {
   }
 
   return (
-    <g
-      style={{
-        cursor: ['start-resize', 'end-resize'].includes(shape.cursor) ? 'pointer' : shape.cursor,
-        display: shape.display,
-      }}
-      onPointerDown={onPointerDown}
-    >
+    <g style={{ cursor: shape.cursor, display: shape.display }} onPointerDown={onPointerDown}>
       {drawShape}
     </g>
   );

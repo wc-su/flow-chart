@@ -16,19 +16,19 @@
 
 // 8 個縮放控制點，x、y 是在圖形上的位置比例（0～1）
 const handleConfig = [
-  { cursor: 'nw-resize', x: 0, y: 0 },
-  { cursor: 'n-resize', x: 0.5, y: 0 },
-  { cursor: 'ne-resize', x: 1, y: 0 },
-  { cursor: 'w-resize', x: 0, y: 0.5 },
-  { cursor: 'e-resize', x: 1, y: 0.5 },
-  { cursor: 'sw-resize', x: 0, y: 1 },
-  { cursor: 's-resize', x: 0.5, y: 1 },
-  { cursor: 'se-resize', x: 1, y: 1 },
+  { handle: 'nw-resize', cursor: 'nw-resize', x: 0, y: 0 },
+  { handle: 'n-resize', cursor: 'n-resize', x: 0.5, y: 0 },
+  { handle: 'ne-resize', cursor: 'ne-resize', x: 1, y: 0 },
+  { handle: 'w-resize', cursor: 'w-resize', x: 0, y: 0.5 },
+  { handle: 'e-resize', cursor: 'e-resize', x: 1, y: 0.5 },
+  { handle: 'sw-resize', cursor: 'sw-resize', x: 0, y: 1 },
+  { handle: 's-resize', cursor: 's-resize', x: 0.5, y: 1 },
+  { handle: 'se-resize', cursor: 'se-resize', x: 1, y: 1 },
 ];
 // flowline 的兩個端點：比例 0 是起點、1 是終點
 const lineHandleConfig = [
-  { cursor: 'start-resize', x: 0, y: 0 },
-  { cursor: 'end-resize', x: 1, y: 1 },
+  { handle: 'start-resize', cursor: 'pointer', x: 0, y: 0 },
+  { handle: 'end-resize', cursor: 'pointer', x: 1, y: 1 },
 ];
 
 export const CANVAS_WIDTH = 600;
@@ -130,22 +130,23 @@ export function buildSelectionOverlay(shapes, selectedId, activeHandle) {
 
     const config = box.type === SHAPE_TYPE.FLOWLINE ? lineHandleConfig : handleConfig;
     for (const handleItem of config) {
-      const handle = { ...handleBase };
-      handle.id = `${box.id}:${handleItem.cursor}`;
-      handle.cursor = handleItem.cursor;
+      const handleShape = { ...handleBase };
+      handleShape.id = `${box.id}:${handleItem.handle}`;
+      handleShape.cursor = handleItem.cursor;
+      handleShape.handle = handleItem.handle;
       // 位置 = start + (end − start) × 比例：比例 0 是起點、1 是終點，
       // 一般圖形的 start、end 已整理成左上、右下，flowline 保留畫的方向，兩種都適用
-      handle.startX += (handle.endX - handle.startX) * handleItem.x;
-      handle.startY += (handle.endY - handle.startY) * handleItem.y;
-      handle.endX = handle.startX;
-      handle.endY = handle.startY;
-      handle.x = handle.startX;
-      handle.y = handle.startY;
+      handleShape.startX += (handleShape.endX - handleShape.startX) * handleItem.x;
+      handleShape.startY += (handleShape.endY - handleShape.startY) * handleItem.y;
+      handleShape.endX = handleShape.startX;
+      handleShape.endY = handleShape.startY;
+      handleShape.x = handleShape.startX;
+      handleShape.y = handleShape.startY;
       // 縮放中只顯示正在拖的那個控制點
       if (activeHandle) {
-        handle.display = handleItem.cursor === activeHandle ? 'block' : 'none';
+        handleShape.display = handleItem.handle === activeHandle ? 'block' : 'none';
       }
-      overlay.push(handle);
+      overlay.push(handleShape);
     }
 
     return overlay;

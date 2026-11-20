@@ -165,11 +165,11 @@ const Canvas = () => {
     e.stopPropagation();
     if (shape.type === 'ellipse') {
       const latest = selectShapes(store.getState());
-      const { relationId, cursor } = shape;
+      const { relationId, handle } = shape;
       // 記住點選的圖形
       pointerDownData.current = { shape: latest.find((item) => item.id === relationId) };
       // 傳入 id 為要調整座標的圖形
-      dispatch(chartActions.startResize({ id: relationId, activeHandle: cursor }));
+      dispatch(chartActions.startResize({ id: relationId, activeHandle: handle }));
       drawStatus.current = DRAW_STATUS.RESIZING;
     } else {
       // 記住點選圖形的資訊以及滑鼠的座標位置
