@@ -1,6 +1,6 @@
 const Flowline = ({ shape, newRate }) => {
   const { startX, startY, endX, endY, pointerEvents } = shape;
-  const { fill, stroke, strokeWidth, strokeMiterlimit } = shape.style;
+  const { stroke, strokeWidth } = shape.style;
 
   const unit = 10;
   const distance = Math.sqrt(Math.pow(startX - endX, 2) + Math.pow(startY - endY, 2));
@@ -11,25 +11,28 @@ const Flowline = ({ shape, newRate }) => {
   const arrowX2 = unit * Math.cos((degree2 + 15) * (Math.PI / 180)) + endX;
   const arrowY2 = unit * Math.sin((degree2 + 15) * (Math.PI / 180)) + endY;
 
+  const lineD = `M ${startX * newRate} ${startY * newRate} L ${endX * newRate} ${endY * newRate}`;
+
   return (
     <>
+      {/* 1. 看得到的線：負責顯示，不接收滑鼠 */}
+      <path d={lineD} stroke={stroke} strokeWidth={strokeWidth} pointerEvents="none"></path>
+      {/* 2. 看不到的線：透明、比較粗，負責接收滑鼠 */}
       <path
-        d={`M ${startX * newRate} ${startY * newRate} L ${endX * newRate} ${endY * newRate}`}
-        fill={fill}
-        stroke={stroke}
-        strokeWidth={strokeWidth}
-        strokeMiterlimit={strokeMiterlimit}
+        d={lineD}
+        stroke="transparent"
+        strokeWidth={12} // 寬度不乘上 newRate，點擊範圍在螢幕上固定是 12px
         pointerEvents="stroke"
+        strokeLinecap="round"
       ></path>
       {distance > 0 && (
         <path
           d={`M ${endX * newRate} ${endY * newRate} L ${arrowX1 * newRate} ${
             arrowY1 * newRate
           } L ${arrowX2 * newRate} ${arrowY2 * newRate} Z`}
-          fill="rgb(0, 0, 0)"
+          fill={stroke}
           stroke={stroke}
           strokeWidth={strokeWidth}
-          strokeMiterlimit={strokeMiterlimit}
           pointerEvents={pointerEvents}
         ></path>
       )}
