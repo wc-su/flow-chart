@@ -422,6 +422,72 @@ describe('getDrawingBox: 依圖形、滑鼠位置計算 x, y 和寬高', () => {
     expect(result.width).toBeCloseTo(14.4);
     expect(result.height).toBeCloseTo(19.2);
   });
+
+  it('滑鼠超出畫布右下', () => {
+    const result = getDrawingBox(SHAPE_TYPE.INPUTOUTPUT, 100, 100, 700, 900);
+
+    expect(result).toEqual({ x: 100, y: 100, endX: 600, endY: 800, width: 500, height: 700 });
+  });
+
+  it('滑鼠超出畫布左上', () => {
+    const result = getDrawingBox(SHAPE_TYPE.TERMINAL, 100, 100, -50, -20);
+
+    expect(result).toEqual({ x: 0, y: 0, endX: 0, endY: 0, width: 100, height: 100 });
+  });
+
+  it('靠右邊界，撐到 24 會出界 → 往左', () => {
+    const result = getDrawingBox(SHAPE_TYPE.TERMINAL, 590, 100, 595, 150);
+
+    expect(result).toEqual({ x: 566, y: 100, endX: 566, endY: 150, width: 24, height: 50 });
+  });
+
+  it('靠下邊界，撐到 24 會出界 → 往上', () => {
+    const result = getDrawingBox(SHAPE_TYPE.TERMINAL, 100, 790, 150, 795);
+
+    expect(result).toEqual({ x: 100, y: 766, endX: 150, endY: 766, width: 50, height: 24 });
+  });
+
+  it('靠左邊界，往左撐會出界 → 往右', () => {
+    const result = getDrawingBox(SHAPE_TYPE.TERMINAL, 10, 100, 5, 150);
+
+    expect(result).toEqual({ x: 10, y: 100, endX: 34, endY: 150, width: 24, height: 50 });
+  });
+
+  it('靠右邊界，差值 0 → 往左', () => {
+    const result = getDrawingBox(SHAPE_TYPE.TERMINAL, 590, 100, 590, 150);
+
+    expect(result).toEqual({ x: 566, y: 100, endX: 566, endY: 150, width: 24, height: 50 });
+  });
+
+  it('線：靠右邊界，水平撐到 24 會出界 → 反方向', () => {
+    const result = getDrawingBox(SHAPE_TYPE.FLOWLINE, 590, 100, 595, 100);
+
+    expect(result).toEqual({ x: 566, y: 100, endX: 566, endY: 100, width: 24, height: 0 });
+  });
+
+  it('線：靠右邊界，長度 0 → 往左', () => {
+    const result = getDrawingBox(SHAPE_TYPE.FLOWLINE, 590, 100, 590, 100);
+
+    expect(result).toEqual({ x: 566, y: 100, endX: 566, endY: 100, width: 24, height: 0 });
+  });
+
+  it('線：滑鼠超出右邊', () => {
+    const result = getDrawingBox(SHAPE_TYPE.FLOWLINE, 100, 100, 700, 100);
+
+    expect(result).toEqual({ x: 100, y: 100, endX: 600, endY: 100, width: 500, height: 0 });
+  });
+
+  it('線：往右下撐到長度 24 會出界 → 往左下', () => {
+    const result = getDrawingBox(SHAPE_TYPE.FLOWLINE, 590, 100, 598, 106);
+
+    // 長度 5，倍數 24 / 5 = 4.8：4 × 4.8 = 19.2、3 × 4.8 = 14.4
+    expect(result.x).toBeCloseTo(570.8);
+    expect(result.y).toBe(100);
+    expect(result.endX).toBeCloseTo(570.8);
+    expect(result.endY).toBeCloseTo(114.4);
+    expect(result.width).toBeCloseTo(19.2);
+    expect(result.height).toBeCloseTo(14.4);
+  });
 });
 
 describe('getMovedShape: 拖曳圖形', () => {
@@ -730,6 +796,24 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
     const result = getResizingBox(shape.cursor, shape, 200, 50);
 
     expect(result).toEqual({ x: 100, y: 50, startX: 100, startY: 100, endX: 200, endY: 50, width: 100, height: 50 });
+  });
+
+  it('線：靠下邊界，撐到 24 會出界 → 往上', () => {
+    const shape = generateShape({
+      x: 100,
+      y: 740,
+      startX: 100,
+      startY: 740,
+      endX: 100,
+      endY: 790,
+      width: 0,
+      height: 50,
+      type: SHAPE_TYPE.FLOWLINE,
+      cursor: 'start-resize',
+    });
+    const result = getResizingBox(shape.cursor, shape, 100, 800);
+
+    expect(result).toEqual({ x: 100, y: 766, startX: 100, startY: 766, endX: 100, endY: 790, width: 0, height: 24 });
   });
 });
 

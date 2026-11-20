@@ -197,7 +197,7 @@ export function toCanvasPoint({ clientX, clientY, rect, rate }) {
  * @returns {Object} 計算的終點、x, y 和寬高
  */
 export function getDrawingBox(shapeType, anchorX, anchorY, pointerX, pointerY) {
-  const { x: newEndX, y: newEndY } = clampMinSize({ type: shapeType, anchorX, anchorY, pointerX, pointerY });
+  const { x: newEndX, y: newEndY } = clampPoint({ type: shapeType, anchorX, anchorY, pointerX, pointerY });
   return {
     endX: newEndX,
     endY: newEndY,
@@ -279,7 +279,7 @@ export function getResizingBox(activeHandle, shape, pointerX, pointerY) {
 
   const isStartResize = activeHandle === 'start-resize';
 
-  const { x: clampX, y: clampY } = clampMinSize({
+  const { x: clampX, y: clampY } = clampPoint({
     type: shape.type,
     anchorX: isStartResize ? result.endX : result.startX,
     anchorY: isStartResize ? result.endY : result.startY,
@@ -327,16 +327,30 @@ export function isEqualShape(oldShape, newShape) {
 }
 
 /**
+ * 限制位置 x, y 在畫布中
+ * @param {number} x 位置 x
+ * @param {number} y 位置 y
+ * @returns {Object} 計算後的位置 x, y
+ */
+function clampToCanvas(x, y) {
+  return { x: Math.min(Math.max(x, 0), CANVAS_WIDTH), y: Math.min(Math.max(y, 0), CANVAS_HEIGHT) };
+}
+/**
  * 一般圖形依固定點、滑鼠位置，計算位置並限制最小值
  * @param {number} anchor 固定點
  * @param {number} pointer 滑鼠位置
+ * @param {number} max 上限
  * @returns {number} 計算後的位置
  */
-function clampAxis(anchor, pointer) {
+function clampAxis(anchor, pointer, max) {
   let result = pointer;
   const diff = pointer - anchor;
   if (Math.abs(diff) < MIN_SHAPE_SIZE) {
-    result = anchor + MIN_SHAPE_SIZE * (Math.sign(diff) >= 0 ? 1 : -1);
+    const direction = Math.sign(diff) >= 0 ? 1 : -1;
+    result = anchor + MIN_SHAPE_SIZE * direction;
+    if (result > max || result < 0) {
+      result = anchor + MIN_SHAPE_SIZE * direction * -1;
+    }
   }
   return result;
 }
@@ -353,12 +367,23 @@ function clampLineLength(anchorX, anchorY, pointerX, pointerY) {
   const dy = pointerY - anchorY;
   const length = Math.hypot(dx, dy);
   if (length < MIN_SHAPE_SIZE) {
+    let result;
     if (length === 0) {
-      return { x: anchorX + MIN_SHAPE_SIZE, y: anchorY };
+      result = { x: anchorX + MIN_SHAPE_SIZE, y: anchorY };
+      if (anchorX + MIN_SHAPE_SIZE > CANVAS_WIDTH) {
+        result.x = anchorX - MIN_SHAPE_SIZE;
+      }
     } else {
       const scale = MIN_SHAPE_SIZE / length;
-      return { x: anchorX + dx * scale, y: anchorY + dy * scale };
+      result = { x: anchorX + dx * scale, y: anchorY + dy * scale };
+      if (result.x > CANVAS_WIDTH || result.x < 0) {
+        result.x = anchorX + dx * scale * -1;
+      }
+      if (result.y > CANVAS_HEIGHT || result.y < 0) {
+        result.y = anchorY + dy * scale * -1;
+      }
     }
+    return result;
   } else {
     return { x: pointerX, y: pointerY };
   }
@@ -373,10 +398,11 @@ function clampLineLength(anchorX, anchorY, pointerX, pointerY) {
  * @param {number} param.pointerY 滑鼠位置 Y
  * @returns {Object} 計算後的位置 x, y
  */
-function clampMinSize({ type, anchorX, anchorY, pointerX, pointerY }) {
+function clampPoint({ type, anchorX, anchorY, pointerX, pointerY }) {
+  const { x, y } = clampToCanvas(pointerX, pointerY);
   if (type === SHAPE_TYPE.FLOWLINE) {
-    return clampLineLength(anchorX, anchorY, pointerX, pointerY);
+    return clampLineLength(anchorX, anchorY, x, y);
   } else {
-    return { x: clampAxis(anchorX, pointerX), y: clampAxis(anchorY, pointerY) };
+    return { x: clampAxis(anchorX, x, CANVAS_WIDTH), y: clampAxis(anchorY, y, CANVAS_HEIGHT) };
   }
 }
