@@ -6,7 +6,6 @@ import { chartActions, selectShapes, selectSelectionOverlay } from '@/redux/char
 import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
-  isEmptyShape,
   toCanvasPoint,
   isSameShape,
   isEqualShape,
@@ -28,12 +27,17 @@ const DRAW_STATUS = Object.freeze({
   DRAGGING: 'dragging',
 });
 
+// 移動超過這個距離 (螢幕 px) 才算拖曳
+const DRAG_THRESHOLD = 4;
+
 const Canvas = () => {
   const dispatch = useDispatch();
   const store = useStore();
 
   const drawStatus = useRef(DRAW_STATUS.IDLE);
-  const moveInitData = useRef({});
+  // 按下時的資料：畫圖存滑鼠位置、拖曳存圖形和滑鼠位置、縮放存圖形
+  const pointerDownData = useRef({});
+  const hasMoved = useRef(false);
 
   const { tool, setTool } = useTool();
 
@@ -55,6 +59,8 @@ const Canvas = () => {
     // 選了繪圖工具時，開始畫新圖形
     if (isDrawTool) {
       drawStatus.current = DRAW_STATUS.DRAWING;
+      hasMoved.current = false;
+      pointerDownData.current = { clientX: e.clientX, clientY: e.clientY };
       const position = toCanvasPoint({
         clientX: e.clientX,
         clientY: e.clientY,
@@ -67,6 +73,17 @@ const Canvas = () => {
 
   function handlePointerMove(e) {
     if (drawStatus.current === DRAW_STATUS.DRAWING) {
+      if (!hasMoved.current) {
+        const distance = Math.hypot(
+          e.clientX - pointerDownData.current.clientX,
+          e.clientY - pointerDownData.current.clientY
+        );
+        if (distance <= DRAG_THRESHOLD) {
+          return;
+        } else {
+          hasMoved.current = true;
+        }
+      }
       dispatch(
         chartActions.draw(
           toCanvasPoint({
@@ -78,11 +95,11 @@ const Canvas = () => {
         )
       );
     } else if (drawStatus.current === DRAW_STATUS.DRAGGING) {
-      const distanceX = (e.clientX - moveInitData.current.clientX) / newRate;
-      const distanceY = (e.clientY - moveInitData.current.clientY) / newRate;
+      const distanceX = (e.clientX - pointerDownData.current.clientX) / newRate;
+      const distanceY = (e.clientY - pointerDownData.current.clientY) / newRate;
       dispatch(
         chartActions.moveShape({
-          initShape: moveInitData.current.shape,
+          initShape: pointerDownData.current.shape,
           distanceX,
           distanceY,
         })
@@ -103,23 +120,21 @@ const Canvas = () => {
 
   function handlePointerUp() {
     if (drawStatus.current === DRAW_STATUS.DRAWING) {
-      const latest = selectShapes(store.getState());
-      const { id, type, width, height } = latest[latest.length - 1];
-      if (isEmptyShape(type, width, height)) {
-        // 移除畫的那筆
-        // TODO: 需要有提示訊息嗎？
-        dispatch(chartActions.cancelDraw());
-      } else {
+      if (hasMoved.current) {
+        const latest = selectShapes(store.getState());
+        const { id } = latest[latest.length - 1];
         dispatch(chartActions.endDraw({ id }));
+        setTool(null);
+      } else {
+        dispatch(chartActions.cancelDraw());
       }
       drawStatus.current = DRAW_STATUS.IDLE;
-      setTool(null);
     } else if (drawStatus.current === DRAW_STATUS.DRAGGING) {
       const latest = selectShapes(store.getState());
-      const { id } = moveInitData.current.shape;
+      const { id } = pointerDownData.current.shape;
       if (
         !isSameShape(
-          moveInitData.current.shape,
+          pointerDownData.current.shape,
           latest.find((shape) => shape.id === id)
         )
       ) {
@@ -128,7 +143,7 @@ const Canvas = () => {
       drawStatus.current = DRAW_STATUS.IDLE;
     } else if (drawStatus.current === DRAW_STATUS.RESIZING) {
       const latestShapes = selectShapes(store.getState());
-      const initShape = moveInitData.current.shape;
+      const initShape = pointerDownData.current.shape;
       const { id } = initShape;
       const latestShape = latestShapes.find((shape) => shape.id === id);
       const isFlowline = latestShape.type === SHAPE_TYPE.FLOWLINE;
@@ -151,18 +166,14 @@ const Canvas = () => {
     if (shape.type === 'ellipse') {
       const latest = selectShapes(store.getState());
       const { relationId, cursor } = shape;
-      // 記住點選圖形的資訊以及滑鼠的座標位置
-      moveInitData.current = {
-        shape: latest.find((item) => item.id === relationId),
-        clientX: e.clientX,
-        clientY: e.clientY,
-      };
+      // 記住點選的圖形
+      pointerDownData.current = { shape: latest.find((item) => item.id === relationId) };
       // 傳入 id 為要調整座標的圖形
       dispatch(chartActions.startResize({ id: relationId, activeHandle: cursor }));
       drawStatus.current = DRAW_STATUS.RESIZING;
     } else {
       // 記住點選圖形的資訊以及滑鼠的座標位置
-      moveInitData.current = {
+      pointerDownData.current = {
         shape: shape,
         clientX: e.clientX,
         clientY: e.clientY,

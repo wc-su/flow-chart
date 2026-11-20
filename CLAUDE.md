@@ -33,7 +33,7 @@ React 19 · Vite · Redux Toolkit + redux-undo · React Router v7 · Firebase ·
 
 ## 資料與狀態 (遷移中確認的規則，陸續補充)
 
-- 座標：`x`、`y` 一律是 start、end 中比較小的 (左上角)，`width`、`height` 一律是正數。
+- 座標：`x`、`y` 一律是 start、end 中比較小的 (左上角)，`width`、`height` 一律是正數
 - 畫圖中、縮放中 start 可能比 end 大；放開滑鼠 (`endDraw`) 後，flowline 以外會整理成 start 左上、end 右下，flowline 保留畫的方向 (箭頭)
-- 放開滑鼠 (endDraw) 時，太小的圖形不存、不記進歷史：一般圖形是寬或高小於 24，flowline 是長度小於 24。完全水平或垂直的 flowline 要保留
+- 放開滑鼠時，移動不到 4px (螢幕座標) 當作點一下，不建立圖形、保留工具。畫圖、縮放時，一般圖形的寬高、flowline 的長度最小撐到 24，超出畫布時往另一側撐
 - redux-undo 的 filter 只收 `init`、`deleteShape`、`endDraw`；`draw`、`moveShape`、`resizeShape` 是過程中的即時更新、`normalizeShape` 更新圖形，但不記入歷史、`clear` 放進去會讓清空可以被 undo，都不能放進 filter

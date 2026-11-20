@@ -209,21 +209,6 @@ export function getDrawingBox(shapeType, anchorX, anchorY, pointerX, pointerY) {
 }
 
 /**
- * 是不是太小、不該保留的圖形
- * @param {string} type 圖形種類
- * @param {number} width 寬度
- * @param {number} height 高度
- * @returns {boolean} true 表示太小 (一般圖形寬或高小於 24，flowline 長度小於 24)
- */
-export function isEmptyShape(type, width, height) {
-  if (type === SHAPE_TYPE.FLOWLINE) {
-    return Math.hypot(width, height) < MIN_SHAPE_SIZE;
-  } else {
-    return width < MIN_SHAPE_SIZE || height < MIN_SHAPE_SIZE;
-  }
-}
-
-/**
  * 依傳入的距離差更新初始狀態
  * @param {Object} params
  * @param {Object} params.initShape 點下的初始狀態

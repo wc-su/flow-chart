@@ -3,7 +3,6 @@ import {
   SHAPE_TYPE,
   createShape,
   buildSelectionOverlay,
-  isEmptyShape,
   normalizeBox,
   toCanvasPoint,
   getDrawingBox,
@@ -248,24 +247,6 @@ describe('buildSelectionOverlay: 產生圖形選取框、控制點 (線沒有選
     // 只有 start-resize 的控制點為顯示，另一個控制點不顯示
     const visible = output.filter((item) => item.display === 'block').map((item) => item.cursor);
     expect(visible).toEqual(['start-resize']);
-  });
-});
-
-describe('isEmptyShape: 檢驗是否為無效圖形', () => {
-  it.each([
-    ['一般圖形寬高皆大於等於 24，要保留', SHAPE_TYPE.PROCESS, 24, 24, false],
-    ['一般圖形寬小於 24，不保留', SHAPE_TYPE.INPUTOUTPUT, 23, 100, true],
-    ['一般圖形高小於 24，不保留', SHAPE_TYPE.DECISION, 100, 23, true],
-    ['只點一下，不保留', SHAPE_TYPE.DECISION, 0, 0, true],
-    ['水平線長度超過 24 要保留', SHAPE_TYPE.FLOWLINE, 300, 0, false],
-    ['垂直線長度大於等於 24，要保留', SHAPE_TYPE.FLOWLINE, 0, 24, false],
-    ['垂直線長度小於 24，不保留', SHAPE_TYPE.FLOWLINE, 0, 23, true],
-    ['斜線長度大於等於 24，要保留', SHAPE_TYPE.FLOWLINE, 15, 20, false],
-    ['斜線長度小於 24，不保留', SHAPE_TYPE.FLOWLINE, 12, 16, true],
-  ])('%s', (_, type, width, height, expected) => {
-    const res = isEmptyShape(type, width, height);
-
-    expect(res).toBe(expected);
   });
 });
 
