@@ -1,20 +1,20 @@
 /**
- * 一個圖形的資料（存在 Redux 的 shapes 陣列、也存進 Firestore）
+ * 一個圖形的資料 (存在 Redux 的 shapes 陣列、也存進 Firestore)
  * @typedef {Object} Shape
- * @property {string} id 圖形 id（uuid）
+ * @property {string} id 圖形 id (uuid)
  * @property {string} type terminal、process、inputOutput、decision、flowline
  * @property {number} startX 畫圖中：按下滑鼠的位置；縮放中：固定不動的對角。
- *   放開滑鼠後，flowline 以外會整理成左上角；flowline 保留畫的方向（箭頭）
+ *   放開滑鼠後，flowline 以外會整理成左上角；flowline 保留畫的方向 (箭頭)
  * @property {number} startY 同 startX
  * @property {number} endX 畫圖中、縮放中：滑鼠目前的位置。放開後，flowline 以外會整理成右下角
  * @property {number} endY 同 endX
- * @property {number} x 左上角（start、end 中比較小的），給 <rect> 等元件畫圖用
+ * @property {number} x 左上角 (start、end 中比較小的)，給 <rect> 等元件畫圖用
  * @property {number} y 同 x
  * @property {number} width 寬，一律是正數
  * @property {number} height 高，一律是正數
  */
 
-// 8 個縮放控制點，x、y 是在圖形上的位置比例（0～1）
+// 8 個縮放控制點，x、y 是在圖形上的位置比例 (0～1)
 const handleConfig = [
   { handle: 'nw-resize', cursor: 'nw-resize', x: 0, y: 0 },
   { handle: 'n-resize', cursor: 'n-resize', x: 0.5, y: 0 },
@@ -49,7 +49,7 @@ export const SHAPE_TYPE = Object.freeze({
  * @param {string} payload.id uuid，存成圖形的 id
  * @param {number} payload.x 滑鼠在畫布上的 x
  * @param {number} payload.y 滑鼠在畫布上的 y
- * @param {string} payload.drawType 圖形種類（terminal、process、inputOutput、decision、flowline）
+ * @param {string} payload.drawType 圖形種類 (terminal、process、inputOutput、decision、flowline)
  * @returns {Shape} 新圖形的資料
  */
 export function createShape({ id, x, y, drawType }) {
@@ -81,8 +81,8 @@ export function createShape({ id, x, y, drawType }) {
 /**
  * 產生選取中圖形的選取框和控制點，疊在原本的圖形上顯示。不會修改傳入的 shapes。
  * @param {Shape[]} shapes 全部圖形
- * @param {string|null} selectedId 被選取圖形的 id（uuid），沒選取時是 null
- * @param {string} activeHandle 正在拖曳的控制點 cursor（例如 'se-resize'），沒有時是 ''
+ * @param {string|null} selectedId 被選取圖形的 id (uuid)，沒選取時是 null
+ * @param {string} activeHandle 正在拖曳的控制點 handle (例如 'se-resize')，沒有時是 ''
  * @returns {Array} 一般圖形：[選取框, 8 個控制點]；flowline：[起點, 終點]；沒選取：[]
  */
 export function buildSelectionOverlay(shapes, selectedId, activeHandle) {
@@ -91,7 +91,7 @@ export function buildSelectionOverlay(shapes, selectedId, activeHandle) {
     // 深拷貝被選取的圖形：shapes 來自 Redux state，已被 Immer 凍結，直接修改會報錯
     const box = JSON.parse(JSON.stringify(selected));
     // 整理座標：由右下往左上畫時 start 會比 end 大，統一成 start 在左上、end 在右下，後面才能從左上角算控制點位置。
-    // flowline 有方向（箭頭），不能整理
+    // flowline 有方向 (箭頭)，不能整理
     if (box.type !== SHAPE_TYPE.FLOWLINE) {
       Object.assign(box, normalizeBox(box));
       box.x = box.startX;
@@ -121,7 +121,7 @@ export function buildSelectionOverlay(shapes, selectedId, activeHandle) {
       overlay.push(box);
     }
 
-    // 把樣板改成藍色實心圓，半徑 4（Ellipse 以 x, y 為圓心）
+    // 把樣板改成藍色實心圓，半徑 4 (Ellipse 以 x, y 為圓心)
     handleBase.style.fill = '#00a8ff';
     handleBase.style.stroke = 'none';
     handleBase.type = 'ellipse';
