@@ -131,20 +131,14 @@ const Canvas = () => {
       const initShape = moveInitData.current.shape;
       const { id } = initShape;
       const latestShape = latestShapes.find((shape) => shape.id === id);
-      const { type, width, height } = latestShape;
-      if (isEmptyShape(type, width, height)) {
-        // 還原成 initShape
-        // TODO: 需要有提示訊息嗎？
-        dispatch(chartActions.resetShape({ id, initShape }));
+      const isFlowline = latestShape.type === SHAPE_TYPE.FLOWLINE;
+      const isEqual = isEqualShape(initShape, isFlowline ? latestShape : normalizeBox(latestShape));
+      if (isEqual) {
+        dispatch(chartActions.normalizeShape({ id }));
       } else {
-        const isFlowline = type === SHAPE_TYPE.FLOWLINE;
-        const isEqual = isEqualShape(initShape, isFlowline ? latestShape : normalizeBox(latestShape));
-        if (isEqual) {
-          dispatch(chartActions.normalizeShape({ id }));
-        } else {
-          dispatch(chartActions.endDraw({ id }));
-        }
+        dispatch(chartActions.endDraw({ id }));
       }
+
       drawStatus.current = DRAW_STATUS.IDLE;
     }
   }

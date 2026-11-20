@@ -72,7 +72,7 @@ const chartSlice = createSlice({
     draw: (state, action) => {
       const { x, y } = action.payload;
       const shape = state.shapes[state.shapes.length - 1];
-      Object.assign(shape, getDrawingBox(shape.startX, shape.startY, x, y));
+      Object.assign(shape, getDrawingBox(shape.type, shape.startX, shape.startY, x, y));
     },
     // 圖形拖曳中
     moveShape: (state, action) => {
@@ -103,14 +103,6 @@ const chartSlice = createSlice({
       if (shape.type !== SHAPE_TYPE.FLOWLINE) {
         Object.assign(shape, normalizeBox(shape));
       }
-      state.activeHandle = '';
-    },
-    // 縮放結束，還原為開始圖形，不會進歷史紀錄
-    resetShape: (state, action) => {
-      const { id, initShape } = action.payload;
-      const { x, y, startX, startY, endX, endY, width, height } = initShape;
-      const shape = state.shapes.find((shape) => shape.id === id);
-      Object.assign(shape, { x, y, startX, startY, endX, endY, width, height });
       state.activeHandle = '';
     },
     // 移除最後一筆

@@ -189,20 +189,22 @@ export function toCanvasPoint({ clientX, clientY, rect, rate }) {
 
 /**
  * 依圖形、滑鼠位置計算 x, y 和寬高
- * @param {number} shapeStartX 圖形起點 startX
- * @param {number} shapeStartY 圖形起點 startY
+ * @param {string} shapeType 圖形類型
+ * @param {number} anchorX 圖形固定點 X
+ * @param {number} anchorY 圖形固定點 Y
  * @param {number} pointerX 滑鼠在畫布位置 X
  * @param {number} pointerY 滑鼠在畫布位置 Y
  * @returns {Object} 計算的終點、x, y 和寬高
  */
-export function getDrawingBox(shapeStartX, shapeStartY, pointerX, pointerY) {
+export function getDrawingBox(shapeType, anchorX, anchorY, pointerX, pointerY) {
+  const { x: newEndX, y: newEndY } = clampMinSize({ type: shapeType, anchorX, anchorY, pointerX, pointerY });
   return {
-    endX: pointerX,
-    endY: pointerY,
-    x: Math.min(shapeStartX, pointerX),
-    y: Math.min(shapeStartY, pointerY),
-    width: Math.abs(pointerX - shapeStartX),
-    height: Math.abs(pointerY - shapeStartY),
+    endX: newEndX,
+    endY: newEndY,
+    x: Math.min(anchorX, newEndX),
+    y: Math.min(anchorY, newEndY),
+    width: Math.abs(newEndX - anchorX),
+    height: Math.abs(newEndY - anchorY),
   };
 }
 
@@ -275,17 +277,27 @@ export function getResizingBox(activeHandle, shape, pointerX, pointerY) {
     height: Math.abs(shape.endY - shape.startY),
   };
 
+  const isStartResize = activeHandle === 'start-resize';
+
+  const { x: clampX, y: clampY } = clampMinSize({
+    type: shape.type,
+    anchorX: isStartResize ? result.endX : result.startX,
+    anchorY: isStartResize ? result.endY : result.startY,
+    pointerX,
+    pointerY,
+  });
+
   // n、s 控制點僅可動垂直方向 (Y)，不可異動 X，將其排除
   const changeX = !['n-resize', 's-resize'].includes(activeHandle);
   // w、e 控制點只能動水平方向 (X)，不可異動 Y，將其排除
   const changeY = !['w-resize', 'e-resize'].includes(activeHandle);
 
-  if (activeHandle === 'start-resize') {
-    result.startX = pointerX;
-    result.startY = pointerY;
+  if (isStartResize) {
+    result.startX = clampX;
+    result.startY = clampY;
   } else {
-    if (changeX) result.endX = pointerX;
-    if (changeY) result.endY = pointerY;
+    if (changeX) result.endX = clampX;
+    if (changeY) result.endY = clampY;
   }
   if (changeX) {
     result.x = Math.min(result.startX, result.endX);
@@ -312,4 +324,59 @@ export function isEqualShape(oldShape, newShape) {
     oldShape.endX === newShape.endX &&
     oldShape.endY === newShape.endY
   );
+}
+
+/**
+ * 一般圖形依固定點、滑鼠位置，計算位置並限制最小值
+ * @param {number} anchor 固定點
+ * @param {number} pointer 滑鼠位置
+ * @returns {number} 計算後的位置
+ */
+function clampAxis(anchor, pointer) {
+  let result = pointer;
+  const diff = pointer - anchor;
+  if (Math.abs(diff) < MIN_SHAPE_SIZE) {
+    result = anchor + MIN_SHAPE_SIZE * (Math.sign(diff) >= 0 ? 1 : -1);
+  }
+  return result;
+}
+/**
+ * 線依固定點、滑鼠位置，計算位置並限制最小值
+ * @param {number} anchorX 固定點 X
+ * @param {number} anchorY 固定點 Y
+ * @param {number} pointerX 滑鼠位置 X
+ * @param {number} pointerY 滑鼠位置 Y
+ * @returns {Object} 計算後的位置 x, y
+ */
+function clampLineLength(anchorX, anchorY, pointerX, pointerY) {
+  const dx = pointerX - anchorX;
+  const dy = pointerY - anchorY;
+  const length = Math.hypot(dx, dy);
+  if (length < MIN_SHAPE_SIZE) {
+    if (length === 0) {
+      return { x: anchorX + MIN_SHAPE_SIZE, y: anchorY };
+    } else {
+      const scale = MIN_SHAPE_SIZE / length;
+      return { x: anchorX + dx * scale, y: anchorY + dy * scale };
+    }
+  } else {
+    return { x: pointerX, y: pointerY };
+  }
+}
+/**
+ * 依圖形類別、固定點、滑鼠位置計算 x, y
+ * @param {Object} param
+ * @param {string} param.type 圖形類別
+ * @param {number} param.anchorX 固定點 X
+ * @param {number} param.anchorY 固定點 Y
+ * @param {number} param.pointerX 滑鼠位置 X
+ * @param {number} param.pointerY 滑鼠位置 Y
+ * @returns {Object} 計算後的位置 x, y
+ */
+function clampMinSize({ type, anchorX, anchorY, pointerX, pointerY }) {
+  if (type === SHAPE_TYPE.FLOWLINE) {
+    return clampLineLength(anchorX, anchorY, pointerX, pointerY);
+  } else {
+    return { x: clampAxis(anchorX, pointerX), y: clampAxis(anchorY, pointerY) };
+  }
 }

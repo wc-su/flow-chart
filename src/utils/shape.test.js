@@ -6,6 +6,7 @@ import {
   isEmptyShape,
   normalizeBox,
   toCanvasPoint,
+  getDrawingBox,
   getMovedShape,
   isSameShape,
   getResizingBox,
@@ -343,6 +344,86 @@ describe('toCanvasPoint: 滑鼠座標轉換成在畫布上的座標', () => {
   });
 });
 
+describe('getDrawingBox: 依圖形、滑鼠位置計算 x, y 和寬高', () => {
+  it('一般圖形：滑鼠位置往右下', () => {
+    const result = getDrawingBox(SHAPE_TYPE.DECISION, 10, 15, 200, 250);
+
+    expect(result).toEqual({ x: 10, y: 15, endX: 200, endY: 250, width: 190, height: 235 });
+  });
+
+  it('一般圖形：滑鼠 X 位置距離固定點 X 不滿 24', () => {
+    const result = getDrawingBox(SHAPE_TYPE.DECISION, 10, 15, 15, 45);
+
+    // 會撐開到 24
+    expect(result).toEqual({ x: 10, y: 15, endX: 34, endY: 45, width: 24, height: 30 });
+  });
+
+  it('一般圖形：滑鼠 Y 位置距離固定點 Y 不滿 24', () => {
+    const result = getDrawingBox(SHAPE_TYPE.DECISION, 10, 15, 50, 35);
+
+    // 會撐開到 24
+    expect(result).toEqual({ x: 10, y: 15, endX: 50, endY: 39, width: 40, height: 24 });
+  });
+
+  it('一般圖形：往左上，不滿 24', () => {
+    const result = getDrawingBox(SHAPE_TYPE.DECISION, 100, 100, 90, 95);
+
+    // 會撐開到 24
+    expect(result).toEqual({ x: 76, y: 76, endX: 76, endY: 76, width: 24, height: 24 });
+  });
+
+  it('一般圖形：差值 0', () => {
+    const result = getDrawingBox(SHAPE_TYPE.DECISION, 100, 100, 100, 150);
+
+    // 差值 0 往右撐到 24
+    expect(result).toEqual({ x: 100, y: 100, endX: 124, endY: 150, width: 24, height: 50 });
+  });
+
+  it('一般圖形：滑鼠 X/Y 位置距離固定點 X/Y 皆不滿 24', () => {
+    const result = getDrawingBox(SHAPE_TYPE.DECISION, 10, 15, 25, 35);
+
+    // 會撐開到 24
+    expect(result).toEqual({ x: 10, y: 15, endX: 34, endY: 39, width: 24, height: 24 });
+  });
+
+  it('線：滑鼠位置往右下', () => {
+    const result = getDrawingBox(SHAPE_TYPE.FLOWLINE, 10, 15, 50, 65);
+
+    expect(result).toEqual({ x: 10, y: 15, endX: 50, endY: 65, width: 40, height: 50 });
+  });
+
+  it('線：長度不滿 24，往右下撐到 24，方向不變', () => {
+    const result = getDrawingBox(SHAPE_TYPE.FLOWLINE, 100, 100, 103, 104);
+
+    // 長度 5，倍數 24 / 5 = 4.8：3 × 4.8 = 14.4、4 × 4.8 = 19.2
+    expect(result.x).toBe(100);
+    expect(result.y).toBe(100);
+    expect(result.endX).toBeCloseTo(114.4);
+    expect(result.endY).toBeCloseTo(119.2);
+    expect(result.width).toBeCloseTo(14.4);
+    expect(result.height).toBeCloseTo(19.2);
+  });
+
+  it('線：長度 0', () => {
+    const result = getDrawingBox(SHAPE_TYPE.FLOWLINE, 100, 100, 100, 100);
+
+    // 會向右，寬撐開到 24
+    expect(result).toEqual({ x: 100, y: 100, endX: 124, endY: 100, width: 24, height: 0 });
+  });
+
+  it('線：往左上，長度不滿 24', () => {
+    const result = getDrawingBox(SHAPE_TYPE.FLOWLINE, 100, 100, 97, 96);
+
+    // 長度 5，倍數 24 / 5 = 4.8：3 × 4.8 = 14.4、4 × 4.8 = 19.2
+    expect(result.x).toBeCloseTo(85.6);
+    expect(result.y).toBeCloseTo(80.8);
+    expect(result.endX).toBeCloseTo(85.6);
+    expect(result.endY).toBeCloseTo(80.8);
+    expect(result.width).toBeCloseTo(14.4);
+    expect(result.height).toBeCloseTo(19.2);
+  });
+});
+
 describe('getMovedShape: 拖曳圖形', () => {
   it('往右下移動', () => {
     const initShape = generateShape({
@@ -613,6 +694,24 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
     const result = getResizingBox(shape.cursor, shape, 150, 100);
 
     expect(result).toEqual({ x: 150, y: 100, startX: 300, startY: 400, endX: 150, endY: 100, width: 150, height: 300 });
+  });
+
+  it('n: 滑鼠 Y 位置離固定點 Y 不滿 24，x 不變，y, height 重算', () => {
+    const shape = generateShape({
+      x: 100,
+      y: 100,
+      startX: 100,
+      startY: 300,
+      endX: 300,
+      endY: 100,
+      width: 200,
+      height: 200,
+      type: SHAPE_TYPE.TERMINAL,
+      cursor: 'n-resize',
+    });
+    const result = getResizingBox(shape.cursor, shape, 105, 290);
+
+    expect(result).toEqual({ x: 100, y: 276, startX: 100, startY: 300, endX: 300, endY: 276, width: 200, height: 24 });
   });
 
   it('Y 方向拖過固定點', () => {

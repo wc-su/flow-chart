@@ -494,6 +494,39 @@ describe('chartReducer', () => {
       expect(state.selectedId).toBe(prev.selectedId);
     });
 
+    it('畫圖中，寬高不滿 24', () => {
+      // 起始畫布位置 10, 20
+      const prevPosition = { startX: 10, startY: 20, x: 10, y: 20, id: 'test-uuid-1' };
+      const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
+      // 滑鼠移到畫布位置 20, 30
+      const input = { x: 20, y: 30 };
+      const state = chartReducer(prev, chartActions.draw(input));
+
+      const shape = state.shapes[0];
+      expect(shape.endX).toBe(34);
+      expect(shape.endY).toBe(44);
+      expect(shape.width).toBe(24);
+      expect(shape.height).toBe(24);
+    });
+
+    it('畫線中，長度不滿 24', () => {
+      // 起始畫布位置 10, 20
+      const prevPosition = { startX: 10, startY: 20, x: 10, y: 20, id: 'test-uuid-1', type: SHAPE_TYPE.FLOWLINE };
+      const prev = { shapes: [generateShape(prevPosition)], selectedId: '', activeHandle: '' };
+      // 滑鼠移到畫布位置 13, 24
+      const input = { x: 13, y: 24 };
+      const state = chartReducer(prev, chartActions.draw(input));
+
+      // 長度 5，倍數 24 / 5 = 4.8：3 × 4.8 = 14.4、4 × 4.8 = 19.2
+      const shape = state.shapes[0];
+      expect(shape.x).toBe(10);
+      expect(shape.y).toBe(20);
+      expect(shape.endX).toBeCloseTo(24.4);
+      expect(shape.endY).toBeCloseTo(39.2);
+      expect(shape.width).toBeCloseTo(14.4);
+      expect(shape.height).toBeCloseTo(19.2);
+    });
+
     it('拖曳圖形', () => {
       const initShape = generateShape({
         id: 'test-2',
@@ -660,6 +693,64 @@ describe('chartReducer', () => {
       expect(state.selectedId).toBe(prev.selectedId);
       expect(state.activeHandle).toBe(prev.activeHandle);
     });
+
+    it('縮放圖形，滑鼠位置距離固定點寬高小於 24', () => {
+      const prev = {
+        shapes: [
+          generateShape({
+            id: 'test-1',
+            x: 150,
+            y: 100,
+            startX: 150,
+            startY: 100,
+            endX: 200,
+            endY: 250,
+            width: 50,
+            height: 150,
+          }),
+        ],
+        selectedId: 'test-1',
+        activeHandle: 'se-resize',
+      };
+      const moveState = chartReducer(prev, chartActions.resizeShape({ x: 160, y: 110 }));
+
+      expect(moveState.shapes[0].x).toBe(150);
+      expect(moveState.shapes[0].y).toBe(100);
+      expect(moveState.shapes[0].endX).toBe(174);
+      expect(moveState.shapes[0].endY).toBe(124);
+      expect(moveState.shapes[0].width).toBe(24);
+      expect(moveState.shapes[0].height).toBe(24);
+    });
+
+    it('縮放線，滑鼠位置距離固定點長度小於 24', () => {
+      const prev = {
+        shapes: [
+          generateShape({
+            id: 'test-1',
+            x: 150,
+            y: 100,
+            startX: 150,
+            startY: 100,
+            endX: 200,
+            endY: 250,
+            width: 50,
+            height: 150,
+            type: SHAPE_TYPE.FLOWLINE,
+          }),
+        ],
+        selectedId: 'test-1',
+        activeHandle: 'start-resize',
+      };
+      const moveState = chartReducer(prev, chartActions.resizeShape({ x: 196, y: 247 }));
+
+      // 長度 5，倍數 24 / 5 = 4.8：4 × 4.8 = 19.2、3 × 4.8 = 14.4
+      expect(moveState.shapes[0].x).toBeCloseTo(180.8);
+      expect(moveState.shapes[0].y).toBeCloseTo(235.6);
+      expect(moveState.shapes[0].endX).toBe(200);
+      expect(moveState.shapes[0].endY).toBe(250);
+      expect(moveState.shapes[0].width).toBeCloseTo(19.2);
+      expect(moveState.shapes[0].height).toBeCloseTo(14.4);
+    });
   });
 
   describe('normalizeShape', () => {
@@ -754,40 +845,6 @@ describe('chartReducer', () => {
       expect(normalizeState.shapes).toEqual(prev.shapes);
       expect(normalizeState.selectedId).toBe(prev.selectedId);
       expect(normalizeState.activeHandle).toBe('');
-    });
-  });
-
-  describe('resetShape', () => {
-    it('圖形最後寬度小於 24', () => {
-      const prev = {
-        shapes: [
-          generateShape({
-            id: 'test-1',
-            startX: 120,
-            startY: 180,
-            endX: 300,
-            endY: 350,
-            x: 120,
-            y: 180,
-            width: 180,
-            height: 170,
-          }),
-        ],
-        selectedId: 'test-1',
-        activeHandle: 'se-resize',
-      };
-      // 寬小於 24
-      const resizeState = chartReducer(prev, chartActions.resizeShape({ x: 143, y: 350 }));
-      expect(resizeState.shapes[0].width).toBe(23);
-
-      const resetState = chartReducer(
-        resizeState,
-        chartActions.resetShape({ id: 'test-1', initShape: prev.shapes[0] })
-      );
-
-      expect(resetState.shapes).toEqual(prev.shapes);
-      expect(resetState.selectedId).toBe(prev.selectedId);
-      expect(resetState.activeHandle).toBe('');
     });
   });
 
