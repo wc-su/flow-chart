@@ -35,7 +35,7 @@ const Canvas = () => {
   const store = useStore();
 
   const drawStatus = useRef(DRAW_STATUS.IDLE);
-  // 按下時的資料：畫圖存滑鼠位置、拖曳存圖形和滑鼠位置、縮放存圖形
+  // 按下時的資料：畫圖存滑鼠位置、拖曳和縮放存圖形和滑鼠位置
   const pointerDownData = useRef({});
   const hasMoved = useRef(false);
 
@@ -72,18 +72,20 @@ const Canvas = () => {
   }
 
   function handlePointerMove(e) {
+    // 沒按下滑鼠，不用處理
+    if (drawStatus.current === DRAW_STATUS.IDLE) return;
+
+    // 還沒超過門檻：滑鼠移動距離不到 DRAG_THRESHOLD 當作點一下，不更新圖形
+    if (!hasMoved.current) {
+      const distance = Math.hypot(
+        e.clientX - pointerDownData.current.clientX,
+        e.clientY - pointerDownData.current.clientY
+      );
+      if (distance <= DRAG_THRESHOLD) return;
+      hasMoved.current = true;
+    }
+
     if (drawStatus.current === DRAW_STATUS.DRAWING) {
-      if (!hasMoved.current) {
-        const distance = Math.hypot(
-          e.clientX - pointerDownData.current.clientX,
-          e.clientY - pointerDownData.current.clientY
-        );
-        if (distance <= DRAG_THRESHOLD) {
-          return;
-        } else {
-          hasMoved.current = true;
-        }
-      }
       dispatch(
         chartActions.draw(
           toCanvasPoint({
@@ -166,8 +168,12 @@ const Canvas = () => {
     if (shape.type === 'ellipse') {
       const latest = selectShapes(store.getState());
       const { relationId, handle } = shape;
-      // 記住點選的圖形
-      pointerDownData.current = { shape: latest.find((item) => item.id === relationId) };
+      // 記住點選圖形的資訊以及滑鼠的座標位置
+      pointerDownData.current = {
+        shape: latest.find((item) => item.id === relationId),
+        clientX: e.clientX,
+        clientY: e.clientY,
+      };
       // 傳入 id 為要調整座標的圖形
       dispatch(chartActions.startResize({ id: relationId, activeHandle: handle }));
       drawStatus.current = DRAW_STATUS.RESIZING;
@@ -181,6 +187,7 @@ const Canvas = () => {
       dispatch(chartActions.setSelection({ selectedId: shape.id, activeHandle: '' }));
       drawStatus.current = DRAW_STATUS.DRAGGING;
     }
+    hasMoved.current = false;
   }
 
   return (
