@@ -1,4 +1,7 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
+import { ActionCreators } from 'redux-undo';
+import { v4 as uuidv4 } from 'uuid';
+
 import {
   createShape,
   buildSelectionOverlay,
@@ -8,7 +11,6 @@ import {
   getMovedShape,
   getResizingBox,
 } from '@/utils/shape';
-import { v4 as uuidv4 } from 'uuid';
 
 const initialState = {
   shapes: [],
@@ -137,5 +139,11 @@ export const selectSelectionOverlay = createSelector(
   [selectShapes, selectSelectedId, selectActiveHandle],
   buildSelectionOverlay
 );
+
+// 開啟檔案：載入圖形並清空歷史紀錄
+export const openChart = (shapes) => (dispatch) => {
+  dispatch(chartActions.init({ shapes }));
+  dispatch(ActionCreators.clearHistory());
+};
 
 export default chartSlice.reducer;

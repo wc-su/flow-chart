@@ -1,7 +1,8 @@
 import { describe, it, beforeEach, expect } from 'vitest';
-import { makeStore } from './store';
-import { chartActions, selectCanUndo, selectCanRedo } from './chartSlice';
 import { ActionCreators } from 'redux-undo';
+
+import { chartActions, selectCanUndo, selectCanRedo, openChart } from './chartSlice';
+import { makeStore } from './store';
 import { SHAPE_TYPE } from '@/utils/shape';
 
 const initialState = {
@@ -298,8 +299,42 @@ describe('整合測試', () => {
 
       expect(getChart().present).toBe(s1);
     });
+
+    it('開舊檔後 undo，最多退回到開檔時的內容', () => {
+      store.dispatch(openChart([{ id: 'test-id-1' }]));
+
+      expect(getChart().past).toHaveLength(0);
+
+      // undo
+      store.dispatch(ActionCreators.undo());
+
+      expect(getChart().past).toHaveLength(0);
+      expect(getChart().present.shapes).toEqual([{ id: 'test-id-1' }]);
+    });
+
+    it('在 A 檔畫幾步後開 B 檔，past 是空的，undo 不會退回 A 的內容', () => {
+      // 開 A 檔
+      store.dispatch(openChart([{ id: 'test-id-a' }]));
+
+      // 畫兩張圖
+      drawShape(100, 150, SHAPE_TYPE.DECISION, 200, 300);
+      drawShape(500, 50, SHAPE_TYPE.FLOWLINE, 50, 250);
+
+      expect(getChart().past).toHaveLength(2);
+
+      // 開 B 檔
+      store.dispatch(openChart([{ id: 'test-id-b' }]));
+
+      expect(getChart().past).toHaveLength(0);
+      expect(getChart().present.shapes).toEqual([{ id: 'test-id-b' }]);
+
+      // undo
+      store.dispatch(ActionCreators.undo());
+
+      expect(getChart().past).toHaveLength(0);
+      expect(getChart().present.shapes).toEqual([{ id: 'test-id-b' }]);
+    });
   });
 });
 
-it.todo('開舊檔後 undo，最多退回到開檔時的內容（10/05 決定 clearHistory）');
 it.todo('clear 之後不能 undo（10/05 決定 clearHistory）');
