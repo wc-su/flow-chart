@@ -563,7 +563,7 @@ describe('isSameShape: 拖曳圖形是否和原本一樣', () => {
 });
 
 describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬高', () => {
-  it('nw，更換 endX/Y，x/y, width/height 重算', () => {
+  it('控制點 nw，更換 endX/Y，x/y, width/height 重算', () => {
     const handle = 'nw-resize';
     const shape = generateShape({
       x: 100,
@@ -581,7 +581,7 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
     expect(result).toEqual({ x: 150, y: 150, startX: 300, startY: 300, endX: 150, endY: 150, width: 150, height: 150 });
   });
 
-  it('n，endX 不變，y, height 重算', () => {
+  it('控制點 n，endX 不變，y, height 重算', () => {
     const handle = 'n-resize';
     const shape = generateShape({
       x: 50,
@@ -599,7 +599,7 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
     expect(result).toEqual({ x: 50, y: 50, startX: 50, startY: 350, endX: 350, endY: 50, width: 300, height: 300 });
   });
 
-  it('ne，更換 endX/Y，x/y, width/height 重算', () => {
+  it('控制點 ne，更換 endX/Y，x/y, width/height 重算', () => {
     const handle = 'ne-resize';
     const shape = generateShape({
       x: 150,
@@ -617,7 +617,7 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
     expect(result).toEqual({ x: 50, y: 50, startX: 150, startY: 380, endX: 50, endY: 50, width: 100, height: 330 });
   });
 
-  it('w，endY 不變，x, width 重算', () => {
+  it('控制點 w，endY 不變，x, width 重算', () => {
     const handle = 'w-resize';
     const shape = generateShape({
       x: 180,
@@ -635,7 +635,7 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
     expect(result).toEqual({ x: 120, y: 50, startX: 320, startY: 50, endX: 120, endY: 120, width: 200, height: 70 });
   });
 
-  it('e，endY 不變，x, width 重算', () => {
+  it('控制點 e，endY 不變，x, width 重算', () => {
     const handle = 'e-resize';
     const shape = generateShape({
       x: 120,
@@ -653,7 +653,7 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
     expect(result).toEqual({ x: 70, y: 100, startX: 120, startY: 100, endX: 70, endY: 350, width: 50, height: 250 });
   });
 
-  it('sw，更換 end，x/y, width/height 重算', () => {
+  it('控制點 sw，更換 end，x/y, width/height 重算', () => {
     const handle = 'sw-resize';
     const shape = generateShape({
       x: 120,
@@ -671,7 +671,7 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
     expect(result).toEqual({ x: 100, y: 180, startX: 300, startY: 180, endX: 100, endY: 400, width: 200, height: 220 });
   });
 
-  it('s，endX 不變，y, height 重算', () => {
+  it('控制點 s，endX 不變，y, height 重算', () => {
     const handle = 's-resize';
     const shape = generateShape({
       x: 150,
@@ -689,7 +689,7 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
     expect(result).toEqual({ x: 150, y: 300, startX: 150, startY: 300, endX: 450, endY: 800, width: 300, height: 500 });
   });
 
-  it('se，更換 endX/Y，x/y, width/height 重算', () => {
+  it('控制點 se，更換 endX/Y，x/y, width/height 重算', () => {
     const handle = 'se-resize';
     const shape = generateShape({
       x: 50,
@@ -707,7 +707,7 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
     expect(result).toEqual({ x: 50, y: 100, startX: 50, startY: 100, endX: 350, endY: 350, width: 300, height: 250 });
   });
 
-  it('start，更換 startX/Y', () => {
+  it('控制點 start，更換 startX/Y', () => {
     const handle = 'start-resize';
     const shape = generateShape({
       x: 100,
@@ -725,7 +725,7 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
     expect(result).toEqual({ x: 200, y: 100, startX: 250, startY: 100, endX: 200, endY: 300, width: 50, height: 200 });
   });
 
-  it('end，更換 endX/Y', () => {
+  it('控制點 end，更換 endX/Y', () => {
     const handle = 'end-resize';
     const shape = generateShape({
       x: 50,
@@ -743,7 +743,7 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
     expect(result).toEqual({ x: 150, y: 100, startX: 300, startY: 400, endX: 150, endY: 100, width: 150, height: 300 });
   });
 
-  it('n: 滑鼠 Y 位置離固定點 Y 不滿 24，x 不變，y, height 重算', () => {
+  it('控制點 n: 滑鼠 Y 位置離固定點 Y 不滿 24，x 不變，y, height 重算', () => {
     const handle = 'n-resize';
     const shape = generateShape({
       x: 100,
@@ -795,6 +795,78 @@ describe('getResizingBox: 依控制點、圖形、滑鼠位置計算 x, y 和寬
     const result = getResizingBox(handle, shape, 100, 800);
 
     expect(result).toEqual({ x: 100, y: 766, startX: 100, startY: 766, endX: 100, endY: 790, width: 0, height: 24 });
+  });
+
+  it('線：控制點 end，拖移到長度不滿 24，往滑鼠方向 (下) 撐到 24', () => {
+    const handle = 'end-resize';
+    const shape = generateShape({
+      x: 100,
+      y: 100,
+      startX: 100,
+      startY: 100,
+      endX: 300,
+      endY: 300,
+      width: 200,
+      height: 200,
+      type: SHAPE_TYPE.FLOWLINE,
+    });
+    const result = getResizingBox(handle, shape, 100, 112);
+
+    expect(result).toEqual({ x: 100, y: 100, startX: 100, startY: 100, endX: 100, endY: 124, width: 0, height: 24 });
+  });
+
+  it('線：控制點 start，拖到和固定點相同位置', () => {
+    const handle = 'start-resize';
+    const shape = generateShape({
+      x: 100,
+      y: 100,
+      startX: 100,
+      startY: 100,
+      endX: 300,
+      endY: 300,
+      width: 200,
+      height: 200,
+      type: SHAPE_TYPE.FLOWLINE,
+    });
+    const result = getResizingBox(handle, shape, 300, 300);
+
+    expect(result).toEqual({ x: 300, y: 300, startX: 324, startY: 300, endX: 300, endY: 300, width: 24, height: 0 });
+  });
+
+  it('線：控制點 start，拖到固定點，長度 0 而且靠右邊界，往左撐', () => {
+    const handle = 'start-resize';
+    const shape = generateShape({
+      x: 400,
+      y: 100,
+      startX: 400,
+      startY: 100,
+      endX: 590,
+      endY: 100,
+      width: 190,
+      height: 0,
+      type: SHAPE_TYPE.FLOWLINE,
+    });
+    const result = getResizingBox(handle, shape, 590, 100);
+
+    expect(result).toEqual({ x: 566, y: 100, startX: 566, startY: 100, endX: 590, endY: 100, width: 24, height: 0 });
+  });
+
+  it('線：控制點 end，滑鼠超出畫布', () => {
+    const handle = 'end-resize';
+    const shape = generateShape({
+      x: 100,
+      y: 100,
+      startX: 100,
+      startY: 100,
+      endX: 500,
+      endY: 200,
+      width: 400,
+      height: 100,
+      type: SHAPE_TYPE.FLOWLINE,
+    });
+    const result = getResizingBox(handle, shape, 700, -50);
+
+    expect(result).toEqual({ x: 100, y: 0, startX: 100, startY: 100, endX: 600, endY: 0, width: 500, height: 100 });
   });
 });
 
