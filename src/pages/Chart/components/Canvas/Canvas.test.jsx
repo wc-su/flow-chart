@@ -11,7 +11,7 @@ import { SHAPE_TYPE } from '@/utils/shape';
 
 vi.mock('uuid', () => ({ v4: () => 'test-uuid' }));
 
-const renderCanvas = () => {
+const renderCanvas = ({ zoom }) => {
   const store = makeStore();
   // 畫一個圖形
   store.dispatch(chartActions.startDraw(100, 120, SHAPE_TYPE.PROCESS));
@@ -22,7 +22,7 @@ const renderCanvas = () => {
   const { container } = render(
     <Provider store={store}>
       <ToolProvider>
-        <Canvas />
+        <Canvas zoom={zoom} />
       </ToolProvider>
     </Provider>
   );
@@ -32,7 +32,7 @@ const renderCanvas = () => {
 
 describe('Canvas: 移動不到 4px 當作點一下', () => {
   it('拖曳 1px 不寫入歷史', () => {
-    const { container, store } = renderCanvas();
+    const { container, store } = renderCanvas({ zoom: 100 });
 
     // SVG 圖形沒有文字、role，Testing Library 的查詢方法找不到，只能用 querySelector
     // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
@@ -50,7 +50,7 @@ describe('Canvas: 移動不到 4px 當作點一下', () => {
   });
 
   it('縮放 1px 不寫入歷史', () => {
-    const { container, store } = renderCanvas();
+    const { container, store } = renderCanvas({ zoom: 100 });
 
     // SVG 圖形沒有文字、role，Testing Library 的查詢方法找不到，只能用 querySelector
     // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
