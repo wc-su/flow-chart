@@ -9,16 +9,18 @@ const OPTIONS = [
   { value: 'jpg', icon: 'jpg.png', label: 'JPG' },
 ];
 
-// 每個測試都建立新的 onClose，記錄才不會被上一個測試影響
+// 每個測試都建立新的 mock 函式，記錄才不會被上一個測試影響
 const renderDropdown = ({ isOpen }) => {
   const onClose = vi.fn();
-  const props = { options: OPTIONS, onClose, onSelect: vi.fn(), onToggle: vi.fn() };
+  const onMainClick = vi.fn();
+  const onSelect = vi.fn();
+  const props = { options: OPTIONS, onClose, onMainClick, onSelect, onToggle: vi.fn() };
 
   const { rerender } = render(<ToolDropdown {...props} isOpen={isOpen} />);
   // 用同一組 props 重新渲染，只換 isOpen
   const setIsOpen = (nextIsOpen) => rerender(<ToolDropdown {...props} isOpen={nextIsOpen} />);
 
-  return { onClose, setIsOpen };
+  return { onClose, onMainClick, onSelect, setIsOpen };
 };
 
 describe('ToolDropdown', () => {
@@ -73,5 +75,29 @@ describe('ToolDropdown', () => {
     fireEvent.pointerDown(pointerDiv);
 
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('按主按鈕 → 呼叫 onMainClick，不呼叫 onSelect', () => {
+    const { onMainClick, onSelect } = renderDropdown({ isOpen: false });
+
+    const mainBtn = screen.getByRole('button', { name: 'PNG' });
+
+    fireEvent.click(mainBtn);
+
+    expect(onMainClick).toHaveBeenCalledTimes(1);
+    expect(onMainClick).toHaveBeenCalledWith(OPTIONS[0]);
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('選選項 → 呼叫 onSelect，不呼叫 onMainClick', () => {
+    const { onMainClick, onSelect } = renderDropdown({ isOpen: true });
+
+    const optionBtn = screen.getByRole('button', { name: 'JPG' });
+
+    fireEvent.click(optionBtn);
+
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onSelect).toHaveBeenCalledWith(OPTIONS[1]);
+    expect(onMainClick).not.toHaveBeenCalled();
   });
 });

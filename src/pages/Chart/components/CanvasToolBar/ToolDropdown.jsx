@@ -6,7 +6,7 @@ import './ToolDropdown.scss';
 
 import selectIcon from './images/down.png';
 
-const ToolDropdown = ({ options, active, disabled, onSelect, isOpen, onClose, onToggle }) => {
+const ToolDropdown = ({ options, active, disabled, onMainClick, onSelect, isOpen, onClose, onToggle }) => {
   const rootRef = useRef(null);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -36,10 +36,10 @@ const ToolDropdown = ({ options, active, disabled, onSelect, isOpen, onClose, on
     };
   }, [isOpen, onClose]);
 
-  function changeIndex(index) {
+  function selectOption(callback, index) {
     setSelectedIndex(index);
     onClose();
-    onSelect(options[index]);
+    callback(options[index]);
   }
 
   return (
@@ -50,7 +50,7 @@ const ToolDropdown = ({ options, active, disabled, onSelect, isOpen, onClose, on
         label={options[selectedIndex].label}
         active={active}
         disabled={disabled}
-        onClick={() => changeIndex(selectedIndex)}
+        onClick={() => selectOption(onMainClick, selectedIndex)}
       />
       <ToolButton className="toolDropdown__toggle" active={active} disabled={disabled} onClick={onToggle}>
         <img className="toolDropdown__arrow" src={selectIcon} alt="select" />
@@ -58,7 +58,12 @@ const ToolDropdown = ({ options, active, disabled, onSelect, isOpen, onClose, on
       {isOpen && (
         <div className="toolDropdown__menu">
           {options.map((item, index) => (
-            <button type="button" className="toolDropdown__option" key={item.value} onClick={() => changeIndex(index)}>
+            <button
+              type="button"
+              className="toolDropdown__option"
+              key={item.value}
+              onClick={() => selectOption(onSelect, index)}
+            >
               <img className="toolDropdown__optionImg" src={item.icon} alt="" />
               <span>{item.label}</span>
             </button>

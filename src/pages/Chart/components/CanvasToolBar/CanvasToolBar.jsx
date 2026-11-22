@@ -89,6 +89,7 @@ const CanvasToolBar = ({
           options={DRAW_OPTIONS}
           active={DRAW_OPTIONS.some((option) => option.value === tool)}
           disabled={isMobile}
+          onMainClick={(option) => setTool(tool === option.value ? null : option.value)}
           onSelect={(option) => setTool(option.value)}
           isOpen={openDropdown === 'draw'}
           onClose={() => setOpenDropdown(null)}
@@ -134,6 +135,7 @@ const CanvasToolBar = ({
         <ToolDropdown
           options={SAVE_OPTIONS}
           disabled={isMobile}
+          onMainClick={(option) => onExport(option.value)}
           onSelect={(option) => onExport(option.value)}
           isOpen={openDropdown === 'save'}
           onClose={() => setOpenDropdown(null)}
