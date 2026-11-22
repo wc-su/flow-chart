@@ -27,10 +27,9 @@ const chartSlice = createSlice({
       state.selectedId = null;
       state.activeHandle = '';
     },
-    deleteShape: (state, action) => {
-      state.shapes = action.payload.shapes;
+    deleteShape: (state) => {
+      state.shapes = state.shapes.filter((shape) => shape.id !== state.selectedId);
       state.selectedId = null;
-      state.activeHandle = '';
     },
     // 新增圖形初始資料
     startDraw: {

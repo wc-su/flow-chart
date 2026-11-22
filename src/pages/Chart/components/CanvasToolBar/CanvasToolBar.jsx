@@ -5,7 +5,7 @@ import { isMobile } from 'react-device-detect';
 import { useNavigate } from 'react-router';
 
 import { USER_STATUS } from '@/redux/userSlice';
-import { selectCanUndo, selectCanRedo, selectSelectedId } from '@/redux/chartSlice';
+import { selectCanUndo, selectCanRedo, selectSelectedId, chartActions } from '@/redux/chartSlice';
 import { useTool } from '../Tool/ToolContext';
 import { TOOL } from '../Tool/tool';
 import ToolButton from './ToolButton';
@@ -107,7 +107,12 @@ const CanvasToolBar = ({
           disabled={isMobile || !canRedo}
           onClick={() => dispatch(ActionCreators.redo())}
         />
-        <ToolButton icon={deleteIcon} label="delete" disabled={isMobile || selectedId === null} />
+        <ToolButton
+          icon={deleteIcon}
+          label="delete"
+          disabled={isMobile || selectedId === null}
+          onClick={() => dispatch(chartActions.deleteShape())}
+        />
       </div>
       <div className="canvasToolBar__container">
         <input

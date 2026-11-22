@@ -334,6 +334,27 @@ describe('整合測試', () => {
       expect(getChart().past).toHaveLength(0);
       expect(getChart().present.shapes).toEqual([{ id: 'test-id-b' }]);
     });
+
+    it('刪除後可以復原、重做', () => {
+      const keep = { id: 'keep' };
+      const remove = { id: 'remove' };
+      store.dispatch(openChart([remove, keep]));
+      store.dispatch(chartActions.setSelection({ selectedId: 'remove', activeHandle: '' }));
+
+      // delete
+      store.dispatch(chartActions.deleteShape());
+      expect(getChart().present.shapes).toEqual([keep]);
+      expect(getChart().present.selectedId).toBe(null);
+      expect(getChart().past).toHaveLength(1);
+
+      // undo
+      store.dispatch(ActionCreators.undo());
+      expect(getChart().present.shapes).toEqual([remove, keep]);
+
+      // redo
+      store.dispatch(ActionCreators.redo());
+      expect(getChart().present.shapes).toEqual([keep]);
+    });
   });
 });
 

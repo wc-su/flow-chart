@@ -64,14 +64,13 @@ describe('chartReducer', () => {
       const remove = generateShape({ id: 'remove' });
       const prev = {
         shapes: [keep, remove],
-        selectedId: 'test-1',
-        activeHandle: 'w-resize',
+        selectedId: 'remove',
+        activeHandle: '',
       };
-      const state = chartReducer(prev, chartActions.deleteShape({ shapes: [keep] }));
+      const state = chartReducer(prev, chartActions.deleteShape());
 
       expect(state.shapes).toEqual([keep]);
       expect(state.selectedId).toBeNull();
-      expect(state.activeHandle).toBe('');
     });
   });
 
