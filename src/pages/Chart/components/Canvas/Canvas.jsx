@@ -30,7 +30,7 @@ const DRAW_STATUS = Object.freeze({
 // 移動超過這個距離 (螢幕 px) 才算拖曳
 const DRAG_THRESHOLD = 4;
 
-const Canvas = () => {
+const Canvas = ({ zoom }) => {
   const dispatch = useDispatch();
   const store = useStore();
 
@@ -44,7 +44,7 @@ const Canvas = () => {
   const shapes = useSelector(selectShapes);
   const selectionOverlay = useSelector(selectSelectionOverlay);
 
-  const newRate = 1;
+  const newRate = zoom / 100;
   const isMoveTool = tool === TOOL.MOVE;
   const isDrawTool = !!tool && tool !== TOOL.MOVE;
 

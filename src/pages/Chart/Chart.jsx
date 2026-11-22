@@ -60,7 +60,7 @@ const Chart = () => {
             onExport={handleExport}
           />
           <div className="chart__main">
-            <Canvas />
+            <Canvas zoom={zoom} />
           </div>
         </ToolProvider>
       )}
