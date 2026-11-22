@@ -392,3 +392,16 @@ function clampPoint({ type, anchorX, anchorY, pointerX, pointerY }) {
     return { x: clampAxis(anchorX, x, CANVAS_WIDTH), y: clampAxis(anchorY, y, CANVAS_HEIGHT) };
   }
 }
+
+/**
+ * 找出新增或位置、大小改變的圖形
+ * @param {Array} prevShapes 改變前的圖形
+ * @param {Array} nextShapes 改變後的圖形
+ * @returns {Object|undefined} 改變的圖形，只有刪除時是 undefined
+ */
+export function findChangedShape(prevShapes, nextShapes) {
+  return nextShapes.find((shape) => {
+    const prev = prevShapes.find((item) => item.id === shape.id);
+    return !prev || !isEqualShape(prev, shape);
+  });
+}

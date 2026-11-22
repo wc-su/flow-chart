@@ -3,6 +3,7 @@ import { ActionCreators } from 'redux-undo';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
+  findChangedShape,
   createShape,
   buildSelectionOverlay,
   getDrawingBox,
@@ -144,5 +145,17 @@ export const openChart = (shapes) => (dispatch) => {
   dispatch(chartActions.init({ shapes }));
   dispatch(ActionCreators.clearHistory());
 };
+
+// undo、redo 後選取有改變的圖形，圖形消失時不選取
+const changeHistory = (action) => (dispatch, getState) => {
+  const prevShapes = selectShapes(getState());
+  dispatch(action);
+  const changed = findChangedShape(prevShapes, selectShapes(getState()));
+  dispatch(
+    changed ? chartActions.setSelection({ selectedId: changed.id, activeHandle: '' }) : chartActions.clearSelection()
+  );
+};
+export const undoChart = () => changeHistory(ActionCreators.undo());
+export const redoChart = () => changeHistory(ActionCreators.redo());
 
 export default chartSlice.reducer;

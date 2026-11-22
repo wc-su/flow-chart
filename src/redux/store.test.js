@@ -1,7 +1,7 @@
 import { describe, it, beforeEach, expect } from 'vitest';
 import { ActionCreators } from 'redux-undo';
 
-import { chartActions, selectCanUndo, selectCanRedo, openChart } from './chartSlice';
+import { chartActions, selectCanUndo, selectCanRedo, openChart, undoChart, redoChart } from './chartSlice';
 import { makeStore } from './store';
 import { SHAPE_TYPE } from '@/utils/shape';
 
@@ -275,7 +275,7 @@ describe('整合測試', () => {
       expect(getChart().present.selectedId).toBe(s2Id);
 
       // undo
-      store.dispatch(ActionCreators.undo());
+      store.dispatch(undoChart());
 
       expect(getChart().present.selectedId).toBe(null);
       expect(getChart().present.shapes).toHaveLength(1);
@@ -354,6 +354,103 @@ describe('整合測試', () => {
       // redo
       store.dispatch(ActionCreators.redo());
       expect(getChart().present.shapes).toEqual([keep]);
+    });
+
+    it('畫圖、拖曳、刪除後 undo/redo，確認選取對象', () => {
+      // 畫圖
+      drawShape(100, 150, SHAPE_TYPE.DECISION, 300, 350);
+      const firstShape = getChart().present.shapes[0];
+
+      expect(getChart().present.selectedId).toBe(firstShape.id);
+
+      // 畫線
+      drawShape(400, 50, SHAPE_TYPE.FLOWLINE, 150, 150);
+      const secondShape = getChart().present.shapes[1];
+
+      expect(getChart().past).toHaveLength(2);
+      expect(getChart().present.shapes).toHaveLength(2);
+      expect(getChart().present.selectedId).toBe(secondShape.id);
+
+      // 拖曳第一個圖形
+      store.dispatch(chartActions.setSelection({ selectedId: firstShape.id, activeHandle: '' }));
+      store.dispatch(chartActions.moveShape({ initShape: firstShape, distanceX: 50, distanceY: 100 }));
+      store.dispatch(chartActions.endDraw({ id: firstShape.id }));
+      const movedFirstShape = getChart().present.shapes[0];
+
+      expect(getChart().present.selectedId).toBe(firstShape.id);
+
+      // 刪除第一個圖形
+      store.dispatch(chartActions.deleteShape());
+
+      expect(getChart().present.shapes).toEqual([secondShape]);
+      expect(getChart().present.selectedId).toBe(null);
+
+      // 選擇第二個圖形，刪除
+      store.dispatch(chartActions.setSelection({ selectedId: secondShape.id, activeHandle: '' }));
+      store.dispatch(chartActions.deleteShape());
+
+      expect(getChart().present.shapes).toHaveLength(0);
+      expect(getChart().present.selectedId).toBe(null);
+
+      // undo
+      store.dispatch(undoChart());
+
+      expect(getChart().present.shapes).toEqual([secondShape]);
+      expect(getChart().present.selectedId).toBe(secondShape.id);
+
+      // undo
+      store.dispatch(undoChart());
+
+      expect(getChart().present.shapes).toEqual([movedFirstShape, secondShape]);
+      expect(getChart().present.selectedId).toBe(movedFirstShape.id);
+
+      // undo
+      store.dispatch(undoChart());
+
+      expect(getChart().present.shapes).toEqual([firstShape, secondShape]);
+      expect(getChart().present.selectedId).toBe(firstShape.id);
+
+      // undo
+      store.dispatch(undoChart());
+
+      expect(getChart().present.shapes).toEqual([firstShape]);
+      expect(getChart().present.selectedId).toBe(null);
+
+      // undo
+      store.dispatch(undoChart());
+
+      expect(getChart().present.shapes).toHaveLength(0);
+      expect(getChart().present.selectedId).toBe(null);
+
+      // redo
+      store.dispatch(redoChart());
+
+      expect(getChart().present.shapes).toEqual([firstShape]);
+      expect(getChart().present.selectedId).toBe(firstShape.id);
+
+      // redo
+      store.dispatch(redoChart());
+
+      expect(getChart().present.shapes).toEqual([firstShape, secondShape]);
+      expect(getChart().present.selectedId).toBe(secondShape.id);
+
+      // redo
+      store.dispatch(redoChart());
+
+      expect(getChart().present.shapes).toEqual([movedFirstShape, secondShape]);
+      expect(getChart().present.selectedId).toBe(movedFirstShape.id);
+
+      // redo
+      store.dispatch(redoChart());
+
+      expect(getChart().present.shapes).toEqual([secondShape]);
+      expect(getChart().present.selectedId).toBe(null);
+
+      // redo
+      store.dispatch(redoChart());
+
+      expect(getChart().present.shapes).toHaveLength(0);
+      expect(getChart().present.selectedId).toBe(null);
     });
   });
 });

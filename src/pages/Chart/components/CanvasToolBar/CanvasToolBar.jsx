@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ActionCreators } from 'redux-undo';
 import { isMobile } from 'react-device-detect';
 import { useNavigate } from 'react-router';
 
 import { USER_STATUS } from '@/redux/userSlice';
-import { selectCanUndo, selectCanRedo, selectSelectedId, chartActions } from '@/redux/chartSlice';
+import { selectCanUndo, selectCanRedo, selectSelectedId, chartActions, undoChart, redoChart } from '@/redux/chartSlice';
 import { useTool } from '../Tool/ToolContext';
 import { TOOL } from '../Tool/tool';
 import ToolButton from './ToolButton';
@@ -99,13 +98,13 @@ const CanvasToolBar = ({
           icon={undoIcon}
           label="undo"
           disabled={isMobile || !canUndo}
-          onClick={() => dispatch(ActionCreators.undo())}
+          onClick={() => dispatch(undoChart())}
         />
         <ToolButton
           icon={redoIcon}
           label="redo"
           disabled={isMobile || !canRedo}
-          onClick={() => dispatch(ActionCreators.redo())}
+          onClick={() => dispatch(redoChart())}
         />
         <ToolButton
           icon={deleteIcon}

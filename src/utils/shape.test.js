@@ -10,6 +10,7 @@ import {
   isSameShape,
   getResizingBox,
   isEqualShape,
+  findChangedShape,
 } from './shape';
 
 const generateShape = ({ startX, startY, endX, endY, x, y, type, ...rest }) => ({
@@ -981,5 +982,33 @@ describe('isEqualShape: 比對新舊圖形起點、終點座標，看圖形是�
     const result = isEqualShape(oldShape, newShape);
 
     expect(result).toBe(false);
+  });
+});
+
+describe('findChangedShape: 找出新增或位置、大小改變的圖形', () => {
+  it('有新增的圖形時，回傳新增的圖形', () => {
+    const prev = { id: 'test-1' };
+    const next = { id: 'test-2' };
+    const oldShapes = [prev];
+    const newShapes = [prev, next];
+    const result = findChangedShape(oldShapes, newShapes);
+
+    expect(result).toBe(next);
+  });
+
+  it('目前圖形和 prev 的座標位置不同', () => {
+    const oldShapes = [{ id: 'test-1', startX: 100, startY: 150, endX: 200, endY: 250 }];
+    const newShapes = [{ id: 'test-1', startX: 100, startY: 150, endX: 300, endY: 400 }];
+    const result = findChangedShape(oldShapes, newShapes);
+
+    expect(result).toBe(newShapes[0]);
+  });
+
+  it('只少了圖形時，回傳 undefined', () => {
+    const oldShapes = [{ id: 'test-1' }, { id: 'test-2' }];
+    const newShapes = [{ id: 'test-1' }];
+    const result = findChangedShape(oldShapes, newShapes);
+
+    expect(result).toBe(undefined);
   });
 });
