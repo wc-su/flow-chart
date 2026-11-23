@@ -30,7 +30,7 @@ const DRAW_STATUS = Object.freeze({
 // 移動超過這個距離 (螢幕 px) 才算拖曳
 const DRAG_THRESHOLD = 4;
 
-const Canvas = ({ zoom }) => {
+const Canvas = ({ canvasRef, zoom, isExporting }) => {
   const dispatch = useDispatch();
   const store = useStore();
 
@@ -229,6 +229,7 @@ const Canvas = ({ zoom }) => {
       onPointerLeave={handlePointerUp}
     >
       <svg
+        ref={canvasRef}
         width={CANVAS_WIDTH * newRate}
         height={CANVAS_HEIGHT * newRate}
         viewBox={`0 0 ${CANVAS_WIDTH * newRate} ${CANVAS_HEIGHT * newRate}`}
@@ -244,14 +245,15 @@ const Canvas = ({ zoom }) => {
           />
         ))}
         {/* 畫圖的外圍 */}
-        {selectionOverlay.map((shape) => (
-          <CanvasDrawItem
-            key={shape.id}
-            shape={shape}
-            newRate={newRate}
-            onPointerDown={(e) => handleShapePointerDown(e, shape)}
-          />
-        ))}
+        {!isExporting &&
+          selectionOverlay.map((shape) => (
+            <CanvasDrawItem
+              key={shape.id}
+              shape={shape}
+              newRate={newRate}
+              onPointerDown={(e) => handleShapePointerDown(e, shape)}
+            />
+          ))}
       </svg>
     </div>
   );
