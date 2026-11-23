@@ -1,7 +1,9 @@
 import { describe, it, beforeEach, expect } from 'vitest';
-import { makeStore } from './store';
-import { chartActions, selectCanUndo, selectCanRedo } from './chartSlice';
 import { ActionCreators } from 'redux-undo';
+
+import { chartActions, selectCanUndo, selectCanRedo, openChart, undoChart, redoChart } from './chartSlice';
+import { makeStore } from './store';
+import { SHAPE_TYPE } from '@/utils/shape';
 
 const initialState = {
   shapes: [],
@@ -14,16 +16,13 @@ beforeEach(() => {
   store = makeStore(); // 每個測試開始前都拿到全新的 store
 });
 const getChart = () => store.getState().chart;
-// 回傳「最後一筆被改過」的新 shapes 陣列
-const updateLastShape = (changes) => {
-  const shapes = getChart().present.shapes;
-  return [...shapes.slice(0, -1), { ...shapes[shapes.length - 1], ...changes }];
-};
 // 完整畫一個圖形 startDraw -> draw -> endDraw
-const drawShape = (x, y, drawType) => {
-  store.dispatch(chartActions.startDraw(x, y, drawType));
-  store.dispatch(chartActions.draw({ shapes: updateLastShape({ endX: x + 1, endY: y + 1 }) }));
-  store.dispatch(chartActions.endDraw({ shapes: updateLastShape({ endX: x + 4, endY: y + 4 }) }));
+const drawShape = (startX, startY, drawType, endX, endY) => {
+  store.dispatch(chartActions.startDraw(startX, startY, drawType));
+  const shapes = getChart().present.shapes;
+  const id = shapes[shapes.length - 1].id;
+  store.dispatch(chartActions.draw({ x: endX, y: endY }));
+  store.dispatch(chartActions.endDraw({ id }));
 };
 
 describe('整合測試', () => {
@@ -49,20 +48,29 @@ describe('整合測試', () => {
 
     it('畫第一張圖形', () => {
       store.dispatch(chartActions.init({ shapes: [{ id: 'init-id' }] }));
-      drawShape(10, 20, 'process');
+      drawShape(10, 20, SHAPE_TYPE.TERMINAL, 100, 200);
 
       // past: [S0, S1], present: S2, future: []
       expect(getChart().past).toHaveLength(2);
       expect(getChart().past[0].shapes).toHaveLength(0);
       expect(getChart().past[1].shapes).toHaveLength(1);
       expect(getChart().present.shapes).toHaveLength(2);
+      const shapes = getChart().present.shapes;
+      expect(shapes[1].startX).toBe(10);
+      expect(shapes[1].startY).toBe(20);
+      expect(shapes[1].x).toBe(10);
+      expect(shapes[1].y).toBe(20);
+      expect(shapes[1].endX).toBe(100);
+      expect(shapes[1].endY).toBe(200);
+      expect(shapes[1].width).toBe(90);
+      expect(shapes[1].height).toBe(180);
       expect(getChart().future).toHaveLength(0);
     });
 
     it('畫兩個圖形', () => {
       store.dispatch(chartActions.init({ shapes: [{ id: 'init-id' }] }));
-      drawShape(10, 20, 'process');
-      drawShape(30, 40, 'terminal');
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 300);
+      drawShape(30, 40, SHAPE_TYPE.TERMINAL, 100, 600);
 
       // past: [S0, S1, S2], present: S3, future: []
       expect(getChart().past).toHaveLength(3);
@@ -89,29 +97,65 @@ describe('整合測試', () => {
       expect(getChart().future).toHaveLength(0);
 
       store.dispatch(chartActions.startDraw(10, 20, 'inputOutput'));
+      const shapes = getChart().present.shapes;
+      const id = shapes[shapes.length - 1].id;
 
       expect(getChart().past).toEqual([s0]);
       expect(getChart().present.shapes).toHaveLength(2);
       expect(getChart().future).toHaveLength(0);
 
-      const drawShapes = getChart().present.shapes;
-      const drawLast = drawShapes[drawShapes.length - 1];
-      store.dispatch(chartActions.draw({ shapes: [...drawShapes.slice(0, -1), { ...drawLast, endX: 11, endY: 21 }] }));
+      store.dispatch(chartActions.draw({ x: 11, y: 21 }));
 
       expect(getChart().past).toEqual([s0]);
       expect(getChart().present.shapes).toHaveLength(2);
       expect(getChart().future).toHaveLength(0);
 
-      const endDrawShapes = getChart().present.shapes;
-      const endDrawLast = endDrawShapes[endDrawShapes.length - 1];
-      store.dispatch(
-        chartActions.endDraw({ shapes: [...endDrawShapes.slice(0, -1), { ...endDrawLast, endX: 15, endY: 25 }] })
-      );
+      store.dispatch(chartActions.endDraw({ id }));
       const s2 = getChart().present;
 
       expect(getChart().past).toEqual([s0, s1]);
       expect(getChart().present).toBe(s2);
       expect(getChart().future).toHaveLength(0);
+    });
+
+    it('太小的圖形不進歷史', () => {
+      store.dispatch(chartActions.init({ shapes: [{ id: 'init-id' }] }));
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 300);
+
+      const prevState = getChart();
+
+      // 高度不滿 24，取消畫圖
+      store.dispatch(chartActions.startDraw(500, 600, SHAPE_TYPE.INPUTOUTPUT));
+      store.dispatch(chartActions.draw({ x: 400, y: 623 }));
+      store.dispatch(chartActions.cancelDraw());
+
+      expect(getChart().past).toEqual(prevState.past);
+      expect(getChart().present).toEqual(prevState.present);
+    });
+
+    it('縮放圖形', () => {
+      store.dispatch(chartActions.init({ shapes: [{ id: 'init-id' }] }));
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 300);
+
+      const prevState = getChart();
+      const id = prevState.present.shapes[1].id;
+
+      // 選擇剛畫好的圖形
+      store.dispatch(chartActions.setSelection({ selectedId: id, activeHandle: '' }));
+
+      // 縮放選擇的圖形
+      store.dispatch(chartActions.startResize({ id, activeHandle: 'se-resize' }));
+      store.dispatch(chartActions.resizeShape({ x: 400, y: 600 }));
+      store.dispatch(chartActions.endDraw({ id }));
+
+      expect(getChart().present.shapes[1].endX).toBe(400);
+      expect(getChart().present.shapes[1].endY).toBe(600);
+      expect(getChart().present.selectedId).toBe(id);
+      expect(getChart().present.activeHandle).toBe('');
+
+      // undo
+      store.dispatch(ActionCreators.undo());
+      expect(getChart().present).toEqual(prevState.present);
     });
   });
 
@@ -135,10 +179,10 @@ describe('整合測試', () => {
       store.dispatch(chartActions.init({ shapes: payloadInit }));
       const s1 = getChart().present; // [init]
 
-      drawShape(10, 20, 'process');
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 300);
       const s2 = getChart().present; // [init, A]
 
-      drawShape(30, 40, 'terminal');
+      drawShape(30, 40, SHAPE_TYPE.TERMINAL, 180, 150);
       const s3 = getChart().present; // [init, A, B]
 
       store.dispatch(ActionCreators.undo());
@@ -180,15 +224,15 @@ describe('整合測試', () => {
       store.dispatch(chartActions.init({ shapes: payloadInit }));
       const s1 = getChart().present; // [init]
 
-      drawShape(10, 20, 'process');
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 100);
       const s2 = getChart().present; // [init, A]
 
-      drawShape(30, 40, 'terminal');
+      drawShape(30, 40, SHAPE_TYPE.TERMINAL, 400, 150);
       const s3a = getChart().present; // [init, A, B]
 
       store.dispatch(ActionCreators.undo());
 
-      drawShape(50, 60, 'inputOutput');
+      drawShape(50, 60, SHAPE_TYPE.INPUTOUTPUT, 250, 360);
       const s3b = getChart().present; // [init, A, C]
 
       expect(getChart().future).toHaveLength(0);
@@ -219,8 +263,196 @@ describe('整合測試', () => {
       expect(selectCanUndo(store.getState())).toBe(false);
       expect(selectCanRedo(store.getState())).toBe(true);
     });
+
+    it('畫完圖後 undo 會取消選取', () => {
+      const payloadInit = [{ id: 'init-id' }];
+      store.dispatch(chartActions.init({ shapes: payloadInit }));
+
+      // 畫圖
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 100);
+      const s2Id = getChart().present.shapes[1].id;
+
+      expect(getChart().present.selectedId).toBe(s2Id);
+
+      // undo
+      store.dispatch(undoChart());
+
+      expect(getChart().present.selectedId).toBe(null);
+      expect(getChart().present.shapes).toHaveLength(1);
+    });
+
+    it('取消之後再畫一個，undo 一次', () => {
+      const payloadInit = [{ id: 'init-id' }];
+      store.dispatch(chartActions.init({ shapes: payloadInit }));
+      const s1 = getChart().present;
+
+      // 寬度太小，執行 cancelDraw
+      store.dispatch(chartActions.startDraw(100, 200, SHAPE_TYPE.TERMINAL));
+      store.dispatch(chartActions.draw({ x: 123, y: 400 }));
+      store.dispatch(chartActions.cancelDraw());
+
+      // 正常畫圖
+      drawShape(10, 20, SHAPE_TYPE.PROCESS, 200, 100);
+
+      // undo
+      store.dispatch(ActionCreators.undo());
+
+      expect(getChart().present).toBe(s1);
+    });
+
+    it('開舊檔後 undo，最多退回到開檔時的內容', () => {
+      store.dispatch(openChart([{ id: 'test-id-1' }]));
+
+      expect(getChart().past).toHaveLength(0);
+
+      // undo
+      store.dispatch(ActionCreators.undo());
+
+      expect(getChart().past).toHaveLength(0);
+      expect(getChart().present.shapes).toEqual([{ id: 'test-id-1' }]);
+    });
+
+    it('在 A 檔畫幾步後開 B 檔，past 是空的，undo 不會退回 A 的內容', () => {
+      // 開 A 檔
+      store.dispatch(openChart([{ id: 'test-id-a' }]));
+
+      // 畫兩張圖
+      drawShape(100, 150, SHAPE_TYPE.DECISION, 200, 300);
+      drawShape(500, 50, SHAPE_TYPE.FLOWLINE, 50, 250);
+
+      expect(getChart().past).toHaveLength(2);
+
+      // 開 B 檔
+      store.dispatch(openChart([{ id: 'test-id-b' }]));
+
+      expect(getChart().past).toHaveLength(0);
+      expect(getChart().present.shapes).toEqual([{ id: 'test-id-b' }]);
+
+      // undo
+      store.dispatch(ActionCreators.undo());
+
+      expect(getChart().past).toHaveLength(0);
+      expect(getChart().present.shapes).toEqual([{ id: 'test-id-b' }]);
+    });
+
+    it('刪除後可以復原、重做', () => {
+      const keep = { id: 'keep' };
+      const remove = { id: 'remove' };
+      store.dispatch(openChart([remove, keep]));
+      store.dispatch(chartActions.setSelection({ selectedId: 'remove', activeHandle: '' }));
+
+      // delete
+      store.dispatch(chartActions.deleteShape());
+      expect(getChart().present.shapes).toEqual([keep]);
+      expect(getChart().present.selectedId).toBe(null);
+      expect(getChart().past).toHaveLength(1);
+
+      // undo
+      store.dispatch(ActionCreators.undo());
+      expect(getChart().present.shapes).toEqual([remove, keep]);
+
+      // redo
+      store.dispatch(ActionCreators.redo());
+      expect(getChart().present.shapes).toEqual([keep]);
+    });
+
+    it('畫圖、拖曳、刪除後 undo/redo，確認選取對象', () => {
+      // 畫圖
+      drawShape(100, 150, SHAPE_TYPE.DECISION, 300, 350);
+      const firstShape = getChart().present.shapes[0];
+
+      expect(getChart().present.selectedId).toBe(firstShape.id);
+
+      // 畫線
+      drawShape(400, 50, SHAPE_TYPE.FLOWLINE, 150, 150);
+      const secondShape = getChart().present.shapes[1];
+
+      expect(getChart().past).toHaveLength(2);
+      expect(getChart().present.shapes).toHaveLength(2);
+      expect(getChart().present.selectedId).toBe(secondShape.id);
+
+      // 拖曳第一個圖形
+      store.dispatch(chartActions.setSelection({ selectedId: firstShape.id, activeHandle: '' }));
+      store.dispatch(chartActions.moveShape({ initShape: firstShape, distanceX: 50, distanceY: 100 }));
+      store.dispatch(chartActions.endDraw({ id: firstShape.id }));
+      const movedFirstShape = getChart().present.shapes[0];
+
+      expect(getChart().present.selectedId).toBe(firstShape.id);
+
+      // 刪除第一個圖形
+      store.dispatch(chartActions.deleteShape());
+
+      expect(getChart().present.shapes).toEqual([secondShape]);
+      expect(getChart().present.selectedId).toBe(null);
+
+      // 選擇第二個圖形，刪除
+      store.dispatch(chartActions.setSelection({ selectedId: secondShape.id, activeHandle: '' }));
+      store.dispatch(chartActions.deleteShape());
+
+      expect(getChart().present.shapes).toHaveLength(0);
+      expect(getChart().present.selectedId).toBe(null);
+
+      // undo
+      store.dispatch(undoChart());
+
+      expect(getChart().present.shapes).toEqual([secondShape]);
+      expect(getChart().present.selectedId).toBe(secondShape.id);
+
+      // undo
+      store.dispatch(undoChart());
+
+      expect(getChart().present.shapes).toEqual([movedFirstShape, secondShape]);
+      expect(getChart().present.selectedId).toBe(movedFirstShape.id);
+
+      // undo
+      store.dispatch(undoChart());
+
+      expect(getChart().present.shapes).toEqual([firstShape, secondShape]);
+      expect(getChart().present.selectedId).toBe(firstShape.id);
+
+      // undo
+      store.dispatch(undoChart());
+
+      expect(getChart().present.shapes).toEqual([firstShape]);
+      expect(getChart().present.selectedId).toBe(null);
+
+      // undo
+      store.dispatch(undoChart());
+
+      expect(getChart().present.shapes).toHaveLength(0);
+      expect(getChart().present.selectedId).toBe(null);
+
+      // redo
+      store.dispatch(redoChart());
+
+      expect(getChart().present.shapes).toEqual([firstShape]);
+      expect(getChart().present.selectedId).toBe(firstShape.id);
+
+      // redo
+      store.dispatch(redoChart());
+
+      expect(getChart().present.shapes).toEqual([firstShape, secondShape]);
+      expect(getChart().present.selectedId).toBe(secondShape.id);
+
+      // redo
+      store.dispatch(redoChart());
+
+      expect(getChart().present.shapes).toEqual([movedFirstShape, secondShape]);
+      expect(getChart().present.selectedId).toBe(movedFirstShape.id);
+
+      // redo
+      store.dispatch(redoChart());
+
+      expect(getChart().present.shapes).toEqual([secondShape]);
+      expect(getChart().present.selectedId).toBe(null);
+
+      // redo
+      store.dispatch(redoChart());
+
+      expect(getChart().present.shapes).toHaveLength(0);
+      expect(getChart().present.selectedId).toBe(null);
+    });
   });
 });
 
-it.todo('開舊檔後 undo，最多退回到開檔時的內容（10/05 決定 clearHistory）');
 it.todo('clear 之後不能 undo（10/05 決定 clearHistory）');

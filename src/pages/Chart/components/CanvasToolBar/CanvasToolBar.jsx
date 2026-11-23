@@ -1,33 +1,32 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ActionCreators } from 'redux-undo';
 import { isMobile } from 'react-device-detect';
 import { useNavigate } from 'react-router';
 
+import { USER_STATUS } from '@/redux/userSlice';
+import { selectCanUndo, selectCanRedo, selectSelectedId, chartActions, undoChart, redoChart } from '@/redux/chartSlice';
+import { useTool } from '../Tool/ToolContext';
+import { TOOL } from '../Tool/tool';
 import ToolButton from './ToolButton';
 import ToolDropdown from './ToolDropdown';
-import { USER_STATUS } from '@/redux/userSlice';
-import { selectCanUndo, selectCanRedo, selectSelectedId } from '@/redux/chartSlice';
-import { useTool } from './Tool/ToolContext';
-import { TOOL } from './Tool/tool';
 
 import './CanvasToolBar.scss';
 
-import terminalIcon from '../images/terminal.png';
-import processIcon from '../images/process.png';
-import inputOutputIcon from '../images/inputOutput.png';
-import decisionIcon from '../images/decision.png';
-import flowlineIcon from '../images/flowline.png';
-import saveAsJPGIcon from '../images/save-as-jpg.png';
-import saveAsPNGIcon from '../images/save-as-png.png';
-import backIcon from '../images/back-files.png';
-import moveIcon from '../images/canvas-move.png';
-import undoIcon from '../images/back-step.png';
-import redoIcon from '../images/next-step.png';
-import deleteIcon from '../images/delete.png';
-import uploadIcon from '../images/upload.png';
-import zoomInIcon from '../images/zoom-in.png';
-import zoomOutIcon from '../images/zoom-out.png';
+import terminalIcon from './images/terminal.png';
+import processIcon from './images/process.png';
+import inputOutputIcon from './images/inputOutput.png';
+import decisionIcon from './images/decision.png';
+import flowlineIcon from './images/flowline.png';
+import saveAsJPGIcon from './images/save-as-jpg.png';
+import saveAsPNGIcon from './images/save-as-png.png';
+import backIcon from './images/back-files.png';
+import moveIcon from './images/canvas-move.png';
+import undoIcon from './images/back-step.png';
+import redoIcon from './images/next-step.png';
+import deleteIcon from './images/delete.png';
+import uploadIcon from './images/upload.png';
+import zoomInIcon from './images/zoom-in.png';
+import zoomOutIcon from './images/zoom-out.png';
 
 const DRAW_OPTIONS = Object.freeze([
   { value: TOOL.TERMINAL, icon: terminalIcon, label: 'Terminal' },
@@ -88,8 +87,10 @@ const CanvasToolBar = ({
         />
         <ToolDropdown
           options={DRAW_OPTIONS}
+          toggleLabel="圖形選單"
           active={DRAW_OPTIONS.some((option) => option.value === tool)}
           disabled={isMobile}
+          onMainClick={(option) => setTool(tool === option.value ? null : option.value)}
           onSelect={(option) => setTool(option.value)}
           isOpen={openDropdown === 'draw'}
           onClose={() => setOpenDropdown(null)}
@@ -99,15 +100,20 @@ const CanvasToolBar = ({
           icon={undoIcon}
           label="undo"
           disabled={isMobile || !canUndo}
-          onClick={() => dispatch(ActionCreators.undo())}
+          onClick={() => dispatch(undoChart())}
         />
         <ToolButton
           icon={redoIcon}
           label="redo"
           disabled={isMobile || !canRedo}
-          onClick={() => dispatch(ActionCreators.redo())}
+          onClick={() => dispatch(redoChart())}
         />
-        <ToolButton icon={deleteIcon} label="delete" disabled={isMobile || selectedId === null} />
+        <ToolButton
+          icon={deleteIcon}
+          label="delete"
+          disabled={isMobile || selectedId === null}
+          onClick={() => dispatch(chartActions.deleteShape())}
+        />
       </div>
       <div className="canvasToolBar__container">
         <input
@@ -129,8 +135,9 @@ const CanvasToolBar = ({
         />
         <ToolDropdown
           options={SAVE_OPTIONS}
+          toggleLabel="匯出選單"
           disabled={isMobile}
-          onSelect={(option) => onExport(option.value)}
+          onMainClick={(option) => onExport(option.value)}
           isOpen={openDropdown === 'save'}
           onClose={() => setOpenDropdown(null)}
           onToggle={() => handleToggleDropdown('save')}

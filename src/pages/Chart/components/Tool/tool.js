@@ -1,8 +1,6 @@
+import { SHAPE_TYPE } from '@/utils/shape';
+
 export const TOOL = Object.freeze({
   MOVE: 'move',
-  TERMINAL: 'terminal',
-  PROCESS: 'process',
-  INPUTOUTPUT: 'inputOutput',
-  DECISION: 'decision',
-  FLOWLINE: 'flowline',
+  ...SHAPE_TYPE,
 });

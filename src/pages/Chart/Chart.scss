@@ -3,10 +3,10 @@
 .chart {
   display: grid;
   grid-template-rows: auto 1fr; // 工具列照內容高度，畫布區填滿剩下的
-  overflow: hidden;
+  overflow: hidden; // 讓頁面不被撐高
 }
 .chart__main {
-  overflow: hidden;
+  overflow: hidden; // 把畫布限制在工作區內
   background-color: colors.$gray-200;
 }
 

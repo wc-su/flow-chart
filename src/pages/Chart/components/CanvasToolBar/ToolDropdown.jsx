@@ -4,9 +4,9 @@ import ToolButton from './ToolButton';
 
 import './ToolDropdown.scss';
 
-import selectIcon from '../images/down.png';
+import selectIcon from './images/down.png';
 
-const ToolDropdown = ({ options, active, disabled, onSelect, isOpen, onClose, onToggle }) => {
+const ToolDropdown = ({ options, toggleLabel, active, disabled, onMainClick, onSelect, isOpen, onClose, onToggle }) => {
   const rootRef = useRef(null);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -24,19 +24,22 @@ const ToolDropdown = ({ options, active, disabled, onSelect, isOpen, onClose, on
       if (e.key === 'Escape') onClose();
     }
 
-    document.addEventListener('pointerdown', handlePointerDown);
+    // 第三個參數 true: 改成在捕獲階段監聽，事件往內傳時 document 會先收到
+    // 用冒泡階段的話，點到圖形時 Canvas 的 stopPropagation 會擋住事件，這邊選單不會關閉
+    document.addEventListener('pointerdown', handlePointerDown, true);
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       // cleanup: 選單關閉或元件消失時移除，不然監聽會一直留著
-      document.removeEventListener('pointerdown', handlePointerDown);
+      // 移除時也要傳 true，和加的時候一致才可以移除
+      document.removeEventListener('pointerdown', handlePointerDown, true);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, onClose]);
 
-  function changeIndex(index) {
+  function selectOption(callback, index) {
     setSelectedIndex(index);
     onClose();
-    onSelect(options[index]);
+    if (callback) callback(options[index]);
   }
 
   return (
@@ -47,15 +50,20 @@ const ToolDropdown = ({ options, active, disabled, onSelect, isOpen, onClose, on
         label={options[selectedIndex].label}
         active={active}
         disabled={disabled}
-        onClick={() => changeIndex(selectedIndex)}
+        onClick={() => selectOption(onMainClick, selectedIndex)}
       />
       <ToolButton className="toolDropdown__toggle" active={active} disabled={disabled} onClick={onToggle}>
-        <img className="toolDropdown__arrow" src={selectIcon} alt="select" />
+        <img className="toolDropdown__arrow" src={selectIcon} alt={toggleLabel} />
       </ToolButton>
       {isOpen && (
         <div className="toolDropdown__menu">
           {options.map((item, index) => (
-            <button type="button" className="toolDropdown__option" key={item.value} onClick={() => changeIndex(index)}>
+            <button
+              type="button"
+              className="toolDropdown__option"
+              key={item.value}
+              onClick={() => selectOption(onSelect, index)}
+            >
               <img className="toolDropdown__optionImg" src={item.icon} alt="" />
               <span>{item.label}</span>
             </button>

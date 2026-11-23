@@ -1,0 +1,27 @@
+@use '@/styles/color' as colors;
+
+// 畫圖、移動模式時，讓滑鼠穿過圖形：游標才會顯示畫布的設定 (crosshair、grab)，按下時也不會點到圖形
+// 圖形元件沒有 class 且元件自己的 pointerEvents 屬性會蓋過繼承的值，所以用 * 直接選取每個子元素
+@mixin canvas-ignore-shapes {
+  svg * {
+    pointer-events: none;
+  }
+}
+
+.canvas {
+  position: relative;
+  box-shadow: 0 0 5px colors.$canvas-shadow;
+  background-color: colors.$white;
+  touch-action: none;
+}
+.canvas--drawing {
+  cursor: crosshair;
+  @include canvas-ignore-shapes;
+}
+.canvas--moving {
+  cursor: grab;
+  @include canvas-ignore-shapes;
+}
+.canvas--panning {
+  cursor: grabbing;
+}

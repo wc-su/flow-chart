@@ -23,8 +23,8 @@ React 19 · Vite · Redux Toolkit + redux-undo · React Router v7 · Firebase ·
   - 元件本身的區塊直接用元件名稱 (`Header.jsx` → `header`)；頁面專用的區塊、元件裡拆出來的區塊，加上所屬的頁面或元件名稱當前綴，用 `-` 連接 (`home-hero`、`header-menu`)
   - `-` 只用在前綴和區塊之間
   - `@keyframes` 名稱也是全域的，用區塊名稱開頭 (`header-logo`)
-- 程式碼註解、測試名稱的標點：括號固定用半形 `()`；冒號前面是中文用全形 `：`，
-  前面不是中文 (英文、`)` 等) 用半形 `:`；中英文之間加空格
+- 資料夾命名：代表某個元件、頁面或功能的用大寫開頭，和主檔案同名 (`Header/Header.jsx`)；分類用的資料夾用小寫 (`components`、`shapes`、`images`)
+- 程式碼註解、測試名稱的標點：括號固定用半形 `()`；冒號前面是中文用全形 `：`，前面不是中文 (英文、`)` 等) 用半形 `:`；中英文之間加空格
 
 ## 測試
 
@@ -33,7 +33,8 @@ React 19 · Vite · Redux Toolkit + redux-undo · React Router v7 · Firebase ·
 
 ## 資料與狀態 (遷移中確認的規則，陸續補充)
 
-- 座標：`x`、`y` 一律是 start、end 中比較小的 (左上角)，`width`、`height` 一律是正數。
+- 座標：`x`、`y` 一律是 start、end 中比較小的 (左上角)，`width`、`height` 一律是正數
 - 畫圖中、縮放中 start 可能比 end 大；放開滑鼠 (`endDraw`) 後，flowline 以外會整理成 start 左上、end 右下，flowline 保留畫的方向 (箭頭)
-- redux-undo 的 filter 只收 `init`、`deleteShape`、`endDraw`；`draw`、`changeShape`
-  是過程中的即時更新、`clear` 放進去會讓清空可以被 undo，都不能放進 filter
+- 畫圖、拖曳、縮放時，移動不到 4px (螢幕座標) 當作點一下，畫圖不建立圖形、保留工具；拖曳、縮放不改變圖形、不寫入歷史。畫圖、縮放時，一般圖形的寬高、flowline 的長度最小撐到 24，超出畫布時往另一側撐
+- redux-undo 的 filter 只收 `init`、`deleteShape`、`endDraw`；`draw`、`moveShape`、`resizeShape` 是過程中的即時更新、`normalizeShape` 更新圖形，但不記入歷史、`clear` 放進去會讓清空可以被 undo，都不能放進 filter
+- undo、redo 一律用 `undoChart`、`redoChart`，不直接 dispatch `ActionCreators.undo()`、`redo()`：改變了誰就選誰，圖形消失就不選

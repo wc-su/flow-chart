@@ -1,30 +1,41 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import { isMobile } from 'react-device-detect';
+import { saveSvgAsPng } from 'save-svg-as-png';
 
-import CanvasToolBar from './components/CanvasToolBar';
-import Canvas from './components/Canvas';
-import ToolProvider from './components/Tool/ToolProvider';
 import { USER_STATUS } from '@/redux/userSlice';
+import CanvasToolBar from './components/CanvasToolBar/CanvasToolBar';
+import Canvas from './components/Canvas/Canvas';
+import ToolProvider from './components/Tool/ToolProvider';
 
 import './Chart.scss';
 
 const MIN_ZOOM = 50;
-const MAX_ZOOM = 500;
+const MAX_ZOOM = 300;
 const ZOOM_STEP = 10;
 
 const Chart = () => {
+  const canvasRef = useRef(null);
+
   const [zoom, setZoom] = useState(100);
   const [title, setTitle] = useState('');
+  const [isExporting, setIsExporting] = useState(false);
 
   const { status } = useSelector((state) => state.user);
   const isLoggedIn = status === USER_STATUS.LOGGED_IN;
 
   function handleUpload() {}
 
-  function handleExport() {
-    // 之後調整，記得帶入參數 format: handleExport(format)
+  function handleExport(format) {
+    setIsExporting(true);
+    const options = { scale: 100 / zoom };
+    if (format === 'jpg') {
+      options.encoderType = 'image/jpeg';
+      options.encoderOptions = 1;
+      options.backgroundColor = '#fff';
+    }
+    saveSvgAsPng(canvasRef.current, title ? title : '未命名', options).finally(() => setIsExporting(false));
   }
 
   function handleZoomIn() {
@@ -60,7 +71,7 @@ const Chart = () => {
             onExport={handleExport}
           />
           <div className="chart__main">
-            <Canvas />
+            <Canvas canvasRef={canvasRef} zoom={zoom} isExporting={isExporting} />
           </div>
         </ToolProvider>
       )}
