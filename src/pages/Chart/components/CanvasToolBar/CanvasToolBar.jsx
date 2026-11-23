@@ -136,7 +136,6 @@ const CanvasToolBar = ({
           options={SAVE_OPTIONS}
           disabled={isMobile}
           onMainClick={(option) => onExport(option.value)}
-          onSelect={(option) => onExport(option.value)}
           isOpen={openDropdown === 'save'}
           onClose={() => setOpenDropdown(null)}
           onToggle={() => handleToggleDropdown('save')}

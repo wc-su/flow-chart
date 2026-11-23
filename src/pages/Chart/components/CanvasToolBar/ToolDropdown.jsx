@@ -39,7 +39,7 @@ const ToolDropdown = ({ options, active, disabled, onMainClick, onSelect, isOpen
   function selectOption(callback, index) {
     setSelectedIndex(index);
     onClose();
-    callback(options[index]);
+    if (callback) callback(options[index]);
   }
 
   return (
