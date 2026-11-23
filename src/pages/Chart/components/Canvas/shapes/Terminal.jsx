@@ -12,7 +12,7 @@ const Terminal = ({ shape, newRate }) => {
       fill={fill}
       fillOpacity={fillOpacity}
       stroke={stroke}
-      strokeWidth={strokeWidth}
+      strokeWidth={strokeWidth * newRate}
       pointerEvents={pointerEvents}
     ></rect>
   );

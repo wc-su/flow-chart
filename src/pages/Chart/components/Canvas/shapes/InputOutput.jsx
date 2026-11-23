@@ -14,7 +14,7 @@ const InputOutput = ({ shape, newRate }) => {
       fill={fill}
       fillOpacity={fillOpacity}
       stroke={stroke}
-      strokeWidth={strokeWidth}
+      strokeWidth={strokeWidth * newRate}
       strokeMiterlimit={strokeMiterlimit}
       pointerEvents={pointerEvents}
     ></path>

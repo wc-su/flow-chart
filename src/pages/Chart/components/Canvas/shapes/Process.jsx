@@ -11,7 +11,7 @@ const Process = ({ shape, newRate }) => {
       fill={fill}
       fillOpacity={fillOpacity}
       stroke={stroke}
-      strokeWidth={strokeWidth}
+      strokeWidth={strokeWidth * newRate}
       strokeDasharray={strokeDasharray}
       pointerEvents={pointerEvents}
     ></rect>

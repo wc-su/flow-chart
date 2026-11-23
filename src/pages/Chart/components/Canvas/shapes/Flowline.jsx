@@ -16,7 +16,7 @@ const Flowline = ({ shape, newRate }) => {
   return (
     <>
       {/* 1. 看得到的線：負責顯示，不接收滑鼠 */}
-      <path d={lineD} stroke={stroke} strokeWidth={strokeWidth} pointerEvents="none"></path>
+      <path d={lineD} stroke={stroke} strokeWidth={strokeWidth * newRate} pointerEvents="none"></path>
       {/* 2. 看不到的線：透明、比較粗，負責接收滑鼠 */}
       <path
         d={lineD}
@@ -32,7 +32,7 @@ const Flowline = ({ shape, newRate }) => {
           } L ${arrowX2 * newRate} ${arrowY2 * newRate} Z`}
           fill={stroke}
           stroke={stroke}
-          strokeWidth={strokeWidth}
+          strokeWidth={strokeWidth * newRate}
           pointerEvents={pointerEvents}
         ></path>
       )}
