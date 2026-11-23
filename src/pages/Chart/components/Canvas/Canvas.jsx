@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useSelector, useDispatch, useStore } from 'react-redux';
 import clsx from 'clsx';
 
@@ -35,9 +35,12 @@ const Canvas = ({ zoom }) => {
   const store = useStore();
 
   const drawStatus = useRef(DRAW_STATUS.IDLE);
-  // 按下時的資料：畫圖存滑鼠位置、拖曳和縮放存圖形和滑鼠位置
+  // 按下時的資料：畫圖存滑鼠位置、拖曳和縮放存圖形和滑鼠位置、畫布拖曳存畫布位置和滑鼠位置
   const pointerDownData = useRef({});
   const hasMoved = useRef(false);
+
+  const [offset, setOffset] = useState({ top: 0, left: 0 });
+  const [isPanning, setIsPanning] = useState(false);
 
   const { tool, setTool } = useTool();
 
@@ -68,6 +71,16 @@ const Canvas = ({ zoom }) => {
         rate: newRate,
       });
       dispatch(chartActions.startDraw(position.x, position.y, tool));
+    } else if (isMoveTool) {
+      drawStatus.current = DRAW_STATUS.PANNING;
+      hasMoved.current = false;
+      setIsPanning(true);
+      pointerDownData.current = {
+        top: offset.top,
+        left: offset.left,
+        clientX: e.clientX,
+        clientY: e.clientY,
+      };
     }
   }
 
@@ -117,6 +130,13 @@ const Canvas = ({ zoom }) => {
           })
         )
       );
+    } else if (drawStatus.current === DRAW_STATUS.PANNING) {
+      const distanceX = e.clientX - pointerDownData.current.clientX;
+      const distanceY = e.clientY - pointerDownData.current.clientY;
+      setOffset({
+        top: pointerDownData.current.top + distanceY,
+        left: pointerDownData.current.left + distanceX,
+      });
     }
   }
 
@@ -130,7 +150,6 @@ const Canvas = ({ zoom }) => {
       } else {
         dispatch(chartActions.cancelDraw());
       }
-      drawStatus.current = DRAW_STATUS.IDLE;
     } else if (drawStatus.current === DRAW_STATUS.DRAGGING) {
       const latest = selectShapes(store.getState());
       const { id } = pointerDownData.current.shape;
@@ -142,7 +161,6 @@ const Canvas = ({ zoom }) => {
       ) {
         dispatch(chartActions.endDraw({ id }));
       }
-      drawStatus.current = DRAW_STATUS.IDLE;
     } else if (drawStatus.current === DRAW_STATUS.RESIZING) {
       const latestShapes = selectShapes(store.getState());
       const initShape = pointerDownData.current.shape;
@@ -155,9 +173,10 @@ const Canvas = ({ zoom }) => {
       } else {
         dispatch(chartActions.endDraw({ id }));
       }
-
-      drawStatus.current = DRAW_STATUS.IDLE;
+    } else if (drawStatus.current === DRAW_STATUS.PANNING) {
+      setIsPanning(false);
     }
+    drawStatus.current = DRAW_STATUS.IDLE;
   }
 
   function handleShapePointerDown(e, shape) {
@@ -192,10 +211,15 @@ const Canvas = ({ zoom }) => {
 
   return (
     <div
-      className={clsx('canvas', isMoveTool && 'canvas--moving', isDrawTool && 'canvas--drawing')}
+      className={clsx(
+        'canvas',
+        isMoveTool && 'canvas--moving',
+        isDrawTool && 'canvas--drawing',
+        isPanning && 'canvas--panning'
+      )}
       style={{
-        top: 0,
-        left: 0,
+        top: offset.top,
+        left: offset.left,
         width: CANVAS_WIDTH * newRate,
         height: CANVAS_HEIGHT * newRate,
       }}
