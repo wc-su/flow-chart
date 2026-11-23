@@ -12,7 +12,7 @@ import ToolProvider from './components/Tool/ToolProvider';
 import './Chart.scss';
 
 const MIN_ZOOM = 50;
-const MAX_ZOOM = 500;
+const MAX_ZOOM = 300;
 const ZOOM_STEP = 10;
 
 const Chart = () => {
