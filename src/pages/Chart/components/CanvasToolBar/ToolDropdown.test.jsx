@@ -14,7 +14,7 @@ const renderDropdown = ({ isOpen }) => {
   const onClose = vi.fn();
   const onMainClick = vi.fn();
   const onSelect = vi.fn();
-  const props = { options: OPTIONS, onClose, onMainClick, onSelect, onToggle: vi.fn() };
+  const props = { options: OPTIONS, toggleLabel: '圖形選單', onClose, onMainClick, onSelect, onToggle: vi.fn() };
 
   const { rerender } = render(<ToolDropdown {...props} isOpen={isOpen} />);
   // 用同一組 props 重新渲染，只換 isOpen
@@ -35,7 +35,7 @@ describe('ToolDropdown', () => {
   it('打開時點箭頭，不呼叫 onClose', () => {
     const { onClose } = renderDropdown({ isOpen: true });
 
-    fireEvent.pointerDown(screen.getByAltText('select'));
+    fireEvent.pointerDown(screen.getByAltText('圖形選單'));
 
     expect(onClose).not.toHaveBeenCalled();
   });

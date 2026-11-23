@@ -6,7 +6,7 @@ import './ToolDropdown.scss';
 
 import selectIcon from './images/down.png';
 
-const ToolDropdown = ({ options, active, disabled, onMainClick, onSelect, isOpen, onClose, onToggle }) => {
+const ToolDropdown = ({ options, toggleLabel, active, disabled, onMainClick, onSelect, isOpen, onClose, onToggle }) => {
   const rootRef = useRef(null);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -53,7 +53,7 @@ const ToolDropdown = ({ options, active, disabled, onMainClick, onSelect, isOpen
         onClick={() => selectOption(onMainClick, selectedIndex)}
       />
       <ToolButton className="toolDropdown__toggle" active={active} disabled={disabled} onClick={onToggle}>
-        <img className="toolDropdown__arrow" src={selectIcon} alt="select" />
+        <img className="toolDropdown__arrow" src={selectIcon} alt={toggleLabel} />
       </ToolButton>
       {isOpen && (
         <div className="toolDropdown__menu">

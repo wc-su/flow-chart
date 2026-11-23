@@ -87,6 +87,7 @@ const CanvasToolBar = ({
         />
         <ToolDropdown
           options={DRAW_OPTIONS}
+          toggleLabel="圖形選單"
           active={DRAW_OPTIONS.some((option) => option.value === tool)}
           disabled={isMobile}
           onMainClick={(option) => setTool(tool === option.value ? null : option.value)}
@@ -134,6 +135,7 @@ const CanvasToolBar = ({
         />
         <ToolDropdown
           options={SAVE_OPTIONS}
+          toggleLabel="匯出選單"
           disabled={isMobile}
           onMainClick={(option) => onExport(option.value)}
           isOpen={openDropdown === 'save'}
